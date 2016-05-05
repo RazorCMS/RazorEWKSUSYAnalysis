@@ -1,0 +1,7 @@
+gammaJet	/Users/cmorgoth/Software/git/RazorFramework/HggRazor/Selection/histos/HighPt/HighPt_gammaJet.root
+diphoton        /Users/cmorgoth/Software/git/RazorFramework/HggRazor/Selection/histos/HighPt/HighPt_diphoton.root
+ggH		/Users/cmorgoth/Software/git/RazorFramework/HggRazor/Selection/histos/HighPt/HighPt_ggH.root
+ttH		/Users/cmorgoth/Software/git/RazorFramework/HggRazor/Selection/histos/HighPt/HighPt_tth.root
+vH		/Users/cmorgoth/Software/git/RazorFramework/HggRazor/Selection/histos/HighPt/HighPt_vH.root
+vbfH		/Users/cmorgoth/Software/git/RazorFramework/HggRazor/Selection/histos/HighPt/HighPt_vbfH.root
+data		/Users/cmorgoth/Software/git/RazorFramework/HggRazor/Selection/histos/HighPt/HighPt_data.root

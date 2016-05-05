@@ -1,0 +1,7 @@
+gammaJet	/Users/cmorgoth/Software/git/RazorFramework/HggRazor/Selection/histos/Hbb/Hbb_gammaJet.root
+diphoton        /Users/cmorgoth/Software/git/RazorFramework/HggRazor/Selection/histos/Hbb/Hbb_diphoton.root
+ggH		/Users/cmorgoth/Software/git/RazorFramework/HggRazor/Selection/histos/Hbb/Hbb_ggH.root
+ttH		/Users/cmorgoth/Software/git/RazorFramework/HggRazor/Selection/histos/Hbb/Hbb_tth.root
+vH		/Users/cmorgoth/Software/git/RazorFramework/HggRazor/Selection/histos/Hbb/Hbb_vH.root
+vbfH		/Users/cmorgoth/Software/git/RazorFramework/HggRazor/Selection/histos/Hbb/Hbb_vbfH.root
+data 		/Users/cmorgoth/Software/git/RazorFramework/HggRazor/Selection/histos/Hbb/Hbb_data.root

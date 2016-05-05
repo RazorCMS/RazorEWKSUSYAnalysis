@@ -1,0 +1,4 @@
+data /Users/cmorgoth/Work/git/RazorFramework/HggRazor/PlottingAndSystematic/lists/imac_caltech/DataHighMass.list
+gammaJet /Users/cmorgoth/Work/git/RazorFramework/HggRazor/PlottingAndSystematic/lists/imac_caltech/GJetsHighMass.list
+diphoton /Users/cmorgoth/Work/git/RazorFramework/HggRazor/PlottingAndSystematic/lists/imac_caltech/DiphotonHighMass.list
+qcd	 /Users/cmorgoth/Work/git/RazorFramework/HggRazor/PlottingAndSystematic/lists/imac_caltech/QCDHighMass.list
