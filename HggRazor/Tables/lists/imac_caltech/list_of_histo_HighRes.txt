@@ -1,0 +1,5 @@
+gammaJet	/Users/cmorgoth/Work/git/RazorFramework/HggRazor/Selection/histos/HighRes/HighRes_gammaJet.root
+ggH		/Users/cmorgoth/Work/git/RazorFramework/HggRazor/Selection/histos/HighRes/HighRes_ggH.root
+ttH		/Users/cmorgoth/Work/git/RazorFramework/HggRazor/Selection/histos/HighRes/HighRes_tth.root
+vH		/Users/cmorgoth/Work/git/RazorFramework/HggRazor/Selection/histos/HighRes/HighRes_vH.root
+vbfH		/Users/cmorgoth/Work/git/RazorFramework/HggRazor/Selection/histos/HighRes/HighRes_vbfH.root

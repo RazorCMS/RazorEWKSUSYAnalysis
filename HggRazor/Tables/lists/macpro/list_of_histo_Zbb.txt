@@ -1,0 +1,5 @@
+gammaJet	/Users/cmorgoth/Work/git/RazorFramework/HggRazor/Selection/histos/Zbb/Zbb_gammaJet.root
+ggH		/Users/cmorgoth/Work/git/RazorFramework/HggRazor/Selection/histos/Zbb/Zbb_ggH.root
+ttH		/Users/cmorgoth/Work/git/RazorFramework/HggRazor/Selection/histos/Zbb/Zbb_tth.root
+vH		/Users/cmorgoth/Work/git/RazorFramework/HggRazor/Selection/histos/Zbb/Zbb_vH.root
+vbfH		/Users/cmorgoth/Work/git/RazorFramework/HggRazor/Selection/histos/Zbb/Zbb_vbfH.root

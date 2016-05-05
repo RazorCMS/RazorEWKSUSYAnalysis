@@ -1,0 +1,8 @@
+gammaJet	/Users/cmorgoth/Work/git/RazorFramework/HggRazor/Selection/lists/imac_caltech/gammaJet_8TeV.list
+diphoton        /Users/cmorgoth/Work/git/RazorFramework/HggRazor/Selection/lists/imac_caltech/diphoton_8TeV.list
+ggH		/Users/cmorgoth/Work/git/RazorFramework/HggRazor/Selection/lists/imac_caltech/ggH_13TeV.list
+ttH		/Users/cmorgoth/Work/git/RazorFramework/HggRazor/Selection/lists/imac_caltech/ttH_13TeV.list
+vH		/Users/cmorgoth/Work/git/RazorFramework/HggRazor/Selection/lists/imac_caltech/vH_13TeV.list
+vbfH		/Users/cmorgoth/Work/git/RazorFramework/HggRazor/Selection/lists/imac_caltech/vbfH_13TeV.list
+qcd		/Users/cmorgoth/Work/git/RazorFramework/HggRazor/Selection/lists/imac_caltech/qcd_8TeV.list
+data		/Users/cmorgoth/Work/git/RazorFramework/HggRazor/Selection/lists/imac_caltech/data_8TeV.list

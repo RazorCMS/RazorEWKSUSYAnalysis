@@ -1,0 +1,20 @@
+\begin{center}
+\captionof{table}{HighRes}
+\begin{tabular}{|c|c|}
+\hline
+process & yield \\ \hline
+$\gamma$ + jets & 74.21 $\pm$ 5.46 \\ \hline
+$\gamma\gamma$ + jets & 130.10 $\pm$ 9.01\\ \hline
+qcd & 49.71 $\pm$ 72.10\\ \hline
+non-resonant& 254.02 $\pm$ 72.86\\ \hline
+\hline
+$t\bar{t}-H$ & 0.29 $\pm$ 0.00\\ \hline
+$gg-H$ & 27.02 $\pm$ 0.37\\ \hline
+$W/Z-H$ & 1.70 $\pm$ 0.02\\ \hline
+$VBF-H$ &3.72 $\pm$ 0.04\\ \hline
+resonant& 32.73 $\pm$ 0.37\\ \hline
+\hline
+total MC & 286.75 $\pm$ 72.86\\ \hline
+observed &0.00\\ \hline
+\end{tabular}
+\end{center}

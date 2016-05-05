@@ -1,0 +1,20 @@
+\begin{center}
+\captionof{table}{HighPt}
+\begin{tabular}{|c|c|}
+\hline
+process & yield \\ \hline
+$\gamma$ + jets & 17.45 $\pm$ 2.64 \\ \hline
+$\gamma\gamma$ + jets & 24.35 $\pm$ 4.03\\ \hline
+qcd & 19.12 $\pm$ 44.71\\ \hline
+non-resonant& 60.92 $\pm$ 44.97\\ \hline
+\hline
+$t\bar{t}-H$ & 0.46 $\pm$ 0.01\\ \hline
+$gg-H$ & 5.79 $\pm$ 0.17\\ \hline
+$W/Z-H$ & 1.06 $\pm$ 0.02\\ \hline
+$VBF-H$ &1.54 $\pm$ 0.03\\ \hline
+resonant& 8.85 $\pm$ 0.17\\ \hline
+\hline
+total MC & 69.77 $\pm$ 44.97\\ \hline
+observed &0.00\\ \hline
+\end{tabular}
+\end{center}

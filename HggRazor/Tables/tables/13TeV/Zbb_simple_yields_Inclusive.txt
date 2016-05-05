@@ -1,0 +1,17 @@
+\begin{center}
+\captionof{table}{Zbb}
+\begin{tabular}{|c|c|}
+\hline
+process & yield \\ \hline
+non-resonant& 0.44 $\pm$ 0.49\\ \hline
+\hline
+$t\bar{t}-H$ & 0.07 $\pm$ 0.00\\ \hline
+$gg-H$ & 0.04 $\pm$ 0.01\\ \hline
+$W/Z-H$ & 0.02 $\pm$ 0.00\\ \hline
+$VBF-H$ &0.01 $\pm$ 0.00\\ \hline
+resonant& 0.14 $\pm$ 0.01\\ \hline
+\hline
+total MC & 0.57 $\pm$ 0.49\\ \hline
+observed &0.00\\ \hline
+\end{tabular}
+\end{center}

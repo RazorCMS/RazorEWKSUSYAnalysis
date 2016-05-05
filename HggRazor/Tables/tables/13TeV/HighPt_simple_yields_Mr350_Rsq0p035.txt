@@ -1,0 +1,17 @@
+\begin{center}
+\captionof{table}{HighPt}
+\begin{tabular}{|c|c|}
+\hline
+process & yield \\ \hline
+non-resonant& 4.53 $\pm$ 1.58\\ \hline
+\hline
+$t\bar{t}-H$ & 0.27 $\pm$ 0.00\\ \hline
+$gg-H$ & 1.61 $\pm$ 0.09\\ \hline
+$W/Z-H$ & 0.28 $\pm$ 0.01\\ \hline
+$VBF-H$ &0.35 $\pm$ 0.01\\ \hline
+resonant& 2.51 $\pm$ 0.09\\ \hline
+\hline
+total MC & 7.04 $\pm$ 1.58\\ \hline
+observed &0.00\\ \hline
+\end{tabular}
+\end{center}
