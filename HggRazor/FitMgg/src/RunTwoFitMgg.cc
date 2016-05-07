@@ -247,19 +247,40 @@ double GetIntegral( RooWorkspace& w, TString pdfName, TString mggName )
   return fIntegral2->getVal();
 };
 
-RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeSMH, TString mggName )
+RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeSMH, TString mggName, bool isHighMass )
 {
   //------------------------------------------------
   // C r e a t e   s i g n a l  s h a p e from TTree
   //------------------------------------------------
   //TFile* ftmp = new TFile("tmp_output_OurID.root", "recreate");
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
-  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 103, 160, "GeV" );
-  mgg.setBins(38);
-  mgg.setRange( "signal", 115, 135. );
-  mgg.setRange( "high", 135, 160);
-  mgg.setRange( "low", 103, 120);
-  mgg.setRange( "full", 103, 160 );
+  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 0, 10000, "GeV" );
+  if ( isHighMass )
+    {
+      //mgg = RooRealVar( mggName, "m_{#gamma#gamma}", 230, 1230, "GeV" );//HighMass
+      mgg.SetNameTitle( mggName, "m_{#gamma#gamma}" );
+      mgg.setMin( 230. );
+      mgg.setMax( 1230. );
+      mgg.setUnit( "GeV" );
+      mgg.setBins(200);
+      mgg.setRange( "signal", 500., 1000. );
+      mgg.setRange( "full", 230., 1230. );
+      mgg.setRange( "high", 850., 1230.);
+      mgg.setRange( "low", 230., 650.);
+    }
+  else
+    {
+      mgg.SetNameTitle( mggName, "m_{#gamma#gamma}" );
+      mgg.setMin( 103. );
+      mgg.setMax( 160. );
+      mgg.setUnit( "GeV" );
+      mgg.setBins(38);
+      mgg.setRange( "signal", 115, 135. );
+      mgg.setRange( "high", 135., 160. );
+      mgg.setRange( "low", 103., 120. );
+      mgg.setRange( "full", 103., 160. );
+    }
+
   //--------------------------------
   //I m p or t i n g   D a t a
   //--------------------------------
@@ -269,7 +290,7 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   //C r e a t e  doubleGaus
   //-----------------------
   bool sameMu = false;
-  TString tagSignal, tagSMH;
+  TString tagSignal, tagSignal2, tagSMH;
   TString tag;
   RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import(*treeData) );
   RooDataSet dataSignal( "dataSignal", "", RooArgSet(mgg), RooFit::Import(*treeSignal) );
@@ -282,19 +303,50 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
     {
       tagSignal = MakeDoubleGauss( "dGauss_signal", mgg, *ws );
       ws->var("dGauss_signal_gauss_Ns")->setVal( (double)npoints );
+      if ( isHighMass ) ws->var("dGauss_signal_gauss_mu")->setVal(750);
     }
   else
     {
       tagSignal = MakeFullDoubleGauss( "dGauss_signal", mgg, *ws );
-      ws->var("dGauss_signal_DG_Ns")->setVal( (double)npoints );
+      tagSignal2 = MakeDoubleCB( "DCB_signal", mgg, *ws );
+      ws->var("DCB_signal_DCB_Ns")->setVal( (double)npoints );
+      if ( isHighMass )
+	{
+	  ws->var("dGauss_signal_DG_mu1")->setVal( 750 );
+	  ws->var("dGauss_signal_DG_mu2")->setVal( 750 );
+	  ws->var("DCB_signal_DCB_muCB")->setVal( 750 );
+	  ws->var("DCB_signal_DCB_sigmaCB")->setVal( 10 );
+	}
     }
-  RooFitResult* sres = ws->pdf( tagSignal )->fitTo( dataSignal, RooFit::Strategy(2), RooFit::Extended( kTRUE ), RooFit::Save( kTRUE ), RooFit::Range("full") );
+
+  RooFitResult* sres = ws->pdf( tagSignal2 )->fitTo( dataSignal, RooFit::Strategy(2), RooFit::Extended( kTRUE ), RooFit::Save( kTRUE ), RooFit::Range("signal") );
   double gausFrac   =  ws->var("dGauss_signal_DG_frac")->getVal();
   double gausMu1    =  ws->var("dGauss_signal_DG_mu1")->getVal();
   double gausMu2    =  ws->var("dGauss_signal_DG_mu2")->getVal();
   double gausSigma1 =  ws->var("dGauss_signal_DG_sigma1")->getVal();
   double gausSigma2 =  ws->var("dGauss_signal_DG_sigma2")->getVal();
 
+  double cbMu    =  ws->var("DCB_signal_DCB_muCB")->getVal();
+  double cbSigma =  ws->var("DCB_signal_DCB_sigmaCB")->getVal();
+  double cbN1    =  ws->var("DCB_signal_DCB_n1")->getVal();
+  double cbN2    =  ws->var("DCB_signal_DCB_n2")->getVal();
+  double cbA1    =  ws->var("DCB_signal_DCB_alpha1")->getVal();
+  double cbA2    =  ws->var("DCB_signal_DCB_alpha2")->getVal();
+
+  //Saving Signal Fit
+  sres->SetName("SignalFitResult");
+  ws->import( *sres );
+  
+  //-----------------------------
+  //S i g n a l   p l o t t i n g
+  //-----------------------------
+  RooPlot *fmgg2 = mgg.frame( 450, 1050, 120);
+  dataSignal.plotOn( fmgg2, RooFit::Range("signal") );
+  ws->pdf( tagSignal2 )->plotOn( fmgg2, RooFit::LineColor(kRed), RooFit::Range("signal"), RooFit::NormRange("signal"));
+  //ws->pdf( tagSignal )->plotOn(fmgg2, RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
+  fmgg2->SetName( "signalFitPlot" );
+  ws->import( *fmgg2 );
+  //return ws;
   //-------------------------------------
   //D e f i n e   S M - H i g g s   P D F
   //-------------------------------------
@@ -303,13 +355,19 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
     {
       tagSMH = MakeDoubleGauss( "dGauss_SMH", mgg, *ws );
       ws->var("dGauss_SMH_gauss_Ns")->setVal( (double)npoints );
+      if ( isHighMass ) ws->var("dGauss_SMH_gauss_mu")->setVal( 750 );
     }
   else
     {
       tagSMH = MakeFullDoubleGauss( "dGauss_SMH", mgg, *ws );
       ws->var("dGauss_SMH_DG_Ns")->setVal( (double)npoints );
+      if ( isHighMass )
+	{
+	  ws->var("dGauss_SMH_DG_mu1")->setVal( 750 );
+	  ws->var("dGauss_SMH_DG_mu2")->setVal( 750 );
+	}
     }
-  RooFitResult* smhres = ws->pdf( tagSMH )->fitTo( dataSMH, RooFit::Strategy(2), RooFit::Extended( kTRUE ), RooFit::Save( kTRUE ), RooFit::Range("full") );
+  //RooFitResult* smhres = ws->pdf( tagSMH )->fitTo( dataSMH, RooFit::Strategy(2), RooFit::Extended( kTRUE ), RooFit::Save( kTRUE ), RooFit::Range("full") );
   double gausFrac_SMH   =  ws->var("dGauss_SMH_DG_frac")->getVal();
   double gausMu1_SMH    =  ws->var("dGauss_SMH_DG_mu1")->getVal();
   double gausMu2_SMH    =  ws->var("dGauss_SMH_DG_mu2")->getVal();
@@ -321,9 +379,28 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   //------------------------------------
   
   TString tag_bkg = MakeSingleExp( "fullsb_fit_singleExp", mgg, *ws );
+  TString tag_bkg_hm;
   RooFitResult* bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
   npoints     = ws->var("fullsb_fit_singleExp_Nbkg")->getVal();
   float exp_a = ws->var("fullsb_fit_singleExp_a")->getVal();
+
+  //high mass parameter to obtain after fit
+  float hm_a, hm_b;
+  
+  if ( isHighMass )
+    {
+      tag_bkg_hm = MakeHMDiphoton( "ext_DHM_pdf", mgg, *ws );
+      RooFitResult* bresHM = ws->pdf( tag_bkg_hm )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+      hm_a = ws->var("ext_DHM_pdf_a")->getVal();
+      hm_b = ws->var("ext_DHM_pdf_b")->getVal();
+      bresHM->SetName("FitResultHM");
+      ws->import( *bresHM );
+      RooPlot* hmPlot = mgg.frame( 230, 1230, 50 );
+      data.plotOn( hmPlot );
+      ws->pdf( tag_bkg_hm )->plotOn( hmPlot, RooFit::NormRange("full"), RooFit::Range("full"), RooFit::LineColor( kRed ) );
+      hmPlot->SetName("FitPlotHM");
+      ws->import( *hmPlot );
+    }
   //creating blinded dataset
   //RooDataSet* data_toys  = GenerateToys( ws->pdf( tag_bkg ), mgg, npoints);
   //RooDataSet* data_toys  = ws->pdf( tag_bkg )->generate(mgg, npoints, kFALSE, kTRUE, "", kTRUE, kFALSE);
@@ -334,40 +411,17 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   //---------------------------
   //bkg_pdf for composite model
   //---------------------------
-  TString tag_bkg2 = MakeSingleExpNE( "BkgModel", mgg, *ws );
-  ws->var("BkgModel_sExp_a")->setVal( exp_a );
+  TString tag_bkg2 = MakeSingleExpNE( "BkgModelExp", mgg, *ws );
+  ws->var("BkgModelExp_sExp_a")->setVal( exp_a );
+  //HighMass Function
+  TString tag_bkg3 = MakeHMDiphotonNE( "BkgModelHM", mgg, *ws );
+  ws->var("BkgModelHM_a")->setVal( hm_a );
+  ws->var("BkgModelHM_b")->setVal( hm_b );
+  
   //-----------------------------------------
   //Define double gaussian for signal and SMH
   //-----------------------------------------
   TString tag_signal2 = MakeFullDoubleGaussNE( "DG_Signal", mgg, *ws );
-  TString tag_sg      = MakeSingleGaussNE( "Signal", mgg, *ws );
-  TString tag_SMH2    = MakeFullDoubleGaussNE( "DG_SMH", mgg, *ws );
-
-  std::cout << "creating s+b model" << std::endl;
-  //---------------
-  //S+B  m  o d e l
-  //---------------
-  //falling background + SM-Higgs + Signal
-  //RooAddPdf* model = new RooAddPdf( "model", "model", RooArgList( *ws->pdf( tag_signal2 ), *ws->pdf( tag_SMH2 ), *ws->pdf( tag_bkg2 ) ) ) ;
-  //RooAddPdf* model = new RooAddPdf( "model", "model", RooArgSet( *ws->pdf( tag_signal2 ), *ws->pdf( tag_bkg2 ) ) ) ;
-  //RooAddPdf* model = new RooAddPdf( "model", "model", RooArgSet( *ws->pdf( tag_bkg2 ), *ws->pdf( tag_sg ) ) ) ;
-  RooRealVar NbkgModel("NbkgModel","", npoints);
-  NbkgModel.setConstant( kFALSE );
-  RooRealVar NsModel("NsModel","",0.0);
-  NsModel.setConstant( kFALSE );
-  RooAddPdf* model = new RooAddPdf( "model", "model", RooArgSet( *ws->pdf( tag_bkg2 ), *ws->pdf( tag_sg ) ), RooArgSet(NbkgModel, NsModel) ) ;
-  
-  //SIGNAL
-  NsModel.setRange(0, 1000.);
-  ws->var("Signal_SG_mu")->setVal( gausMu1 );
-  ws->var("Signal_SG_sigma")->setVal( gausSigma1 );
-  //ws->var("Signal_SG_mu")->setConstant( kTRUE );
-  ws->var("Signal_SG_sigma")->setConstant( kTRUE );
-
-
-  //set intitial values for signal parameters
-  //ws->var("DG_Signal_DG_Ns")->setVal( 15 );
-  //ws->var("DG_Signal_DG_Ns")->setRange( 0, 200 );
   ws->var("DG_Signal_DG_frac")->setVal( gausFrac );
   ws->var("DG_Signal_DG_mu1")->setVal( gausMu1 );
   ws->var("DG_Signal_DG_mu2")->setVal( gausMu2 );
@@ -379,10 +433,30 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   ws->var("DG_Signal_DG_mu2")->setConstant(kTRUE);
   ws->var("DG_Signal_DG_sigma1")->setConstant(kTRUE);
   ws->var("DG_Signal_DG_sigma2")->setConstant(kTRUE);
-  //SM-Higgs
-  //set intitial value for SM-Higgs parameters
-  //ws->var("DG_SMH_DG_Ns")->setVal( 0.5 );
-  //ws->var("DG_SMH_DG_Ns")->setMin( "", 0.0 );
+  
+  TString tag_sg      = MakeSingleGaussNE( "Signal", mgg, *ws );
+  ws->var("Signal_SG_mu")->setVal( gausMu1 );
+  ws->var("Signal_SG_sigma")->setVal( gausSigma2 );
+  //ws->var("Signal_SG_mu")->setConstant( kTRUE );
+  ws->var("Signal_SG_sigma")->setConstant( kTRUE );
+  
+  TString tag_sDCB    = MakeDoubleCBNE( "smodel", mgg, *ws );
+  //Signal DoubleCB
+  ws->var("smodel_DCB_muCB")->setVal( cbMu );
+  ws->var("smodel_DCB_sigmaCB")->setVal( cbSigma );
+  ws->var("smodel_DCB_n1")->setVal( cbN1 );
+  ws->var("smodel_DCB_n2")->setVal( cbN2 );
+  ws->var("smodel_DCB_alpha1")->setVal( cbA1 );
+  ws->var("smodel_DCB_alpha2")->setVal( cbA2 );
+  //ws->var("smodel_DCB_muCB")->setConstant(kTRUE);
+  ws->var("smodel_DCB_sigmaCB")->setConstant(kTRUE);
+  ws->var("smodel_DCB_n1")->setConstant(kTRUE);
+  ws->var("smodel_DCB_n2")->setConstant(kTRUE);
+  ws->var("smodel_DCB_alpha1")->setConstant(kTRUE);
+  ws->var("smodel_DCB_alpha2")->setConstant(kTRUE);
+  std::cout << "pass doubleCB setup" << std::endl;
+
+  TString tag_SMH2    = MakeFullDoubleGaussNE( "DG_SMH", mgg, *ws );
   ws->var("DG_SMH_DG_frac")->setVal( gausFrac_SMH );
   ws->var("DG_SMH_DG_mu1")->setVal( gausMu1_SMH );
   ws->var("DG_SMH_DG_mu2")->setVal( gausMu2_SMH );
@@ -394,7 +468,41 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   ws->var("DG_SMH_DG_mu2")->setConstant(kTRUE);
   ws->var("DG_SMH_DG_sigma1")->setConstant(kTRUE);
   ws->var("DG_SMH_DG_sigma2")->setConstant(kTRUE);
+  
+  std::cout << "creating s+b model" << std::endl;
+  //---------------
+  //S+B  m  o d e l
+  //---------------
+  //falling background + SM-Higgs + Signal
+  //RooAddPdf* model = new RooAddPdf( "model", "model", RooArgList( *ws->pdf( tag_signal2 ), *ws->pdf( tag_SMH2 ), *ws->pdf( tag_bkg2 ) ) ) ;
+  //RooAddPdf* model = new RooAddPdf( "model", "model", RooArgSet( *ws->pdf( tag_signal2 ), *ws->pdf( tag_bkg2 ) ) ) ;
+  //RooAddPdf* model = new RooAddPdf( "model", "model", RooArgSet( *ws->pdf( tag_bkg2 ), *ws->pdf( tag_sg ) ) ) ;
+  RooRealVar NbkgModel("NbkgModel","", npoints);
+  NbkgModel.setConstant( kFALSE );
 
+  RooRealVar NsModel("NsModel","",0.0);
+  NsModel.setConstant( kFALSE );
+  NsModel.setRange(0, 1000.);
+  
+  RooAddPdf* model = new RooAddPdf( "model", "model", RooArgSet( *ws->pdf( tag_bkg2 ), *ws->pdf( tag_sDCB ) ), RooArgSet(NbkgModel, NsModel) ) ;
+  if ( isHighMass )
+    {
+      RooAddPdf* modelHM = new RooAddPdf( "modelHM", "modelHM", RooArgSet( *ws->pdf( tag_bkg3 ), *ws->pdf( tag_sDCB ) ), RooArgSet(NbkgModel, NsModel) ) ;
+      RooFitResult* sbresHM = modelHM->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("full") );
+      RooPlot* sbPlotHM = mgg.frame( 230., 1230., 50 );
+      data.plotOn( sbPlotHM );
+      modelHM->plotOn( sbPlotHM, RooFit::Components( *ws->pdf( tag_bkg3) ), RooFit::Range("full"), RooFit::NormRange("full"),
+		       RooFit::LineColor( kBlue ), RooFit::LineStyle( kDashed ) );
+       modelHM->plotOn( sbPlotHM, RooFit::Components( *ws->pdf( tag_sDCB) ), RooFit::Range("full"), RooFit::NormRange("full"),
+			RooFit::LineColor( kRed ), RooFit::LineStyle( kDashed ) );
+      modelHM->plotOn( sbPlotHM, RooFit::Range("full"), RooFit::NormRange("full"), RooFit::LineColor( kRed ) );
+      
+      sbPlotHM->SetName( "sbFitPlotHM" );
+      sbresHM->SetName( "sbFitResultHM" );
+      ws->import( *sbresHM );
+      ws->import( *sbPlotHM );
+    }
+  
   std::cout << "entering constraints" << std::endl;
   //--------------------------------------
   //H i g g s   C o n s t r a i n s
@@ -426,8 +534,8 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   TH1F* h_1 = new TH1F("h_1", "h_1", 100, 0, 10);
   RooFitResult* sbres;
   //sbres = model->fitTo( *data_toys, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("full") );
-  //sbres = model->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("full") );
-  sbres = model->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::ExternalConstraints(HiggsMass_Constraint) ,RooFit::Range("full") );
+  sbres = model->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("full") );
+  //sbres = model->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::ExternalConstraints(HiggsMass_Constraint) ,RooFit::Range("full") );
   
   
   for (int i = 0; i < 100; i++ )
@@ -482,11 +590,13 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   //E n d  M i n i m i z a t i o n
   //------------------------------
   
-  sbres->SetName("sb_fit_result");
+  sbres->SetName("sbFitResult");
+  ws->import( *sbres );
+
   //r->SetName("sb_fit_result_M2_migrad");
   //r2->SetName("sb_fit_result_M2_hesse");
   //r3->SetName("sb_fit_result_M2_minos");
-  ws->import( *sbres );
+  //
   //ws->import( *r );
   //ws->import( *r2 );
   //ws->import( *r3 );
@@ -495,7 +605,7 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   //-----------------------------
   //S + B   p l o t t i n g
   //-----------------------------
-  RooPlot *fmgg = mgg.frame();
+  RooPlot *fmgg = mgg.frame( 230, 1230, 50);
   data.plotOn(fmgg);
   //data_toys->plotOn(fmgg);
   model->plotOn(fmgg, RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("Full"));
@@ -503,23 +613,14 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   fmgg->SetName( "sb_fit_frame" );
   ws->import( *fmgg );
   
-  //-----------------------------
-  //S i g n a l   p l o t t i n g
-  //-----------------------------
-  RooPlot *fmgg2 = mgg.frame();
-  dataSignal.plotOn(fmgg2);
-  ws->pdf( tagSignal )->plotOn(fmgg2, RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("Full"));
-  ws->pdf( tagSignal )->plotOn(fmgg2, RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
-  fmgg2->SetName( "signal_fit_frame" );
-  ws->import( *fmgg2 );
-
+  
   //---------------------------------
   //S M - H i g g s   p l o t t i n g
   //---------------------------------
   RooPlot *fmgg3 = mgg.frame();
   dataSMH.plotOn(fmgg3);
-  ws->pdf( tagSMH )->plotOn(fmgg3, RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("Full"));
-  ws->pdf( tagSMH )->plotOn(fmgg3, RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
+  //ws->pdf( tagSMH )->plotOn(fmgg3, RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("Full"));
+  //ws->pdf( tagSMH )->plotOn(fmgg3, RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
   fmgg3->SetName( "smh_fit_frame" );
   ws->import( *fmgg3 );
   

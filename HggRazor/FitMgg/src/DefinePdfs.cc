@@ -281,6 +281,36 @@ TString MakeDoubleCB( TString tag, RooRealVar& mgg, RooWorkspace& w )
   return ex_pdf_name;
 };
 
+TString MakeDoubleCBNE( TString tag, RooRealVar& mgg, RooWorkspace& w )
+{
+  //------------------------------
+  //C r e a t e  V a r i a b l e s
+  //------------------------------
+  //DCB: Double Crystal Ball
+  RooRealVar* mu       = new RooRealVar( tag + "_DCB_muCB", "#mu_{CB}", 125, "" );
+  RooRealVar* sigma    = new RooRealVar( tag + "_DCB_sigmaCB", "#sigma_{CB}", 1.1, "" );
+  RooRealVar* alpha1   = new RooRealVar( tag  + "_DCB_alpha1", "#alpha_{1}", 1.5, "" );
+  RooRealVar* alpha2   = new RooRealVar( tag  + "_DCB_alpha2", "#alpha_{2}", 2.8, "" );
+  RooRealVar* n1       = new RooRealVar( tag  + "_DCB_n1", "#n_{1}", 3.6, "" );
+  RooRealVar* n2       = new RooRealVar( tag  + "_DCB_n2", "#n_{2}", 1.0, "" );
+  mu->setConstant(kFALSE);
+  sigma->setConstant(kFALSE);
+  alpha1->setConstant(kFALSE);
+  alpha1->setRange(0, 100);
+  alpha2->setConstant(kFALSE);
+  alpha2->setRange(0, 100);
+  n1->setConstant(kFALSE);
+  n1->setRange(0, 100);
+  n2->setConstant(kFALSE);
+  n2->setRange(0, 100);
+
+  TString pdf_name = tag + "_DCB";
+  RooDoubleCB* dCB = new RooDoubleCB( pdf_name , "", mgg, *mu, *sigma, *alpha1, *n1, *alpha2, *n2 );
+  w.import( *dCB );
+  
+  return pdf_name;
+};
+
 TString MakeDoubleExp(TString tag, RooRealVar& mgg, RooWorkspace& w)
 {
   //------------------------------
@@ -415,6 +445,38 @@ TString MakeSingleExpNE( TString tag, RooRealVar& mgg, RooWorkspace& w )
   TString pdfName = tag+"_sExp";
   RooExponential* se = new RooExponential( pdfName,"", mgg, *a);
   w.import( *se );
+  return pdfName;
+};
+
+TString MakeHMDiphoton( TString tag, RooRealVar& mgg, RooWorkspace& w )
+{
+  RooRealVar* a = new RooRealVar( tag + "_a", "", -0.06, "a.u"); 
+  a->setConstant(kFALSE);
+  RooRealVar* b = new RooRealVar( tag + "_b", "", -0.06, "a.u"); 
+  b->setConstant(kFALSE);
+
+  RooRealVar* Nbkg = new RooRealVar( tag + "_Nbkg","",10., "events");
+  Nbkg->setConstant(kFALSE);
+  
+  RooHMDiphoton* hmDiphoton = new RooHMDiphoton( tag + "_HMDiphoton", "", mgg, *a, *b );
+  
+  TString pdfName = tag + "_HMDiphoton_ext";
+  RooAddPdf* ext_HMDiphoton = new RooAddPdf( pdfName,"", RooArgList( *hmDiphoton ), RooArgList( *Nbkg ) );
+  w.import( *ext_HMDiphoton );
+  return pdfName;
+};
+
+TString MakeHMDiphotonNE( TString tag, RooRealVar& mgg, RooWorkspace& w )
+{
+  RooRealVar* a = new RooRealVar( tag + "_a", "", -0.06, "a.u"); 
+  a->setConstant(kFALSE);
+  RooRealVar* b = new RooRealVar( tag + "_b", "", -0.06, "a.u"); 
+  b->setConstant(kFALSE);
+
+  TString pdfName = tag + "_HMDiphoton";
+  RooHMDiphoton* hmDiphoton = new RooHMDiphoton( pdfName, "", mgg, *a, *b );
+  
+  w.import( *hmDiphoton );
   return pdfName;
 };
 

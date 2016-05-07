@@ -36,6 +36,30 @@ private:
   ClassDef(RooCB,1)
 };
 
+class RooHMDiphoton : public RooAbsPdf {
+public:
+  RooHMDiphoton();
+  RooHMDiphoton(const char *name, const char *title,
+		RooAbsReal& _x,
+		RooAbsReal& _a,
+		RooAbsReal& _b
+		);
+  RooHMDiphoton(const RooHMDiphoton& other, const char* name=0) ;
+  virtual TObject* clone(const char* newname) const { return new RooHMDiphoton(*this,newname); }
+  inline virtual ~RooHMDiphoton() { };
+  
+protected:
+  
+  RooRealProxy x ;
+  RooRealProxy a;
+  RooRealProxy b;
+
+  Double_t evaluate() const ;
+
+private:
+
+  ClassDef(RooHMDiphoton,1)
+};
  
 class RooDoubleCB : public RooAbsPdf {
 public:
