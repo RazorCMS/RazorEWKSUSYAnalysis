@@ -493,8 +493,8 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
       data.plotOn( sbPlotHM );
       modelHM->plotOn( sbPlotHM, RooFit::Components( *ws->pdf( tag_bkg3) ), RooFit::Range("full"), RooFit::NormRange("full"),
 		       RooFit::LineColor( kBlue ), RooFit::LineStyle( kDashed ) );
-       modelHM->plotOn( sbPlotHM, RooFit::Components( *ws->pdf( tag_sDCB) ), RooFit::Range("full"), RooFit::NormRange("full"),
-			RooFit::LineColor( kRed ), RooFit::LineStyle( kDashed ) );
+      /*modelHM->plotOn( sbPlotHM, RooFit::Components( *ws->pdf( tag_sDCB) ), RooFit::Range("full"), RooFit::NormRange("full"),
+	RooFit::LineColor( kRed ), RooFit::LineStyle( kDashed ) );*/
       modelHM->plotOn( sbPlotHM, RooFit::Range("full"), RooFit::NormRange("full"), RooFit::LineColor( kRed ) );
       
       sbPlotHM->SetName( "sbFitPlotHM" );
