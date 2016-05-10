@@ -10,6 +10,7 @@
 
 //#pragma link C++ defined_in "CustomPdfs.hh";
 #pragma link C++ class RooCB+;
+#pragma link C++ class RooHMDiphoton+;
 #pragma link C++ class RooDoubleCB+;
 #pragma link C++ class RooFermi+;
 #pragma link C++ class RooRelBW+;

@@ -532,6 +532,71 @@ void HggRazorClass::Loop()
   if ( _debug ) std::cout << "[DEBUG]: Finishing Loop" << std::endl;
 };
 
+
+void HggRazorClass::CreateEffTable( float ntotal )
+{
+  if ( _debug ) std::cout << "[DEBUG]: Entering Loop" << std::endl;
+  if (fChain == 0) return;
+
+  Long64_t nentries = fChain->GetEntriesFast();
+  Long64_t nbytes = 0, nb = 0;
+  double total_in = 0, total_rm = 0;
+  std::cout << "[INFO]: nentries: " << nentries << std::endl;
+  float EBEBcut = 0;
+  float EBEEcut = 0;
+  
+  float EleVetoIso_EBEB = 0;
+  float EleVetoIso_EBEE = 0;
+
+  float PtCuts_EBEB = 0;
+  float PtCuts_EBEE = 0;
+  
+  float mggCutEBEB = 0;
+  float mggCutEBEE = 0;
+  
+  for (Long64_t jentry=0; jentry < nentries; jentry++ )
+    {
+      Long64_t ientry = LoadTree(jentry);
+      
+      if (ientry < 0) break;
+      nb = fChain->GetEntry(jentry);   nbytes += nb;
+
+      if ( fabs( pho1Eta ) < 1.48 && fabs( pho2Eta ) < 1.48 )
+	{
+	  EBEBcut++;
+	   if ( pho1passIso && pho2passIso && pho1passEleVeto && pho2passEleVeto ) EleVetoIso_EBEB++;
+	   if ( pho1passIso && pho2passIso && pho1passEleVeto && pho2passEleVeto && pho1Pt > 75. && pho2Pt > 75 ) PtCuts_EBEB++;
+	   if ( pho1passIso && pho2passIso && pho1passEleVeto && pho2passEleVeto && pho1Pt > 75. && pho2Pt > 75 && mGammaGamma > 230 ) mggCutEBEB++;
+	}
+      if ( ( (fabs( pho1Eta ) > 1.48 && fabs( pho2Eta ) < 1.48 ) || (fabs( pho1Eta ) < 1.48 && fabs( pho2Eta ) > 1.48 ) ) )
+	{
+	  EBEEcut++;
+	  if ( pho1passIso && pho2passIso && pho1passEleVeto && pho2passEleVeto ) EleVetoIso_EBEE++;
+	  if ( pho1passIso && pho2passIso && pho1passEleVeto && pho2passEleVeto && pho1Pt > 75. && pho2Pt > 75 ) PtCuts_EBEE++;
+	  if ( pho1passIso && pho2passIso && pho1passEleVeto && pho2passEleVeto && pho1Pt > 75. && pho2Pt > 75 && mGammaGamma > 320 ) mggCutEBEE++;
+	}
+      
+     
+     
+      
+    }
+
+  std::cout << "total eff:" << 100.*nentries/ntotal << "%" << std::endl;
+  std::cout << "===================================" << std::endl;
+  std::cout << "EBEBcut: " << 100.*EBEBcut/ntotal << "%" << std::endl;
+  std::cout << "EleVetoIsoEBEB: " << 100.*EleVetoIso_EBEB/ntotal << "%" << std::endl;
+  std::cout << "PtCutsEBEB: " << 100.*PtCuts_EBEB/ntotal << "%" << std::endl;
+  std::cout << "mggCutEBEB: " << 100.*mggCutEBEB/ntotal << "%" << std::endl;
+
+  std::cout << "===================================" << std::endl;
+  std::cout << "EBEEcut: " << 100.*EBEEcut/ntotal << "%" << std::endl;
+  std::cout << "EleVetoIsoEBEE: " << 100.*EleVetoIso_EBEE/ntotal << "%" << std::endl;
+  std::cout << "PtCutsEBEE: " << 100.*PtCuts_EBEE/ntotal << "%" << std::endl;
+  std::cout << "mggCutEBEE: " << 100.*mggCutEBEE/ntotal << "%" << std::endl;
+ 
+  
+};
+
 float HggRazorClass::GetHighPtGB( double mr, double r2 )
 {
   int mr_bin = -1;

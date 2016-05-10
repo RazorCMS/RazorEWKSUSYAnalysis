@@ -229,6 +229,18 @@ int main( int argc, char* argv[])
     }
   
 
+  //----------------
+  //High Mass Option
+  //----------------
+  bool _highMassMode = false;
+  std::string isHighMass = ParseCommandLine( argc, argv, "-isHighMass=" );
+  
+  if (  isHighMass == "yes" )
+    {
+      _highMassMode = true;
+    }
+  
+  
   if (  f1 != "" ) std::cout << "[INFO]: f1    :" << f1 << std::endl;
   if (  f2 != "" ) std::cout << "[INFO]: f2    :" << f2 << std::endl;
 
@@ -355,6 +367,10 @@ int main( int argc, char* argv[])
   //assymetric cut on photon PT
   //TString cut = "mGammaGamma >103. && mGammaGamma < 160. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 40. && pho2Pt>40.";
   //TString cutMETfilters = "&& (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
+  if ( _highMassMode )
+    {
+      cut = "mGammaGamma > 230. && mGammaGamma < 1230. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta) < 1.48 && pho1Pt> 75. && pho2Pt>75.";
+    }
   TString cutMETfilters = "";
   TString cutTrigger = "";
   if(fitMode == "AIC2")
@@ -470,7 +486,7 @@ int main( int argc, char* argv[])
 	}
       else
 	{
-	  w_sb = MakeSignalBkgFit( tree->CopyTree( cut ), treeSignal->CopyTree( cut ), treeSMH->CopyTree( cut ), mggName );
+	  w_sb = MakeSignalBkgFit( tree->CopyTree( cut ), treeSignal->CopyTree( cut ), treeSMH->CopyTree( cut ), mggName, _highMassMode );
 	}
       w_sb->Write("w_sb");
     }

@@ -19,7 +19,7 @@ double GetIntegral( RooWorkspace& w, TString pdfName, TString mggName );
 void MakePlot( TTree* tree,  RooWorkspace& w, TString pdfName, TString mggName );
 RooWorkspace* MakeSideBandFit( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName );
 RooWorkspace* MakeSignalBkgFit( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName );
-RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeSMH, TString mggName );
+RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeSMH, TString mggName, bool isHighMass = false );
 RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, TString mggName, float SMH_Yield, std::string SMH_CL,
 			    float Signal_Yield, std::string Signal_CL, TString binNumber = "-1", TString category = "category" );
 

@@ -16,12 +16,15 @@ TString MakeDoubleGaussNE( TString tag, RooRealVar& mgg, RooWorkspace& w, bool _
 TString MakeFullDoubleGauss( TString tag, RooRealVar& mgg, RooWorkspace& w );//all parameters are floated
 TString MakeFullDoubleGaussNE( TString tag, RooRealVar& mgg, RooWorkspace& w, bool _globalScale = false, bool _categoryScale = false, TString category = "category" );//all parameters are floated NonExtended
 TString MakeDoubleCB( TString tag, RooRealVar& mgg, RooWorkspace& w );
+TString MakeDoubleCBNE( TString tag, RooRealVar& mgg, RooWorkspace& w );
 TString MakeFullTripleGauss( TString tag, RooRealVar& mgg, RooWorkspace& w );//all parameters are floated
 TString MakeDoubleExp( TString tag, RooRealVar& mgg, RooWorkspace& w );
 TString MakeDoubleExpNE( TString tag, RooRealVar& mgg, RooWorkspace& w );
 TString MakeDoubleExpN1N2( TString tag, RooRealVar& mgg, RooWorkspace& w );
 TString MakeSingleExp( TString tag, RooRealVar& mgg, RooWorkspace& w );
 TString MakeSingleExpNE( TString tag, RooRealVar& mgg, RooWorkspace& w );//nonExtended
+TString MakeHMDiphoton( TString tag, RooRealVar& mgg, RooWorkspace& w );
+TString MakeHMDiphotonNE( TString tag, RooRealVar& mgg, RooWorkspace& w );//nonExtended
 TString MakeDoublePow(TString tag, RooRealVar& mgg,RooWorkspace& w);
 TString MakeDoublePowNE(TString tag, RooRealVar& mgg,RooWorkspace& w);
 TString MakeDoublePowN1N2(TString tag, RooRealVar& mgg,RooWorkspace& w);

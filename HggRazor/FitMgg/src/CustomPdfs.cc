@@ -62,8 +62,40 @@ double RooCB::evaluate() const
   }
 };
 
+//HighMass Diphoton
+ClassImp(RooHMDiphoton);
 
+RooHMDiphoton::RooHMDiphoton(){};
 
+RooHMDiphoton::RooHMDiphoton(const char *name, const char *title,
+			     RooAbsReal& _x,
+			     RooAbsReal& _a,
+			     RooAbsReal& _b
+			     ) :
+  RooAbsPdf(name,title),
+  x("x","x",this,_x),
+  a("a","a",this,_a),
+  b("b","b",this,_b)
+  
+{
+};
+
+RooHMDiphoton::RooHMDiphoton(const RooHMDiphoton& other, const char* name) :
+  RooAbsPdf(other,name),
+  x("x",this,other.x),
+  a("a",this,other.a),
+  b("b",this,other.b)
+{
+};
+
+double RooHMDiphoton::evaluate() const
+{
+  if ( x < 0 ) return 0.0;
+  return TMath::Power( x, a+b*TMath::Log(x) );
+  
+};
+
+//RooDoubleCB
 ClassImp(RooDoubleCB)
 
 RooDoubleCB::RooDoubleCB( ){ };
