@@ -4,9 +4,9 @@ LD = $(shell root-config --ld)
 INC = $(shell pwd)
 Repo = $(shell git rev-parse --show-toplevel)
 Aux = $(Repo)/Aux
-HggRazor = $(Repo)/HggRazor
-Selection = $(HggRazor)/Selection
-CommonTools = $(HggRazor)/CommonTools
+Diphoton = $(Repo)/Diphoton750
+Selection = $(Diphoton)/Selection
+CommonTools = $(Diphoton)/CommonTools
 
 CPPFLAGS := $(shell root-config --cflags) -I$(INC)/include -I$(CommonTools)/include -I$(Aux)/include -I$(Selection)/include
 LDFLAGS := $(shell root-config --glibs) $(STDLIBDIR)
