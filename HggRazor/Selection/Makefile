@@ -13,15 +13,24 @@ LDFLAGS := $(shell root-config --glibs) $(STDLIBDIR)
 CPPFLAGS += -g -std=c++11
 
 TARGET = MakeSelection
+TARGET1 = MakeAcceptanceAndEfficiencyTable 
 
-SRC = app/MakeSelection.cc src/HggTree.cc src/HggRazorClass.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc $(Aux)/src/TChainTools.cc
+SRC = app/MakeSelection.cc $(CommonTools)/src/HggTree.cc src/HggRazorClass.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc $(Aux)/src/TChainTools.cc
+SRC1 = app/MakeAcceptanceAndEfficiencyTable.cc $(CommonTools)/src/HggTree.cc src/HggRazorClass.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc $(Aux)/src/TChainTools.cc
 
 OBJ = $(SRC:.cc=.o)
+OBJ1 = $(SRC1:.cc=.o)
 
-all : $(TARGET)
+all : $(TARGET) $(TARGET1)
 
 $(TARGET) : $(OBJ)
 	$(LD) $(CPPFLAGS) -o $(TARGET) $(OBJ) $(LDFLAGS)
+	@echo $@
+	@echo $<
+	@echo $^
+
+$(TARGET1) : $(OBJ1)
+	$(LD) $(CPPFLAGS) -o $(TARGET1) $(OBJ1) $(LDFLAGS)
 	@echo $@
 	@echo $<
 	@echo $^
@@ -31,4 +40,4 @@ $(TARGET) : $(OBJ)
 	@echo $@
 	@echo $<
 clean :
-	rm -f *.o app/*.o src/*.o $(CommonTools)/src/*.o $(Aux)/src/*.o $(TARGET) *~
+	rm -f *.o app/*.o src/*.o $(CommonTools)/src/*.o $(Aux)/src/*.o $(TARGET) $(TARGET1) *~

@@ -1,6 +1,7 @@
 //C++ INCLUDES
 #include <iostream>
 #include <map>
+#include <assert.h>
 //ROOT INCLUDES
 #include <TString.h>
 //LOCAL INCLUDES
@@ -117,7 +118,6 @@ int HggRazorClass::n_njets = 11;
 float HggRazorClass::njets_l = .0;
 float HggRazorClass::njets_h = 10;
 
-
 int HggRazorClass::n_unroll_highPt  = 15;
 int HggRazorClass::n_unroll_highRes = 10;
 
@@ -152,12 +152,6 @@ float MR_Hbb[N_Hbb+1] = {150,300,3000};
 float Rsq_Hbb[N_Hbb+1] = {0.01,0.05,1.00};
 
 
-//A p p l y   B a s e l i n e   C u t
-//-----------------------------------
-TString cut = "MR > 250.0 && Rsq > 0.04 && abs( pho1Eta ) < 1.44 && abs( pho2Eta ) < 1.44 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25.";
-//TString mggCut = "mGammaGamma > 117. 5 && mGammaGamma < 132.5";
-TString mggCut = "1";
-
 #define _debug 1
 
 int main ( int argc, char* argv[] )
@@ -172,66 +166,26 @@ int main ( int argc, char* argv[] )
       std::cerr << "[ERROR]: please provide an input file using --inputFile=<path_to_file>" << std::endl;
       return -1;
     }
-  FillMapList( mapList, inputFile );
-  if ( _debug ) std::cout << "[DEBUG]: map size: " << mapList.size() << std::endl;
+ 
+  TFile* f = new TFile( inputFile.c_str(), "READ");
+  std::cout << "[DEBUG]: asserting TFile" << std::endl;
+  assert( f );
+  std::cout << "[DEBUG]: TFile asserted" << std::endl;
+  TTree* tree = (TTree*)f->Get("HggRazor");
+  std::cout << "[DEBUG]: asserting TTree" << std::endl;
+  assert( tree );
+  std::cout << "[DEBUG]: TTree asserted" << std::endl;
+  TH1F* nevents = (TH1F*)f->Get("NEvents");
+  std::cout << "[DEBUG]: asserting TH1F" << std::endl;
+  assert( nevents );
+  std::cout << "[DEBUG]: TH1F asserted" << std::endl;
+
+  float Nevents = nevents->GetBinContent(1);
+  //------------------------------------------------
+  //C r e a t in g   S e l e c t i o n   O b j e c t
+  //------------------------------------------------
+  HggRazorClass* hggclass = new HggRazorClass( tree, "signalHM", "inclusive", false, false );;
+  hggclass->CreateEffTable( Nevents );
   
-  for( auto& myMap : mapList )
-    {
-      if ( _debug ) std::cout << "[DEBUG]: first: " << myMap.first << " second: " << myMap.second << std::endl;
-    }
-  
-  TFile* f;
-  TTree* tree;
-  TChain* chain;
-  TTree* cutTree;
-  HggRazorClass* hggclass;
-  
-  for( const auto& process : Process() )
-    {
-      std::string processName = GetProcessString( process );
-      std::cout << "[INFO]: process name: " << processName << std::endl;
-      for( const auto& box : Boxes() )
-	{
-	  std::string boxName = GetBoxString( box );
-	  // R e t r i e v i n g  T r e e
-	  //-----------------------------
-	  //tree    = (TTree*)f->Get( boxName.c_str() );
-	  chain   = new TChain( boxName.c_str() );
-	  AddTChain( chain, mapList[processName] );
-	  
-	  //need to create temporary root file to store cutTree
-	  TFile* tmp = new TFile("tmp","recreate");
-	  //A p p l y i n g  C u t s
-	  //------------------------
-	  cutTree = (TTree*)chain->CopyTree( cut + " && " + mggCut );
-	  if ( cutTree == NULL )
-	    {
-	      std::cout << "[WARNING]: Empty selected tree: " << boxName << std::endl;
-	      continue;
-	    }
-	  std::cout << "[INFO]: Including tree: " << boxName << std::endl;
-	  //C r e a t in g   S e l e c t i o n   O b j e c t
-	  //------------------------------------------------
-	  hggclass = new HggRazorClass( cutTree, processName, boxName, false, false );
-	  if ( box == Boxes::HighPt )
-	    {
-	      hggclass->InitMrRsqCustomHisto( N_HighPt, MR_HighPt, N_HighPt, Rsq_HighPt );
-	    }
-	  else if ( box == Boxes::HighRes || box == Boxes::LowRes )
-	    {
-	      hggclass->InitMrRsqCustomHisto( N_HighRes, MR_HighRes, N_HighRes, Rsq_HighRes );
-	    }
-	  else if( box == Boxes::Hbb || box == Boxes::Zbb )
-	    {
-	      hggclass->InitMrRsqCustomHisto( N_Hbb, MR_Hbb, N_Hbb, Rsq_Hbb );
-	    }
-	  else
-	    {
-	      std::cout << "[WARNING]: Undefined box->" << std::endl;
-	    }
-	  hggclass->Loop();
-	  hggclass->WriteOutput( boxName );
-	}
-    }
   return 0;
 }
