@@ -597,6 +597,41 @@ void HggRazorClass::CreateEffTable( float ntotal )
   
 };
 
+void HggRazorClass::PrintEventInfo( std::vector< std::pair<long int, long int> > eventList )
+{
+  if ( _debug ) std::cout << "[DEBUG]: Entering Loop" << std::endl;
+  if (fChain == 0) return;
+  
+  Long64_t nentries = fChain->GetEntriesFast();
+  Long64_t nbytes = 0, nb = 0;
+  double total_in = 0, total_rm = 0;
+  std::cout << "[INFO]: nentries: " << nentries << std::endl;
+  
+  for (Long64_t jentry=0; jentry < nentries; jentry++ )
+    {
+      Long64_t ientry = LoadTree(jentry);
+      
+      if (ientry < 0) break;
+      nb = fChain->GetEntry(jentry);   nbytes += nb;
+      std::pair<long int, long int> myPair = std::make_pair(run,event);
+      for ( auto tmp : eventList )
+	{
+	  if ( tmp.first == run && tmp.second == event )
+	    {
+	      std::cout << run << " " << lumi << " " << event << " " << mGammaGamma << " " << pho1Pt << " " << pho1Eta << " " << pho1SC_Eta
+			<< " " << pho1passIso << " " << pho1passEleVeto << " " << pho1sumChargedHadronPt << " " << pho1sumNeutralHadronEt << " "  << pho1sumPhotonEt
+			<< " " << pho2Pt << " " << pho2Eta << " " << pho2SC_Eta << " " << pho2passIso << " " << pho2passEleVeto
+			<< " " << pho2sumChargedHadronPt << " " << pho2sumNeutralHadronEt << " "  << pho2sumPhotonEt;
+	      if ( pho1passIso == 0 || pho2passIso == 0 ) std::cout << " Iso!" << std::endl;
+	      else if ( ( fabs(pho1SC_Eta) > 1.4442 && fabs(pho1SC_Eta) < 1.566 ) || ( fabs(pho2SC_Eta) > 1.4442 && fabs(pho2SC_Eta) < 1.566 ) ) std::cout << " crack!\n";
+	      else if ( mGammaGamma < 230.0 ) std::cout << " mgg!\n";
+	      else std::cout << "\n";
+	    }
+	}
+    }
+  
+};
+
 float HggRazorClass::GetHighPtGB( double mr, double r2 )
 {
   int mr_bin = -1;
