@@ -56,6 +56,7 @@ public:
   void Loop();
   void CreateEffTable( float ntotal );
   void PrintEventInfo( std::vector< std::pair<long int, long int> > eventList );
+  void PrintEventInfo( );
   float GetYields( float mr, float rsq, float mgg_l, float mgg_h );
   float GetYields( float mr, float rsq, float mgg_l, float mgg_h, double& err );
   bool WriteOutput( TString outName = "default" );

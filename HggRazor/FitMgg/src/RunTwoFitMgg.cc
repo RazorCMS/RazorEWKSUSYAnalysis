@@ -315,7 +315,7 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
 	  ws->var("dGauss_signal_DG_mu1")->setVal( 750 );
 	  ws->var("dGauss_signal_DG_mu2")->setVal( 750 );
 	  ws->var("DCB_signal_DCB_muCB")->setVal( 750 );
-	  ws->var("DCB_signal_DCB_sigmaCB")->setVal( 10 );
+	  ws->var("DCB_signal_DCB_sigmaCB")->setVal( 20 );
 	}
     }
 

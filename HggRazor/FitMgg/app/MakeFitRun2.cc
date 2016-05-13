@@ -364,15 +364,20 @@ int main( int argc, char* argv[])
   /*CP's Tree Format is default*/
   
   TString cut = "mGammaGamma >103. && mGammaGamma < 160. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.";
+  TString cutMETfilters = "";
+  TString cutTrigger = "";
   //assymetric cut on photon PT
   //TString cut = "mGammaGamma >103. && mGammaGamma < 160. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 40. && pho2Pt>40.";
   //TString cutMETfilters = "&& (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
   if ( _highMassMode )
     {
-      cut = "mGammaGamma > 230. && mGammaGamma < 1230. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta) < 1.48 && pho1Pt> 75. && pho2Pt>75.";
+      //EBEB
+      //cut = "mGammaGamma > 230. && mGammaGamma < 1230. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1SC_Eta) <1.4442 && abs(pho2SC_Eta) < 1.4442 && pho1Pt> 75. && pho2Pt>75.";
+      //EBEE
+      cut = "mGammaGamma > 230. && mGammaGamma < 1230. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1Pt> 75. && pho2Pt>75. && ( (abs(pho1SC_Eta) > 1.566 && abs(pho2SC_Eta) < 1.4442) || (abs(pho1SC_Eta) < 1.4442 && abs(pho2SC_Eta) > 1.566) ) ";
+      cutMETfilters = "&& (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
     }
-  TString cutMETfilters = "";
-  TString cutTrigger = "";
+  
   if(fitMode == "AIC2")
      {
 	cutMETfilters = "&& (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
@@ -457,7 +462,9 @@ int main( int argc, char* argv[])
   //C o n c a t e n a t i n g   C u t s
   //-----------------------------------
   cut = cut + categoryCutString + BinCutString + cutMETfilters + cutTrigger;
+  std::cout << "============================================================================" << std::endl;
   std::cout << "[INFO]: cut -> " << cut << std::endl;
+  std::cout << "============================================================================" << std::endl;
   //return -1;
   
   TString outName = outputfilename.substr( 0, outputfilename.find(".root") );

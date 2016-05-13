@@ -489,7 +489,7 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
   ratio->SetTitle("");
   ratio->GetYaxis()->SetTitle("data / mc");
   ratio->GetYaxis()->CenterTitle( true );
-  ratio->GetYaxis()->SetNdivisions( 5, false );
+  ratio->GetYaxis()->SetNdivisions( 10, false );
   ratio->SetStats( 0 );
   ratio->Draw("E");
 
@@ -516,6 +516,7 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
       s->SetMaximum( 1e4*mc->GetMaximum() );
       pad1->SetLogy();
       pad1->Update();
+      
     }
   else if ( var == "mgg" )
     {
@@ -528,8 +529,10 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
       
       s->SetMinimum( 1e-1 );
       s->SetMaximum( 1.5*s->GetMaximum() );
-      pad1->SetLogy();
+      //pad1->SetLogy();
       pad1->Update();
+      ratio->GetYaxis()->SetRangeUser( 0.5, 1.5 );
+      pad2->Update();
     }
   else if ( var == "ptgg" )
     {

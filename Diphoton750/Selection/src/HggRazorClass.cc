@@ -470,6 +470,7 @@ void HggRazorClass::Loop()
       else
 	{ 
 	  w = weight*pileupWeight;
+	  //w = weight;
 	}
       total_in += w;
       bool pho1_isFake = false;
@@ -557,10 +558,10 @@ void HggRazorClass::Loop()
       if ( h_mr_rsq_c != NULL ) h_mr_rsq_c->Fill( MR, Rsq, w );
 
       //Add To Yields
-      if ( abs(pho1Eta) < 1.4442 && abs(pho2Eta) < 1.4442) {
+      if ( fabs(pho1Eta) < 1.4442 && fabs(pho2Eta) < 1.4442) {
 	if (mGammaGamma > 230) NEventsMgg230_EBEB += w;
 	if (mGammaGamma > 500) NEventsMgg500_EBEB += w;	
-      } else if (  abs(pho1Eta) < 1.4442 || abs(pho2Eta) < 1.4442) {
+      } else if (  fabs(pho1Eta) < 1.4442 || fabs(pho2Eta) < 1.4442) {
 	if (mGammaGamma > 320) NEventsMgg320_EBEE += w;
 	if (mGammaGamma > 500) NEventsMgg500_EBEE += w;	
       }

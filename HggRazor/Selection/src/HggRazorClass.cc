@@ -1,5 +1,6 @@
 //C++ INCLUDES
 #include <iostream>
+#include <fstream>
 #include <math.h>
 //ROOT INCLUDES
 //LOCAL INCLUDES
@@ -597,7 +598,31 @@ void HggRazorClass::CreateEffTable( float ntotal )
   
 };
 
-void HggRazorClass::PrintEventInfo( std::vector< std::pair<long int, long int> > eventList )
+void HggRazorClass::PrintEventInfo( )
+{
+  if ( _debug ) std::cout << "[DEBUG]: Entering Loop" << std::endl;
+  if (fChain == 0) return;
+  
+  Long64_t nentries = fChain->GetEntriesFast();
+  Long64_t nbytes = 0, nb = 0;
+  double total_in = 0, total_rm = 0;
+  std::cout << "[INFO]: nentries: " << nentries << std::endl;
+  std::ofstream ofs ( "eventListData.txt", std::ofstream::out );
+  for (Long64_t jentry=0; jentry < nentries; jentry++ )
+    {
+      Long64_t ientry = LoadTree(jentry);
+      
+      if (ientry < 0) break;
+      nb = fChain->GetEntry(jentry);   nbytes += nb;
+      //ofs << run << ":" << lumi << ":" << event << " " << mGammaGamma << " " << pTGammaGamma << "\n";
+      ofs << run << ":" << lumi << ":" << event << "\n";
+
+		
+    }
+  ofs.close();
+};
+
+void HggRazorClass::PrintEventInfo(  std::vector< std::pair<long int, long int> > eventList )
 {
   if ( _debug ) std::cout << "[DEBUG]: Entering Loop" << std::endl;
   if (fChain == 0) return;

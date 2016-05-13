@@ -155,6 +155,12 @@ float Rsq_Hbb[N_Hbb+1] = {0.01,0.05,1.00};
 
 #define _debug 1
 
+//TString cut = "";
+//EBEB
+//TString cut = "mGammaGamma > 230. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1DefaultSC_Eta) <1.4442 && abs(pho2DefaultSC_Eta) < 1.4442 && pho1Pt> 75. && pho2Pt>75.";
+//EBEE
+TString cut = "mGammaGamma > 320. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1Pt> 75. && pho2Pt>75. && ( (abs(pho1DefaultSC_Eta) > 1.566 && abs(pho2DefaultSC_Eta) < 1.4442) || (abs(pho1DefaultSC_Eta) < 1.4442 && abs(pho2DefaultSC_Eta) > 1.566) ) ";
+
 int main ( int argc, char* argv[] )
 {
   std::cout << "[INFO]: Initializing program" << std::endl;
@@ -203,12 +209,15 @@ int main ( int argc, char* argv[] )
   std::cout << "[DEBUG]: asserting TTree" << std::endl;
   assert( tree );
   std::cout << "[DEBUG]: TTree asserted" << std::endl;
-  
+
+
+  TFile* tmp = new TFile("tmp.root", "recreate");
   //------------------------------------------------
   //C r e a t in g   S e l e c t i o n   O b j e c t
   //------------------------------------------------
-  HggRazorClass* hggclass = new HggRazorClass( tree, "signalHM", "inclusive", false, false );
-  hggclass->PrintEventInfo( myVect );
+  HggRazorClass* hggclass = new HggRazorClass( tree->CopyTree( cut ), "signalHM", "inclusive", false, false );
+  hggclass->PrintEventInfo( );
+  //hggclass->PrintEventInfo( myVect );
   
   return 0;
 }
