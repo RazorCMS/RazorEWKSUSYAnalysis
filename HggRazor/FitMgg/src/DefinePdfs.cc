@@ -281,7 +281,7 @@ TString MakeDoubleCB( TString tag, RooRealVar& mgg, RooWorkspace& w )
   return ex_pdf_name;
 };
 
-TString MakeDoubleCBNE( TString tag, RooRealVar& mgg, RooWorkspace& w )
+TString MakeDoubleCBNE( TString tag, RooRealVar& mgg, RooWorkspace& w, bool _globalScale, bool _categoryScale, TString category )
 {
   //------------------------------
   //C r e a t e  V a r i a b l e s
@@ -305,7 +305,32 @@ TString MakeDoubleCBNE( TString tag, RooRealVar& mgg, RooWorkspace& w )
   n2->setRange(0, 100);
 
   TString pdf_name = tag + "_DCB";
-  RooDoubleCB* dCB = new RooDoubleCB( pdf_name , "", mgg, *mu, *sigma, *alpha1, *n1, *alpha2, *n2 );
+  RooDoubleCB* dCB;
+  if ( _globalScale && _categoryScale )
+    {
+      RooRealVar* muGlobal = new RooRealVar( "mu_Global", "#mu_{global}", 0, "" );
+      RooRealVar* muCat    = new RooRealVar( category+"_mu_Global", "#mu_{"+category+"}", 0, "" );
+      RooFormulaVar* mggp  = new RooFormulaVar( tag + "_DG_mggp", "m_{gg} - #mu_{g} - #mu_{"+category+"}", "(@0-@1-@2)", RooArgList(mgg, *muGlobal, *muCat) );
+      dCB = new RooDoubleCB( pdf_name , "", *mggp, *mu, *sigma, *alpha1, *n1, *alpha2, *n2 );
+    }
+  else if ( _globalScale && !_categoryScale )
+    {
+      RooRealVar* muGlobal = new RooRealVar( "mu_Global", "#mu_{g}", 0, "" );
+      RooFormulaVar* mggp  = new RooFormulaVar( tag + "_DG_muG", "m_{gg} - #mu_{g}", "(@0-@1)", RooArgList(mgg, *muGlobal) );
+      dCB = new RooDoubleCB( pdf_name , "", *mggp, *mu, *sigma, *alpha1, *n1, *alpha2, *n2 );
+    }
+  else if ( !_globalScale && _categoryScale )
+    {
+      RooRealVar* muCat    = new RooRealVar( category+"_mu_Global", "#mu_{"+category+"}", 0, "" );
+      RooFormulaVar* mggp  = new RooFormulaVar( tag + "_DG_muG", "mgg - #mu_{"+category+"}", "(@0-@1)", RooArgList(mgg, *muCat) );
+      dCB = new RooDoubleCB( pdf_name , "", *mggp, *mu, *sigma, *alpha1, *n1, *alpha2, *n2 );
+    }
+  else
+    {
+      dCB = new RooDoubleCB( pdf_name , "", mgg, *mu, *sigma, *alpha1, *n1, *alpha2, *n2 );
+    }
+
+  
   w.import( *dCB );
   
   return pdf_name;

@@ -730,18 +730,32 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
     }
   else
     {
-      tagSignal = MakeFullDoubleGauss( "DG_signal_bin"+binNumber , mgg, *ws );
-      std::cout << tagSignal << std::endl;
+      //tagSignal = MakeFullDoubleGauss( "DG_signal_bin"+binNumber , mgg, *ws );
+      //ws->var(tagSignal+"_Ns")->setVal( (double)npoints );
+      
+      tagSignal = MakeDoubleCB( "DCB_Signal_bin"+ binNumber, mgg, *ws );
       ws->var(tagSignal+"_Ns")->setVal( (double)npoints );
+      
+      ws->var(tagSignal+"_muCB")->setVal( 125.0 );
+      ws->var(tagSignal+"_sigmaCB")->setVal( 1.0 );
+      std::cout << tagSignal << std::endl;
+      
     }
   std::cout << tagSignal << std::endl;
   RooFitResult* sres = ws->pdf( tagSignal )->fitTo( dataSignal, RooFit::Strategy(2), RooFit::Extended( kTRUE ), RooFit::Save( kTRUE ), RooFit::Range("Full") );
+  /*
   double gausFrac    =  ws->var(tagSignal+"_frac")->getVal();
   double gausMu1     =  ws->var(tagSignal+"_mu1")->getVal();
   double gausMu2     =  ws->var(tagSignal+"_mu2")->getVal();
   double gausSigma1  =  ws->var(tagSignal+"_sigma1")->getVal();
   double gausSigma2  =  ws->var(tagSignal+"_sigma2")->getVal();
-
+  */
+  double DCB_mu_s    = ws->var(tagSignal+"_muCB")->getVal( );
+  double DCB_sigma_s = ws->var(tagSignal+"_sigmaCB")->getVal( );
+  double DCB_a1_s    = ws->var(tagSignal+"_alpha1")->getVal( );
+  double DCB_n1_s    = ws->var(tagSignal+"_n1")->getVal( );
+  double DCB_a2_s    = ws->var(tagSignal+"_alpha2")->getVal( );
+  double DCB_n2_s    = ws->var(tagSignal+"_n2")->getVal( );
   //-------------------------------------
   //D e f i n e   S M - H i g g s   P D F
   //-------------------------------------
@@ -753,16 +767,30 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
     }
   else
     {
-      tagSMH = MakeFullDoubleGauss( "DG_SMH_bin"+binNumber, mgg, *ws );
+      //tagSMH = MakeFullDoubleGauss( "DG_SMH_bin"+binNumber, mgg, *ws );
+      //ws->var(tagSMH+"_Ns")->setVal( (double)npoints );
+      tagSMH = MakeDoubleCB( "DCB_SMH_bin"+ binNumber, mgg, *ws );
       ws->var(tagSMH+"_Ns")->setVal( (double)npoints );
+      
+      ws->var(tagSMH+"_muCB")->setVal( 125.0 );
+      ws->var(tagSMH+"_sigmaCB")->setVal( 1.0 );
     }
+  
   RooFitResult* smhres  = ws->pdf( tagSMH )->fitTo( dataSMH, RooFit::Strategy(2), RooFit::Extended( kTRUE ), RooFit::Save( kTRUE ), RooFit::Range("Full") );
+
+  /*
   double gausFrac_SMH   =  ws->var(tagSMH+"_frac")->getVal();
   double gausMu1_SMH    =  ws->var(tagSMH+"_mu1")->getVal();
   double gausMu2_SMH    =  ws->var(tagSMH+"_mu2")->getVal();
   double gausSigma1_SMH =  ws->var(tagSMH+"_sigma1")->getVal();
   double gausSigma2_SMH =  ws->var(tagSMH+"_sigma2")->getVal();
-  
+  */
+  double DCB_mu_smh    = ws->var(tagSMH+"_muCB")->getVal( );
+  double DCB_sigma_smh = ws->var(tagSMH+"_sigmaCB")->getVal( );
+  double DCB_a1_smh    = ws->var(tagSMH+"_alpha1")->getVal( );
+  double DCB_n1_smh    = ws->var(tagSMH+"_n1")->getVal( );
+  double DCB_a2_smh    = ws->var(tagSMH+"_alpha2")->getVal( );
+  double DCB_n2_smh    = ws->var(tagSMH+"_n2")->getVal( );
   //------------------------------------
   // C r e a t e   b k g  s h a p e
   //------------------------------------
@@ -803,7 +831,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   data_toys->plotOn(fmgg);
   ws->pdf( tag_bkg)->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("Full"),RooFit::NormRange("Full"));
   ws->pdf( tag_bkg)->plotOn(fmgg,RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
-  fmgg->SetName( "fullsb_fit_frame" );
+  fmgg->SetName( "BkgOnlyFitPlot" );
   //ws->import( *model );
   ws->import( *bres );
   ws->import( *fmgg );
@@ -815,7 +843,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   dataSignal.plotOn(fmgg2);
   ws->pdf( tagSignal )->plotOn(fmgg2, RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("Full"));
   ws->pdf( tagSignal )->plotOn(fmgg2, RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
-  fmgg2->SetName( "signal_fit_frame" );
+  fmgg2->SetName( "SignalFitPlot" );
   ws->import( *fmgg2 );
 
   //---------------------------------
@@ -825,7 +853,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   dataSMH.plotOn(fmgg3);
   ws->pdf( tagSMH )->plotOn(fmgg3, RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("Full"));
   ws->pdf( tagSMH )->plotOn(fmgg3, RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
-  fmgg3->SetName( "smh_fit_frame" );
+  fmgg3->SetName( "SMHFitPlot" );
   ws->import( *fmgg3 );
 
   //-------------------------------------------------------
@@ -838,7 +866,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   //--------------
   RooWorkspace* combine_ws = new RooWorkspace( "combine_ws", "" );
   TString combineSMH;
-  if ( category != "highres" ) combineSMH = MakeFullDoubleGaussNE( "SMH_bin"+binNumber, mgg, *combine_ws, true, true, category );//add global and cat scale uncertainty
+  /*if ( category != "highres" ) combineSMH = MakeFullDoubleGaussNE( "SMH_bin"+binNumber, mgg, *combine_ws, true, true, category );//add global and cat scale uncertainty
   else combineSMH = MakeFullDoubleGaussNE( "SMH_bin"+binNumber, mgg, *combine_ws, true );//adding global scale uncertainty only
   combine_ws->var( combineSMH+"_frac")->setVal(gausFrac_SMH);
   combine_ws->var( combineSMH+"_mu1")->setVal(gausMu1_SMH);
@@ -850,6 +878,22 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   combine_ws->var( combineSMH+"_mu2")->setConstant(kTRUE);
   combine_ws->var( combineSMH+"_sigma1")->setConstant(kTRUE);
   combine_ws->var( combineSMH+"_sigma2")->setConstant(kTRUE);
+  */
+  if ( category != "highres" ) combineSMH = MakeDoubleCBNE( "SMH_bin"+binNumber, mgg, *combine_ws, true, true, category );//add global and cat scale uncertainty
+  else combineSMH = MakeDoubleCBNE( "SMH_bin"+binNumber, mgg, *combine_ws, true );//adding global scale uncertainty only
+  combine_ws->var( combineSMH+"_muCB")->setVal( DCB_mu_smh );
+  combine_ws->var( combineSMH+"_sigmaCB")->setVal( DCB_sigma_smh );
+  combine_ws->var( combineSMH+"_alpha1")->setVal( DCB_a1_smh );
+  combine_ws->var( combineSMH+"_n1")->setVal( DCB_n1_smh );
+  combine_ws->var( combineSMH+"_alpha2")->setVal( DCB_a2_smh );
+  combine_ws->var( combineSMH+"_n2")->setVal( DCB_n1_smh );
+  
+  combine_ws->var( combineSMH+"_muCB")->setConstant(kTRUE);
+  combine_ws->var( combineSMH+"_sigmaCB")->setConstant(kTRUE);
+  combine_ws->var( combineSMH+"_alpha1")->setConstant(kTRUE);
+  combine_ws->var( combineSMH+"_n1")->setConstant(kTRUE);
+  combine_ws->var( combineSMH+"_alpha2")->setConstant(kTRUE);
+  combine_ws->var( combineSMH+"_n2")->setConstant(kTRUE);
   RooRealVar SMH_norm( combineSMH+"_norm" ,"", SMH_Yield);
   //SMH_norm.setConstant(kFALSE);
   combine_ws->import( SMH_norm );
@@ -857,6 +901,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   //Signal line shape
   //-----------------
   TString combineSignal;
+  /*
   if ( category != "highres" ) combineSignal = MakeFullDoubleGaussNE( "signal_bin"+binNumber, mgg, *combine_ws, true, true, category );//add global and cat scale uncertainty
   else combineSignal = MakeFullDoubleGaussNE( "signal_bin"+binNumber, mgg, *combine_ws, true );//add global scale uncertainty only
   combine_ws->var( combineSignal+"_frac")->setVal(gausFrac);
@@ -869,6 +914,23 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   combine_ws->var( combineSignal+"_mu2")->setConstant(kTRUE);
   combine_ws->var( combineSignal+"_sigma1")->setConstant(kTRUE);
   combine_ws->var( combineSignal+"_sigma2")->setConstant(kTRUE);
+  */
+  if ( category != "highres" ) combineSignal = MakeDoubleCBNE( "signal_bin"+binNumber, mgg, *combine_ws, true, true, category );//add global and cat scale uncertainty
+  else combineSignal = MakeDoubleCBNE( "signal_bin"+binNumber, mgg, *combine_ws, true );//add global scale uncertainty only
+  combine_ws->var( combineSignal+"_muCB")->setVal( DCB_mu_s );
+  combine_ws->var( combineSignal+"_sigmaCB")->setVal( DCB_sigma_s );
+  combine_ws->var( combineSignal+"_alpha1")->setVal( DCB_a1_s );
+  combine_ws->var( combineSignal+"_n1")->setVal( DCB_n1_s );
+  combine_ws->var( combineSignal+"_alpha2")->setVal( DCB_a2_s );
+  combine_ws->var( combineSignal+"_n2")->setVal( DCB_n1_s );
+  
+  combine_ws->var( combineSignal+"_muCB")->setConstant(kTRUE);
+  combine_ws->var( combineSignal+"_sigmaCB")->setConstant(kTRUE);
+  combine_ws->var( combineSignal+"_alpha1")->setConstant(kTRUE);
+  combine_ws->var( combineSignal+"_n1")->setConstant(kTRUE);
+  combine_ws->var( combineSignal+"_alpha2")->setConstant(kTRUE);
+  combine_ws->var( combineSignal+"_n2")->setConstant(kTRUE);
+  
   RooRealVar Signal_norm( combineSignal + "_norm", "", Signal_Yield );
   //Signal_norm.setConstant(kFALSE);
   combine_ws->import( Signal_norm );
