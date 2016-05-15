@@ -665,7 +665,7 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
 }
 
 RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, TString mggName, float SMH_Yield, std::string SMH_CF,
-			    float Signal_Yield, std::string Signal_CF, TString binNumber, TString category )
+			    float Signal_Yield, std::string Signal_CF, TString binNumber, TString category, bool isHighMass )
 {
   std::cout << "entering datacard: " << SMH_Yield << " " << Signal_Yield << std::endl;
   std::stringstream ss_smh, ss_signal;
@@ -700,11 +700,33 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   TString combinedRootFileName = "HggRazorWorkspace_bin" + binNumber + ".root";
   TFile* ftmp = new TFile( combinedRootFileName, "recreate");
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
-  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 103, 160, "GeV" );
-  mgg.setBins(38);
-  mgg.setRange( "signal", 115, 135. );
-  mgg.setRange( "high", 135, 160);
-  mgg.setRange( "low", 103, 120);
+
+  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 0, 10000, "GeV" );
+  if ( isHighMass )
+    {
+      mgg.SetNameTitle( mggName, "m_{#gamma#gamma}" );
+      mgg.setMin( 230. );
+      mgg.setMax( 1230. );
+      mgg.setUnit( "GeV" );
+      mgg.setBins(200);
+      mgg.setRange( "signal", 600., 900. );
+      mgg.setRange( "full", 230., 1230. );
+      mgg.setRange( "high", 850., 1230.);
+      mgg.setRange( "low", 230., 650.);
+    }
+  else
+    {
+      mgg.SetNameTitle( mggName, "m_{#gamma#gamma}" );
+      mgg.setMin( 103. );
+      mgg.setMax( 160. );
+      mgg.setUnit( "GeV" );
+      mgg.setBins(38);
+      mgg.setRange( "signal", 115, 135. );
+      mgg.setRange( "high", 135., 160. );
+      mgg.setRange( "low", 103., 120. );
+      mgg.setRange( "full", 103., 160. );
+    }
+  
   //--------------------------------
   //I m p or t i n g   D a t a
   //--------------------------------
@@ -735,21 +757,37 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
       
       tagSignal = MakeDoubleCB( "DCB_Signal_bin"+ binNumber, mgg, *ws );
       ws->var(tagSignal+"_Ns")->setVal( (double)npoints );
-      
-      ws->var(tagSignal+"_muCB")->setVal( 125.0 );
-      ws->var(tagSignal+"_sigmaCB")->setVal( 1.0 );
-      std::cout << tagSignal << std::endl;
-      
+      //--------------------------
+      //Setting initial parameters
+      //--------------------------
+      if ( isHighMass )
+	{
+	  ws->var(tagSignal+"_muCB")->setVal( 740.0 );
+	  ws->var(tagSignal+"_sigmaCB")->setVal( 8.0 );
+	  ws->var(tagSignal+"_alpha1")->setVal( 1.0 );
+	  ws->var(tagSignal+"_alpha2")->setVal( 1.0 );
+	  ws->var(tagSignal+"_n1")->setVal( 1.8 );
+	  ws->var(tagSignal+"_n2")->setVal( 3.8 );
+	}
+      else
+	{
+	  ws->var(tagSignal+"_muCB")->setVal( 125.0 );
+	  ws->var(tagSignal+"_sigmaCB")->setVal( 1.0 );
+	}
     }
   std::cout << tagSignal << std::endl;
-  RooFitResult* sres = ws->pdf( tagSignal )->fitTo( dataSignal, RooFit::Strategy(2), RooFit::Extended( kTRUE ), RooFit::Save( kTRUE ), RooFit::Range("Full") );
+  RooFitResult* sres = ws->pdf( tagSignal )->fitTo( dataSignal, RooFit::Strategy(2), RooFit::Extended( kTRUE ), RooFit::Save( kTRUE ), RooFit::Range("signal") );
+  sres->SetName("SignalFitResult");
+  ws->import( *sres );
   /*
-  double gausFrac    =  ws->var(tagSignal+"_frac")->getVal();
-  double gausMu1     =  ws->var(tagSignal+"_mu1")->getVal();
-  double gausMu2     =  ws->var(tagSignal+"_mu2")->getVal();
-  double gausSigma1  =  ws->var(tagSignal+"_sigma1")->getVal();
-  double gausSigma2  =  ws->var(tagSignal+"_sigma2")->getVal();
+  //double gaussian relic
+    double gausFrac    =  ws->var(tagSignal+"_frac")->getVal();
+    double gausMu1     =  ws->var(tagSignal+"_mu1")->getVal();
+    double gausMu2     =  ws->var(tagSignal+"_mu2")->getVal();
+    double gausSigma1  =  ws->var(tagSignal+"_sigma1")->getVal();
+    double gausSigma2  =  ws->var(tagSignal+"_sigma2")->getVal();
   */
+  
   double DCB_mu_s    = ws->var(tagSignal+"_muCB")->getVal( );
   double DCB_sigma_s = ws->var(tagSignal+"_sigmaCB")->getVal( );
   double DCB_a1_s    = ws->var(tagSignal+"_alpha1")->getVal( );
@@ -771,14 +809,30 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
       //ws->var(tagSMH+"_Ns")->setVal( (double)npoints );
       tagSMH = MakeDoubleCB( "DCB_SMH_bin"+ binNumber, mgg, *ws );
       ws->var(tagSMH+"_Ns")->setVal( (double)npoints );
-      
-      ws->var(tagSMH+"_muCB")->setVal( 125.0 );
-      ws->var(tagSMH+"_sigmaCB")->setVal( 1.0 );
+      //--------------------------
+      //Setting initial parameters
+      //--------------------------
+      if ( isHighMass )
+	{
+	  ws->var(tagSMH+"_muCB")->setVal( 740.0 );
+	  ws->var(tagSMH+"_sigmaCB")->setVal( 20.0 );
+	  ws->var(tagSMH+"_alpha1")->setVal( 1.0 );
+	  ws->var(tagSMH+"_alpha2")->setVal( 1.0 );
+	  ws->var(tagSMH+"_n1")->setVal( 1.8 );
+	  ws->var(tagSMH+"_n2")->setVal( 3.8 );
+	}
+      else
+	{
+	  ws->var(tagSMH+"_muCB")->setVal( 125.0 );
+	  ws->var(tagSMH+"_sigmaCB")->setVal( 1.0 );
+	}
     }
   
-  RooFitResult* smhres  = ws->pdf( tagSMH )->fitTo( dataSMH, RooFit::Strategy(2), RooFit::Extended( kTRUE ), RooFit::Save( kTRUE ), RooFit::Range("Full") );
-
+  RooFitResult* smhres  = ws->pdf( tagSMH )->fitTo( dataSMH, RooFit::Strategy(2), RooFit::Extended( kTRUE ), RooFit::Save( kTRUE ), RooFit::Range("signal") );
+  smhres->SetName("SMHFitResult");
+  ws->import( *smhres );
   /*
+    //double gaussian relic
   double gausFrac_SMH   =  ws->var(tagSMH+"_frac")->getVal();
   double gausMu1_SMH    =  ws->var(tagSMH+"_mu1")->getVal();
   double gausMu2_SMH    =  ws->var(tagSMH+"_mu2")->getVal();
@@ -794,7 +848,8 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   //------------------------------------
   // C r e a t e   b k g  s h a p e
   //------------------------------------
-  TString tag_bkg = MakeSingleExp( "fullsb_fit_singleExp", mgg, *ws );
+  TString tag_bkg;
+  
   //Initializing Nbkg
   npoints = data.numEntries();
   //set Nbkg Initial Value
@@ -814,12 +869,36 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   //---------------------
   //F i t   t o   D a t a
   //---------------------
-  RooFitResult* bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
-  float sExp_a = ws->var("fullsb_fit_singleExp_a")->getVal();
-  float Nbkg   = ws->var("fullsb_fit_singleExp_Nbkg")->getVal();
-  float NbkgUn = ws->var("fullsb_fit_singleExp_Nbkg")->getError();
-  float BkgNormUn = 1.0 + NbkgUn/Nbkg;//input a lnN to combine
+  float sExp_a;
+  float Nbkg;
+  float NbkgUn;
+  float BkgNormUn;
+  //HighMassDiphoton
+  float hmd_a;
+  float hmd_b;
+  RooFitResult* bres;
+  if ( isHighMass )
+    {
+      tag_bkg = MakeHMDiphoton( "Bkg_fit_HMDiphoton", mgg, *ws );
+      bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+      bres->SetName("BkgOnlyFitResult");
+      ws->import( *bres );
+      hmd_a = ws->var( tag_bkg+"_a")->getVal();
+      hmd_b = ws->var( tag_bkg+"_b")->getVal();
+    }
+  else
+    {
+      tag_bkg = MakeSingleExp( "fullsb_fit_singleExp", mgg, *ws );
+      bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+      bres->SetName("BkgOnlyFitResult");
+      ws->import( *bres );
+      sExp_a = ws->var("fullsb_fit_singleExp_a")->getVal();
+      Nbkg   = ws->var("fullsb_fit_singleExp_Nbkg")->getVal();
+      NbkgUn = ws->var("fullsb_fit_singleExp_Nbkg")->getError();
+      BkgNormUn = 1.0 + NbkgUn/Nbkg;//input a lnN to combine
+    }
   
+    
   //RooDataSet* data_toys = GenerateToys( ws->pdf( tag_bkg ), mgg, npoints);
   RooAbsData* data_toys = ws->pdf( tag_bkg )->generateBinned( mgg, npoints, RooFit::ExpectedData() );
   data_toys->SetName("data_bin"+binNumber);
@@ -937,13 +1016,26 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   //---------
   //Bkg model
   //---------
-  TString combineBkg    = MakeSingleExpNE( "Bkg_bin"+binNumber, mgg, *combine_ws );
-  combine_ws->var( combineBkg + "_a" )->setVal( sExp_a );
-  RooRealVar Bkg_norm(  combineBkg + "_norm", "", Nbkg );
-  Bkg_norm.setConstant(kFALSE);
-  combine_ws->import( Bkg_norm );
-  combine_ws->import( *data_toys );
-  //combine_ws->import( data );
+  TString combineBkg;
+  if ( isHighMass )
+    { 
+      combineBkg = MakeHMDiphotonNE( "Bkg_bin"+binNumber, mgg, *combine_ws );
+      combine_ws->var( combineBkg + "_a" )->setVal( hmd_a );
+      combine_ws->var( combineBkg + "_b" )->setVal( hmd_a );
+      RooRealVar Bkg_norm(  combineBkg + "_norm", "", Nbkg );
+      Bkg_norm.setConstant(kFALSE);
+      combine_ws->import( Bkg_norm );
+    }
+  else
+    {
+      combineBkg = MakeSingleExpNE( "Bkg_bin"+binNumber, mgg, *combine_ws );
+      combine_ws->var( combineBkg + "_a" )->setVal( sExp_a );
+      RooRealVar Bkg_norm(  combineBkg + "_norm", "", Nbkg );
+      Bkg_norm.setConstant(kFALSE);
+      combine_ws->import( Bkg_norm );
+    }
+  //combine_ws->import( *data_toys );
+  combine_ws->import( data );
     
   combine_ws->Write("combineWS");
   ftmp->cd();

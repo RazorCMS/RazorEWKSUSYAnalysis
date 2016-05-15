@@ -372,10 +372,10 @@ int main( int argc, char* argv[])
   if ( _highMassMode )
     {
       //EBEB
-      //cut = "mGammaGamma > 230. && mGammaGamma < 1230. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1DefaultSC_Eta) <1.4442 && abs(pho2DefaultSC_Eta) < 1.4442 && pho1Pt> 75. && pho2Pt>75.";
+      cut = "mGammaGamma > 230. && mGammaGamma < 1230. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1DefaultSC_Eta) <1.4442 && abs(pho2DefaultSC_Eta) < 1.4442 && pho1Pt> 75. && pho2Pt>75.";
       //EBEE
-      cut = "mGammaGamma > 230. && mGammaGamma < 1230. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1Pt> 75. && pho2Pt>75. && ( (abs(pho1DefaultSC_Eta) > 1.566 && abs(pho2DefaultSC_Eta) < 1.4442) || (abs(pho1DefaultSC_Eta) < 1.4442 && abs(pho2DefaultSC_Eta) > 1.566) ) ";
-      cutMETfilters = "&& (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
+      //cut = "mGammaGamma > 230. && mGammaGamma < 1230. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1Pt> 75. && pho2Pt>75. && ( (abs(pho1DefaultSC_Eta) > 1.566 && abs(pho2DefaultSC_Eta) < 1.4442) || (abs(pho1DefaultSC_Eta) < 1.4442 && abs(pho2DefaultSC_Eta) > 1.566) ) ";
+      cutMETfilters = " && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
     }
   
   if(fitMode == "AIC2")
@@ -502,7 +502,7 @@ int main( int argc, char* argv[])
       RooWorkspace* w_sb;
       std::cout << "calling MakeDataCard" << std::endl;
       w_sb = MakeDataCard( tree->CopyTree( cut ), treeSignal->CopyTree( cut ), treeSMH->CopyTree( cut ), mggName, _SMH_Yield, SMH_CL,
-      			   _Signal_Yield, Signal_CL, binNumber, categoryMode );
+      			   _Signal_Yield, Signal_CL, binNumber, categoryMode, _highMassMode );
       std::cout << "finish MakeDataCard" << std::endl;
       w_sb->Write("w_sb");
     }

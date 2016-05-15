@@ -258,13 +258,13 @@ TString MakeDoubleCB( TString tag, RooRealVar& mgg, RooWorkspace& w )
   mu->setConstant(kFALSE);
   sigma->setConstant(kFALSE);
   alpha1->setConstant(kFALSE);
-  alpha1->setRange(0, 100);
+  alpha1->setRange(0, 1000);
   alpha2->setConstant(kFALSE);
-  alpha2->setRange(0, 100);
+  alpha2->setRange(0, 1000);
   n1->setConstant(kFALSE);
-  n1->setRange(0, 100);
+  n1->setRange(0, 1000);
   n2->setConstant(kFALSE);
-  n2->setRange(0, 100);
+  n2->setRange(0, 1000);
   
   RooRealVar* Ns     = new RooRealVar( tag + "_DCB_Ns", "N_{s}", 1e5, "events");
   Ns->setConstant(kFALSE);
@@ -296,13 +296,13 @@ TString MakeDoubleCBNE( TString tag, RooRealVar& mgg, RooWorkspace& w, bool _glo
   mu->setConstant(kFALSE);
   sigma->setConstant(kFALSE);
   alpha1->setConstant(kFALSE);
-  alpha1->setRange(0, 100);
+  alpha1->setRange(0, 1000);
   alpha2->setConstant(kFALSE);
-  alpha2->setRange(0, 100);
+  alpha2->setRange(0, 1000);
   n1->setConstant(kFALSE);
-  n1->setRange(0, 100);
+  n1->setRange(0, 1000);
   n2->setConstant(kFALSE);
-  n2->setRange(0, 100);
+  n2->setRange(0, 1000);
 
   TString pdf_name = tag + "_DCB";
   RooDoubleCB* dCB;
