@@ -475,17 +475,18 @@ TString MakeSingleExpNE( TString tag, RooRealVar& mgg, RooWorkspace& w )
 
 TString MakeHMDiphoton( TString tag, RooRealVar& mgg, RooWorkspace& w )
 {
-  RooRealVar* a = new RooRealVar( tag + "_a", "", -0.06, "a.u"); 
+  TString pdfName = tag + "_HMDiphoton_ext";
+  RooRealVar* a = new RooRealVar( pdfName + "_a", "", -0.06, "a.u"); 
   a->setConstant(kFALSE);
-  RooRealVar* b = new RooRealVar( tag + "_b", "", -0.06, "a.u"); 
+  RooRealVar* b = new RooRealVar( pdfName + "_b", "", -0.06, "a.u"); 
   b->setConstant(kFALSE);
 
-  RooRealVar* Nbkg = new RooRealVar( tag + "_Nbkg","",10., "events");
+  RooRealVar* Nbkg = new RooRealVar( pdfName + "_Nbkg","",10., "events");
   Nbkg->setConstant(kFALSE);
   
-  RooHMDiphoton* hmDiphoton = new RooHMDiphoton( tag + "_HMDiphoton", "", mgg, *a, *b );
+  RooHMDiphoton* hmDiphoton = new RooHMDiphoton( pdfName + "_HMDiphoton", "", mgg, *a, *b );
   
-  TString pdfName = tag + "_HMDiphoton_ext";
+ 
   RooAddPdf* ext_HMDiphoton = new RooAddPdf( pdfName,"", RooArgList( *hmDiphoton ), RooArgList( *Nbkg ) );
   w.import( *ext_HMDiphoton );
   return pdfName;
@@ -493,12 +494,13 @@ TString MakeHMDiphoton( TString tag, RooRealVar& mgg, RooWorkspace& w )
 
 TString MakeHMDiphotonNE( TString tag, RooRealVar& mgg, RooWorkspace& w )
 {
-  RooRealVar* a = new RooRealVar( tag + "_a", "", -0.06, "a.u"); 
+  TString pdfName = tag + "_HMDiphoton";
+  RooRealVar* a = new RooRealVar( pdfName + "_a", "", -0.06, "a.u"); 
   a->setConstant(kFALSE);
-  RooRealVar* b = new RooRealVar( tag + "_b", "", -0.06, "a.u"); 
+  RooRealVar* b = new RooRealVar( pdfName + "_b", "", -0.06, "a.u"); 
   b->setConstant(kFALSE);
 
-  TString pdfName = tag + "_HMDiphoton";
+  
   RooHMDiphoton* hmDiphoton = new RooHMDiphoton( pdfName, "", mgg, *a, *b );
   
   w.import( *hmDiphoton );

@@ -853,7 +853,6 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   //Initializing Nbkg
   npoints = data.numEntries();
   //set Nbkg Initial Value
-  ws->var("fullsb_fit_singleExp_Nbkg")->setVal( npoints );
   std::cout << "entering constraints" << std::endl;
   //--------------------------------------
   //H i g g s   C o n s t r a i n s
@@ -880,6 +879,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   if ( isHighMass )
     {
       tag_bkg = MakeHMDiphoton( "Bkg_fit_HMDiphoton", mgg, *ws );
+      ws->var(tag_bkg+"_Nbkg")->setVal( npoints );
       bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
       bres->SetName("BkgOnlyFitResult");
       ws->import( *bres );
@@ -889,6 +889,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   else
     {
       tag_bkg = MakeSingleExp( "fullsb_fit_singleExp", mgg, *ws );
+      ws->var("fullsb_fit_singleExp_Nbkg")->setVal( npoints );
       bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
       bres->SetName("BkgOnlyFitResult");
       ws->import( *bres );
