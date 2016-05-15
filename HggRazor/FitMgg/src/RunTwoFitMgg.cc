@@ -885,6 +885,8 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
       ws->import( *bres );
       hmd_a = ws->var( tag_bkg+"_a")->getVal();
       hmd_b = ws->var( tag_bkg+"_b")->getVal();
+      Nbkg   = ws->var( tag_bkg+"_Nbkg")->getVal();
+      NbkgUn = ws->var( tag_bkg+"_Nbkg")->getError();
     }
   else
     {
@@ -908,7 +910,8 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   // m o d e l   1   p l o t t i n g
   //--------------------------------
   RooPlot *fmgg = mgg.frame();
-  data_toys->plotOn(fmgg);
+  //data_toys->plotOn(fmgg);
+  data.plotOn(fmgg);
   ws->pdf( tag_bkg)->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("Full"),RooFit::NormRange("Full"));
   ws->pdf( tag_bkg)->plotOn(fmgg,RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
   fmgg->SetName( "BkgOnlyFitPlot" );
