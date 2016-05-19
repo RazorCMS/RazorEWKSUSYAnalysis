@@ -306,7 +306,7 @@ int main ( int argc, char* argv[] )
   double k_f = 0.9373762951;
   const double lumi_frac = 1.0; // (5./19.8)
   //const double lumi = 2690.0;
-  const double lumi = 2.7;
+  const double lumi = 27;
   const int mod = 0; 
   if ( treeType == "inclusive" )
     {

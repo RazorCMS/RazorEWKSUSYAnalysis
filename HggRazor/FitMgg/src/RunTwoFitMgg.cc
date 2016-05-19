@@ -665,7 +665,7 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
 }
 
 RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, TString mggName, float SMH_Yield, std::string SMH_CF,
-			    float Signal_Yield, std::string Signal_CF, TString binNumber, TString category )
+			    float Signal_Yield, std::string Signal_CF, TString binNumber, TString category, bool isHighMass )
 {
   std::cout << "entering datacard: " << SMH_Yield << " " << Signal_Yield << std::endl;
   std::stringstream ss_smh, ss_signal;
@@ -700,11 +700,33 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   TString combinedRootFileName = "HggRazorWorkspace_bin" + binNumber + ".root";
   TFile* ftmp = new TFile( combinedRootFileName, "recreate");
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
-  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 103, 160, "GeV" );
-  mgg.setBins(38);
-  mgg.setRange( "signal", 115, 135. );
-  mgg.setRange( "high", 135, 160);
-  mgg.setRange( "low", 103, 120);
+
+  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 0, 10000, "GeV" );
+  if ( isHighMass )
+    {
+      mgg.SetNameTitle( mggName, "m_{#gamma#gamma}" );
+      mgg.setMin( 230. );
+      mgg.setMax( 1230. );
+      mgg.setUnit( "GeV" );
+      mgg.setBins(50);
+      mgg.setRange( "signal", 600., 900. );
+      mgg.setRange( "full", 230., 1230. );
+      mgg.setRange( "high", 850., 1230.);
+      mgg.setRange( "low", 230., 650.);
+    }
+  else
+    {
+      mgg.SetNameTitle( mggName, "m_{#gamma#gamma}" );
+      mgg.setMin( 103. );
+      mgg.setMax( 160. );
+      mgg.setUnit( "GeV" );
+      mgg.setBins(38);
+      mgg.setRange( "signal", 115, 135. );
+      mgg.setRange( "high", 135., 160. );
+      mgg.setRange( "low", 103., 120. );
+      mgg.setRange( "full", 103., 160. );
+    }
+  
   //--------------------------------
   //I m p or t i n g   D a t a
   //--------------------------------
@@ -735,21 +757,45 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
       
       tagSignal = MakeDoubleCB( "DCB_Signal_bin"+ binNumber, mgg, *ws );
       ws->var(tagSignal+"_Ns")->setVal( (double)npoints );
-      
-      ws->var(tagSignal+"_muCB")->setVal( 125.0 );
-      ws->var(tagSignal+"_sigmaCB")->setVal( 1.0 );
-      std::cout << tagSignal << std::endl;
-      
+      //--------------------------
+      //Setting initial parameters
+      //--------------------------
+      if ( isHighMass )
+	{
+	  ws->var(tagSignal+"_muCB")->setVal( 740.0 );
+	  //Narrow Resonance
+	  /*ws->var(tagSignal+"_sigmaCB")->setVal( 8.0 );
+	    ws->var(tagSignal+"_alpha1")->setVal( 1.0 );
+	    ws->var(tagSignal+"_alpha2")->setVal( 1.0 );
+	    ws->var(tagSignal+"_n1")->setVal( 1.8 );
+	    ws->var(tagSignal+"_n2")->setVal( 3.8 );*/
+	  //Wide Resonance
+	  ws->var(tagSignal+"_sigmaCB")->setVal( 20.0 );
+	  ws->var(tagSignal+"_alpha1")->setVal( 1.0 );
+	  ws->var(tagSignal+"_alpha2")->setVal( 1.0 );
+	  ws->var(tagSignal+"_n1")->setVal( 1.8 );
+	  ws->var(tagSignal+"_n2")->setVal( 3.8 );
+	  
+	}
+      else
+	{
+	  ws->var(tagSignal+"_muCB")->setVal( 125.0 );
+	  ws->var(tagSignal+"_sigmaCB")->setVal( 1.0 );
+	}
     }
   std::cout << tagSignal << std::endl;
-  RooFitResult* sres = ws->pdf( tagSignal )->fitTo( dataSignal, RooFit::Strategy(2), RooFit::Extended( kTRUE ), RooFit::Save( kTRUE ), RooFit::Range("Full") );
+  RooFitResult* sres = ws->pdf( tagSignal )->fitTo( dataSignal, RooFit::Strategy(2), RooFit::Extended( kTRUE ), RooFit::Save( kTRUE ), RooFit::Range("signal") );
+  sres->SetName("SignalFitResult");
+  ws->import( *sres );
   /*
-  double gausFrac    =  ws->var(tagSignal+"_frac")->getVal();
-  double gausMu1     =  ws->var(tagSignal+"_mu1")->getVal();
-  double gausMu2     =  ws->var(tagSignal+"_mu2")->getVal();
-  double gausSigma1  =  ws->var(tagSignal+"_sigma1")->getVal();
-  double gausSigma2  =  ws->var(tagSignal+"_sigma2")->getVal();
+  //double gaussian relic
+    double gausFrac    =  ws->var(tagSignal+"_frac")->getVal();
+    double gausMu1     =  ws->var(tagSignal+"_mu1")->getVal();
+    double gausMu2     =  ws->var(tagSignal+"_mu2")->getVal();
+    double gausSigma1  =  ws->var(tagSignal+"_sigma1")->getVal();
+    double gausSigma2  =  ws->var(tagSignal+"_sigma2")->getVal();
   */
+  
   double DCB_mu_s    = ws->var(tagSignal+"_muCB")->getVal( );
   double DCB_sigma_s = ws->var(tagSignal+"_sigmaCB")->getVal( );
   double DCB_a1_s    = ws->var(tagSignal+"_alpha1")->getVal( );
@@ -771,14 +817,30 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
       //ws->var(tagSMH+"_Ns")->setVal( (double)npoints );
       tagSMH = MakeDoubleCB( "DCB_SMH_bin"+ binNumber, mgg, *ws );
       ws->var(tagSMH+"_Ns")->setVal( (double)npoints );
-      
-      ws->var(tagSMH+"_muCB")->setVal( 125.0 );
-      ws->var(tagSMH+"_sigmaCB")->setVal( 1.0 );
+      //--------------------------
+      //Setting initial parameters
+      //--------------------------
+      if ( isHighMass )
+	{
+	  ws->var(tagSMH+"_muCB")->setVal( 740.0 );
+	  ws->var(tagSMH+"_sigmaCB")->setVal( 20.0 );
+	  ws->var(tagSMH+"_alpha1")->setVal( 1.0 );
+	  ws->var(tagSMH+"_alpha2")->setVal( 1.0 );
+	  ws->var(tagSMH+"_n1")->setVal( 1.8 );
+	  ws->var(tagSMH+"_n2")->setVal( 3.8 );
+	}
+      else
+	{
+	  ws->var(tagSMH+"_muCB")->setVal( 125.0 );
+	  ws->var(tagSMH+"_sigmaCB")->setVal( 1.0 );
+	}
     }
   
-  RooFitResult* smhres  = ws->pdf( tagSMH )->fitTo( dataSMH, RooFit::Strategy(2), RooFit::Extended( kTRUE ), RooFit::Save( kTRUE ), RooFit::Range("Full") );
-
+  RooFitResult* smhres  = ws->pdf( tagSMH )->fitTo( dataSMH, RooFit::Strategy(2), RooFit::Extended( kTRUE ), RooFit::Save( kTRUE ), RooFit::Range("signal") );
+  smhres->SetName("SMHFitResult");
+  ws->import( *smhres );
   /*
+    //double gaussian relic
   double gausFrac_SMH   =  ws->var(tagSMH+"_frac")->getVal();
   double gausMu1_SMH    =  ws->var(tagSMH+"_mu1")->getVal();
   double gausMu2_SMH    =  ws->var(tagSMH+"_mu2")->getVal();
@@ -794,11 +856,11 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   //------------------------------------
   // C r e a t e   b k g  s h a p e
   //------------------------------------
-  TString tag_bkg = MakeSingleExp( "fullsb_fit_singleExp", mgg, *ws );
+  TString tag_bkg;
+  
   //Initializing Nbkg
   npoints = data.numEntries();
   //set Nbkg Initial Value
-  ws->var("fullsb_fit_singleExp_Nbkg")->setVal( npoints );
   std::cout << "entering constraints" << std::endl;
   //--------------------------------------
   //H i g g s   C o n s t r a i n s
@@ -814,12 +876,40 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   //---------------------
   //F i t   t o   D a t a
   //---------------------
-  RooFitResult* bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
-  float sExp_a = ws->var("fullsb_fit_singleExp_a")->getVal();
-  float Nbkg   = ws->var("fullsb_fit_singleExp_Nbkg")->getVal();
-  float NbkgUn = ws->var("fullsb_fit_singleExp_Nbkg")->getError();
-  float BkgNormUn = 1.0 + NbkgUn/Nbkg;//input a lnN to combine
+  float sExp_a;
+  float Nbkg;
+  float NbkgUn;
+  float BkgNormUn;
+  //HighMassDiphoton
+  float hmd_a;
+  float hmd_b;
+  RooFitResult* bres;
+  if ( isHighMass )
+    {
+      tag_bkg = MakeHMDiphoton( "Bkg_fit_HMDiphoton", mgg, *ws );
+      ws->var(tag_bkg+"_Nbkg")->setVal( npoints );
+      bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+      bres->SetName("BkgOnlyFitResult");
+      ws->import( *bres );
+      hmd_a = ws->var( tag_bkg+"_a")->getVal();
+      hmd_b = ws->var( tag_bkg+"_b")->getVal();
+      Nbkg   = ws->var( tag_bkg+"_Nbkg")->getVal();
+      NbkgUn = ws->var( tag_bkg+"_Nbkg")->getError();
+    }
+  else
+    {
+      tag_bkg = MakeSingleExp( "fullsb_fit_singleExp", mgg, *ws );
+      ws->var("fullsb_fit_singleExp_Nbkg")->setVal( npoints );
+      bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+      bres->SetName("BkgOnlyFitResult");
+      ws->import( *bres );
+      sExp_a = ws->var("fullsb_fit_singleExp_a")->getVal();
+      Nbkg   = ws->var("fullsb_fit_singleExp_Nbkg")->getVal();
+      NbkgUn = ws->var("fullsb_fit_singleExp_Nbkg")->getError();
+      BkgNormUn = 1.0 + NbkgUn/Nbkg;//input a lnN to combine
+    }
   
+    
   //RooDataSet* data_toys = GenerateToys( ws->pdf( tag_bkg ), mgg, npoints);
   RooAbsData* data_toys = ws->pdf( tag_bkg )->generateBinned( mgg, npoints, RooFit::ExpectedData() );
   data_toys->SetName("data_bin"+binNumber);
@@ -828,7 +918,8 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   // m o d e l   1   p l o t t i n g
   //--------------------------------
   RooPlot *fmgg = mgg.frame();
-  data_toys->plotOn(fmgg);
+  //data_toys->plotOn(fmgg);
+  data.plotOn(fmgg);
   ws->pdf( tag_bkg)->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("Full"),RooFit::NormRange("Full"));
   ws->pdf( tag_bkg)->plotOn(fmgg,RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
   fmgg->SetName( "BkgOnlyFitPlot" );
@@ -924,7 +1015,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   combine_ws->var( combineSignal+"_alpha2")->setVal( DCB_a2_s );
   combine_ws->var( combineSignal+"_n2")->setVal( DCB_n1_s );
   
-  combine_ws->var( combineSignal+"_muCB")->setConstant(kTRUE);
+  //combine_ws->var( combineSignal+"_muCB")->setConstant(kTRUE);
   combine_ws->var( combineSignal+"_sigmaCB")->setConstant(kTRUE);
   combine_ws->var( combineSignal+"_alpha1")->setConstant(kTRUE);
   combine_ws->var( combineSignal+"_n1")->setConstant(kTRUE);
@@ -937,13 +1028,26 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   //---------
   //Bkg model
   //---------
-  TString combineBkg    = MakeSingleExpNE( "Bkg_bin"+binNumber, mgg, *combine_ws );
-  combine_ws->var( combineBkg + "_a" )->setVal( sExp_a );
-  RooRealVar Bkg_norm(  combineBkg + "_norm", "", Nbkg );
-  Bkg_norm.setConstant(kFALSE);
-  combine_ws->import( Bkg_norm );
-  combine_ws->import( *data_toys );
-  //combine_ws->import( data );
+  TString combineBkg;
+  if ( isHighMass )
+    { 
+      combineBkg = MakeHMDiphotonNE( "Bkg_bin"+binNumber, mgg, *combine_ws );
+      combine_ws->var( combineBkg + "_a" )->setVal( hmd_a );
+      combine_ws->var( combineBkg + "_b" )->setVal( hmd_b );
+      RooRealVar Bkg_norm(  combineBkg + "_norm", "", Nbkg );
+      Bkg_norm.setConstant(kFALSE);
+      combine_ws->import( Bkg_norm );
+    }
+  else
+    {
+      combineBkg = MakeSingleExpNE( "Bkg_bin"+binNumber, mgg, *combine_ws );
+      combine_ws->var( combineBkg + "_a" )->setVal( sExp_a );
+      RooRealVar Bkg_norm(  combineBkg + "_norm", "", Nbkg );
+      Bkg_norm.setConstant(kFALSE);
+      combine_ws->import( Bkg_norm );
+    }
+  //combine_ws->import( *data_toys );
+  combine_ws->import( data );
     
   combine_ws->Write("combineWS");
   ftmp->cd();
@@ -952,61 +1056,118 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   //std::string bNumber( binNumber );//TString to std::string
   TString dataCardName = "HggRazorCombinedCard_bin" + binNumber + ".txt";
   std::ofstream ofs( dataCardName , std::ofstream::out );
-  ofs << "imax 1 number of bins\njmax 2 number of processes minus 1\nkmax * number of nuisance parameters\n";
-  ofs << "----------------------------------------------------------------------------------------\n";
-  ofs << "shapes Bkg\t\tbin"      << binNumber << "\t" << combinedRootFileName << " combineWS:" << combineBkg << "\n";
-  ofs << "shapes SMH\t\tbin"      << binNumber << "\t" << combinedRootFileName << " combineWS:" << combineSMH << "\n";
-  ofs << "shapes signal\t\tbin"   << binNumber << "\t" << combinedRootFileName << " combineWS:" << combineSignal << "\n";
-  ofs << "shapes data_obs\t\tbin" << binNumber << "\t" << combinedRootFileName << " combineWS:" << "data_bin" << binNumber << "\n";
-  ofs << "----------------------------------------------------------------------------------------\n";
-  ofs << "bin\t\tbin" << binNumber << "\n";
-  ofs << "observation\t-1.0\n";
-  ofs << "----------------------------------------------------------------------------------------\n";
-  ofs << "bin\t\t\t\t\t\tbin" << binNumber << "\t\tbin" << binNumber << "\t\tbin" << binNumber << "\n";
-  ofs << "process\t\t\t\t\t\tsignal\t\tSMH\t\tBkg\n";
-  ofs << "process\t\t\t\t\t\t0\t\t1\t\t2\n";
-  ofs << "rate\t\t\t\t\t\t1\t\t1\t\t1\n";
-  ofs << "----------------------------------------------------------------------------------------\n";
-  ofs << "CMS_Lumi\t\t\tlnN\t\t1.04\t\t1.04\t\t-\n";
-  ofs << "Photon_Trigger\t\t\tlnN\t\t1.05\t\t1.05\t\t-\n";
-  ofs << "ScaleNorm\t\t\tlnN\t\t-\t\t0.931/1.065\t\t-\n";
-  ofs << "PdfNorm\t\t\t\tlnN\t\t-\t\t0.948/1.062\t\t-\n";
-  int totalSys = smh_sys.size();
-  int ctr = 0;
-  for( int isys = 0; isys < totalSys; isys++ )
+  if ( isHighMass )
     {
-      if ( isys == 0 )
+      ofs << "imax 1 number of bins\njmax 1 number of processes minus 1\nkmax * number of nuisance parameters\n";
+      ofs << "----------------------------------------------------------------------------------------\n";
+      ofs << "shapes Bkg\t\tbin"      << binNumber << "\t" << combinedRootFileName << " combineWS:" << combineBkg << "\n";
+      ofs << "shapes signal\t\tbin"   << binNumber << "\t" << combinedRootFileName << " combineWS:" << combineSignal << "\n";
+      ofs << "shapes data_obs\t\tbin" << binNumber << "\t" << combinedRootFileName << " combineWS:" << "data_bin" << binNumber << "\n";
+      ofs << "----------------------------------------------------------------------------------------\n";
+      ofs << "bin\t\tbin" << binNumber << "\n";
+      ofs << "observation\t-1.0\n";
+      ofs << "----------------------------------------------------------------------------------------\n";
+      ofs << "bin\t\t\t\t\t\tbin" << binNumber << "\t\tbin" << binNumber << "\n";
+      ofs << "process\t\t\t\t\t\tsignal\t\tBkg\n";
+      ofs << "process\t\t\t\t\t\t0\t\t1\n";
+      ofs << "rate\t\t\t\t\t\t1\t\t1\n";
+      ofs << "----------------------------------------------------------------------------------------\n";
+      ofs << "CMS_Lumi\t\t\tlnN\t\t1.04\t\t-\n";
+      ofs << "Photon_Trigger\t\t\tlnN\t\t1.03\t\t-\n";
+      ofs << "ScaleNorm\t\t\tlnN\t\t0.931/1.065\t\t-\n";
+      ofs << "PdfNorm\t\t\t\tlnN\t\t0.948/1.062\t\t-\n";
+      int totalSys = smh_sys.size();
+      int ctr = 0;
+      for( int isys = 0; isys < totalSys; isys++ )
 	{
-	  ofs << "SMH_JES\t\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	  if ( isys == 0 )
+	    {
+	      ofs << "SMH_JES\t\t\t\tlnN\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	    }
+	  else if ( isys == 2 )
+	    {
+	      ofs << "SMH_facScale\t\t\tlnN\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	    }
+	  else if ( isys == 4 )
+	    {
+	      ofs << "SMH_renScale\t\t\tlnN\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	    }
+	  else if ( isys == 6 )
+	    {
+	      ofs << "SMH_facRenScale\t\t\tlnN\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	    }
+	  else if ( isys > 7 )
+	    {
+	      ofs << "SMH_pdf" << ctr << "\t\t\tlnN\t\t" << smh_sys.at(isys) << "\t\t-\n";
+	      ctr++;
+	    }
 	}
-      else if ( isys == 2 )
+      ofs << "mu_Global\t\t\tparam\t\t 0 1.25\n";
+      if ( category != "highres" ) ofs << category << "_mu_Global\t\t\tparam\t\t 0 1.25\n";
+      if ( category == "hzbb" )
 	{
-	  ofs << "SMH_facScale\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
-	}
-      else if ( isys == 4 )
-	{
-	  ofs << "SMH_renScale\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
-	}
-      else if ( isys == 6 )
-	{
-	  ofs << "SMH_facRenScale\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
-	}
-      else if ( isys > 7 )
-	{
-	  ofs << "SMH_pdf" << ctr << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys) << "\t\t-\n";
-	  ctr++;
+	  ofs << "SMH_btag\t\t\tlnN\t\t" << "0.961/1.04" "\t\t-\n";
+	  ofs << "SMH_misstag\t\t\tlnN\t\t" << "0.992/1.008" << "\t\t-\n";
 	}
     }
-  ofs << "mu_Global\t\t\tparam\t\t 0 1.25\n";
-  if ( category != "highres" ) ofs << category << "_mu_Global\t\t\tparam\t\t 0 1.25\n";
-  if ( category == "hzbb" )
+  else
     {
-      ofs << "SMH_btag\t\t\tlnN\t\t-\t\t" << "0.961/1.04" "\t\t-\n";
-      ofs << "SMH_misstag\t\t\tlnN\t\t-\t\t" << "0.992/1.008" << "\t\t-\n";
+      ofs << "imax 1 number of bins\njmax 2 number of processes minus 1\nkmax * number of nuisance parameters\n";
+      ofs << "----------------------------------------------------------------------------------------\n";
+      ofs << "shapes Bkg\t\tbin"      << binNumber << "\t" << combinedRootFileName << " combineWS:" << combineBkg << "\n";
+      ofs << "shapes SMH\t\tbin"      << binNumber << "\t" << combinedRootFileName << " combineWS:" << combineSMH << "\n";
+      ofs << "shapes signal\t\tbin"   << binNumber << "\t" << combinedRootFileName << " combineWS:" << combineSignal << "\n";
+      ofs << "shapes data_obs\t\tbin" << binNumber << "\t" << combinedRootFileName << " combineWS:" << "data_bin" << binNumber << "\n";
+      ofs << "----------------------------------------------------------------------------------------\n";
+      ofs << "bin\t\tbin" << binNumber << "\n";
+      ofs << "observation\t-1.0\n";
+      ofs << "----------------------------------------------------------------------------------------\n";
+      ofs << "bin\t\t\t\t\t\tbin" << binNumber << "\t\tbin" << binNumber << "\t\tbin" << binNumber << "\n";
+      ofs << "process\t\t\t\t\t\tsignal\t\tSMH\t\tBkg\n";
+      ofs << "process\t\t\t\t\t\t0\t\t1\t\t2\n";
+      ofs << "rate\t\t\t\t\t\t1\t\t1\t\t1\n";
+      ofs << "----------------------------------------------------------------------------------------\n";
+      ofs << "CMS_Lumi\t\t\tlnN\t\t1.04\t\t1.04\t\t-\n";
+      ofs << "Photon_Trigger\t\t\tlnN\t\t1.05\t\t1.05\t\t-\n";
+      ofs << "ScaleNorm\t\t\tlnN\t\t-\t\t0.931/1.065\t\t-\n";
+      ofs << "PdfNorm\t\t\t\tlnN\t\t-\t\t0.948/1.062\t\t-\n";
+      int totalSys = smh_sys.size();
+      int ctr = 0;
+      for( int isys = 0; isys < totalSys; isys++ )
+	{
+	  if ( isys == 0 )
+	    {
+	      ofs << "SMH_JES\t\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	    }
+	  else if ( isys == 2 )
+	    {
+	      ofs << "SMH_facScale\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	    }
+	  else if ( isys == 4 )
+	    {
+	      ofs << "SMH_renScale\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	    }
+	  else if ( isys == 6 )
+	    {
+	      ofs << "SMH_facRenScale\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	    }
+	  else if ( isys > 7 )
+	    {
+	      ofs << "SMH_pdf" << ctr << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys) << "\t\t-\n";
+	      ctr++;
+	    }
+	}
+      ofs << "mu_Global\t\t\tparam\t\t 0 1.25\n";
+      if ( category != "highres" ) ofs << category << "_mu_Global\t\t\tparam\t\t 0 1.25\n";
+      if ( category == "hzbb" )
+	{
+	  ofs << "SMH_btag\t\t\tlnN\t\t-\t\t" << "0.961/1.04" "\t\t-\n";
+	  ofs << "SMH_misstag\t\t\tlnN\t\t-\t\t" << "0.992/1.008" << "\t\t-\n";
+	}
+      //ofs << "SMH_renScale\t\t\tlnN\t\t-\t\t" << SMH_renScale << "\t\t-\n";
+      //ofs << "SMH_facRenScale\t\t\tlnN\t\t-\t\t" << SMH_facRenScale << "\t\t-\n";
+      //ofs << "BkgNorm_bin" << binNumber << "\t\t\tlnN\t\t-\t\t-\t\t" << BkgNormUn << std::endl;
     }
-  //ofs << "SMH_renScale\t\t\tlnN\t\t-\t\t" << SMH_renScale << "\t\t-\n";
-  //ofs << "SMH_facRenScale\t\t\tlnN\t\t-\t\t" << SMH_facRenScale << "\t\t-\n";
-  //ofs << "BkgNorm_bin" << binNumber << "\t\t\tlnN\t\t-\t\t-\t\t" << BkgNormUn << std::endl;
   ofs.close();
   return ws;
 };
