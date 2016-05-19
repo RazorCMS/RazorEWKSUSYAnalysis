@@ -189,8 +189,8 @@ float lres_k[2] = { 1.0, 1.0};
 //Zee
 //--------------
 //EBEB 
-TString cut    = "abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) < 1.4442 && pho1Pt > 40. && pho2Pt> 30. && mGammaGamma > 50 && pho1passIso == 1 && pho2passIso == 1";
-TString cut_mc = "abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) < 1.4442 && pho1Pt > 40. && pho2Pt> 30. && mGammaGamma > 50 && pho1passIso == 1 && pho2passIso == 1";
+TString cut    = "abs( pho1DefaultSC_Eta ) < 1.4442 && abs( pho2DefaultSC_Eta ) < 1.4442 && pho1Pt > 40. && pho2Pt> 30. && mGammaGamma > 50 && pho1passIso == 1 && pho2passIso == 1";
+TString cut_mc = "abs( pho1DefaultSC_Eta ) < 1.4442 && abs( pho2DefaultSC_Eta ) < 1.4442 && pho1Pt > 40. && pho2Pt> 30. && mGammaGamma > 50 && pho1passIso == 1 && pho2passIso == 1";
 //EBEE
 //TString cut    = "( (abs( pho1SC_Eta ) > 1.566 && abs( pho2SC_Eta ) < 1.4442) || (abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) > 1.566) ) && pho1Pt > 40. && pho2Pt> 30. && mGammaGamma > 50 && pho1passIso == 1 && pho2passIso == 1";
 //TString cut_mc = "( (abs( pho1SC_Eta ) > 1.566 && abs( pho2SC_Eta ) < 1.4442) || (abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) > 1.566) ) && pho1Pt > 40. && pho2Pt> 30. && mGammaGamma > 50 && pho1passIso == 1 && pho2passIso == 1";
@@ -203,6 +203,7 @@ TString cut_mc = "abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) < 1.4442 && ph
 //TString triggerCut = "( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
 //TString triggerCut = "( HLTDecision[66] == 1 || HLTDecision[71] == 1 )";
 //TString triggerCut = "( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) ";
+//TString triggerCut = "( HLTDecision[44] == 1 ) ";  
 TString triggerCut = "1";
 
 //--------------------------------
@@ -306,7 +307,7 @@ int main ( int argc, char* argv[] )
   double k_f = 0.9373762951;
   const double lumi_frac = 1.0; // (5./19.8)
   //const double lumi = 2690.0;
-  const double lumi = 2.7;
+  const double lumi = 27;
   const int mod = 0; 
   if ( treeType == "inclusive" )
     {

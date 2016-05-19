@@ -708,7 +708,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
       mgg.setMin( 230. );
       mgg.setMax( 1230. );
       mgg.setUnit( "GeV" );
-      mgg.setBins(200);
+      mgg.setBins(50);
       mgg.setRange( "signal", 600., 900. );
       mgg.setRange( "full", 230., 1230. );
       mgg.setRange( "high", 850., 1230.);
@@ -763,11 +763,19 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
       if ( isHighMass )
 	{
 	  ws->var(tagSignal+"_muCB")->setVal( 740.0 );
-	  ws->var(tagSignal+"_sigmaCB")->setVal( 8.0 );
+	  //Narrow Resonance
+	  /*ws->var(tagSignal+"_sigmaCB")->setVal( 8.0 );
+	    ws->var(tagSignal+"_alpha1")->setVal( 1.0 );
+	    ws->var(tagSignal+"_alpha2")->setVal( 1.0 );
+	    ws->var(tagSignal+"_n1")->setVal( 1.8 );
+	    ws->var(tagSignal+"_n2")->setVal( 3.8 );*/
+	  //Wide Resonance
+	  ws->var(tagSignal+"_sigmaCB")->setVal( 20.0 );
 	  ws->var(tagSignal+"_alpha1")->setVal( 1.0 );
 	  ws->var(tagSignal+"_alpha2")->setVal( 1.0 );
 	  ws->var(tagSignal+"_n1")->setVal( 1.8 );
 	  ws->var(tagSignal+"_n2")->setVal( 3.8 );
+	  
 	}
       else
 	{
@@ -1007,7 +1015,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   combine_ws->var( combineSignal+"_alpha2")->setVal( DCB_a2_s );
   combine_ws->var( combineSignal+"_n2")->setVal( DCB_n1_s );
   
-  combine_ws->var( combineSignal+"_muCB")->setConstant(kTRUE);
+  //combine_ws->var( combineSignal+"_muCB")->setConstant(kTRUE);
   combine_ws->var( combineSignal+"_sigmaCB")->setConstant(kTRUE);
   combine_ws->var( combineSignal+"_alpha1")->setConstant(kTRUE);
   combine_ws->var( combineSignal+"_n1")->setConstant(kTRUE);
@@ -1025,7 +1033,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
     { 
       combineBkg = MakeHMDiphotonNE( "Bkg_bin"+binNumber, mgg, *combine_ws );
       combine_ws->var( combineBkg + "_a" )->setVal( hmd_a );
-      combine_ws->var( combineBkg + "_b" )->setVal( hmd_a );
+      combine_ws->var( combineBkg + "_b" )->setVal( hmd_b );
       RooRealVar Bkg_norm(  combineBkg + "_norm", "", Nbkg );
       Bkg_norm.setConstant(kFALSE);
       combine_ws->import( Bkg_norm );
@@ -1048,61 +1056,118 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   //std::string bNumber( binNumber );//TString to std::string
   TString dataCardName = "HggRazorCombinedCard_bin" + binNumber + ".txt";
   std::ofstream ofs( dataCardName , std::ofstream::out );
-  ofs << "imax 1 number of bins\njmax 2 number of processes minus 1\nkmax * number of nuisance parameters\n";
-  ofs << "----------------------------------------------------------------------------------------\n";
-  ofs << "shapes Bkg\t\tbin"      << binNumber << "\t" << combinedRootFileName << " combineWS:" << combineBkg << "\n";
-  ofs << "shapes SMH\t\tbin"      << binNumber << "\t" << combinedRootFileName << " combineWS:" << combineSMH << "\n";
-  ofs << "shapes signal\t\tbin"   << binNumber << "\t" << combinedRootFileName << " combineWS:" << combineSignal << "\n";
-  ofs << "shapes data_obs\t\tbin" << binNumber << "\t" << combinedRootFileName << " combineWS:" << "data_bin" << binNumber << "\n";
-  ofs << "----------------------------------------------------------------------------------------\n";
-  ofs << "bin\t\tbin" << binNumber << "\n";
-  ofs << "observation\t-1.0\n";
-  ofs << "----------------------------------------------------------------------------------------\n";
-  ofs << "bin\t\t\t\t\t\tbin" << binNumber << "\t\tbin" << binNumber << "\t\tbin" << binNumber << "\n";
-  ofs << "process\t\t\t\t\t\tsignal\t\tSMH\t\tBkg\n";
-  ofs << "process\t\t\t\t\t\t0\t\t1\t\t2\n";
-  ofs << "rate\t\t\t\t\t\t1\t\t1\t\t1\n";
-  ofs << "----------------------------------------------------------------------------------------\n";
-  ofs << "CMS_Lumi\t\t\tlnN\t\t1.04\t\t1.04\t\t-\n";
-  ofs << "Photon_Trigger\t\t\tlnN\t\t1.05\t\t1.05\t\t-\n";
-  ofs << "ScaleNorm\t\t\tlnN\t\t-\t\t0.931/1.065\t\t-\n";
-  ofs << "PdfNorm\t\t\t\tlnN\t\t-\t\t0.948/1.062\t\t-\n";
-  int totalSys = smh_sys.size();
-  int ctr = 0;
-  for( int isys = 0; isys < totalSys; isys++ )
+  if ( isHighMass )
     {
-      if ( isys == 0 )
+      ofs << "imax 1 number of bins\njmax 1 number of processes minus 1\nkmax * number of nuisance parameters\n";
+      ofs << "----------------------------------------------------------------------------------------\n";
+      ofs << "shapes Bkg\t\tbin"      << binNumber << "\t" << combinedRootFileName << " combineWS:" << combineBkg << "\n";
+      ofs << "shapes signal\t\tbin"   << binNumber << "\t" << combinedRootFileName << " combineWS:" << combineSignal << "\n";
+      ofs << "shapes data_obs\t\tbin" << binNumber << "\t" << combinedRootFileName << " combineWS:" << "data_bin" << binNumber << "\n";
+      ofs << "----------------------------------------------------------------------------------------\n";
+      ofs << "bin\t\tbin" << binNumber << "\n";
+      ofs << "observation\t-1.0\n";
+      ofs << "----------------------------------------------------------------------------------------\n";
+      ofs << "bin\t\t\t\t\t\tbin" << binNumber << "\t\tbin" << binNumber << "\n";
+      ofs << "process\t\t\t\t\t\tsignal\t\tBkg\n";
+      ofs << "process\t\t\t\t\t\t0\t\t1\n";
+      ofs << "rate\t\t\t\t\t\t1\t\t1\n";
+      ofs << "----------------------------------------------------------------------------------------\n";
+      ofs << "CMS_Lumi\t\t\tlnN\t\t1.04\t\t-\n";
+      ofs << "Photon_Trigger\t\t\tlnN\t\t1.03\t\t-\n";
+      ofs << "ScaleNorm\t\t\tlnN\t\t0.931/1.065\t\t-\n";
+      ofs << "PdfNorm\t\t\t\tlnN\t\t0.948/1.062\t\t-\n";
+      int totalSys = smh_sys.size();
+      int ctr = 0;
+      for( int isys = 0; isys < totalSys; isys++ )
 	{
-	  ofs << "SMH_JES\t\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	  if ( isys == 0 )
+	    {
+	      ofs << "SMH_JES\t\t\t\tlnN\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	    }
+	  else if ( isys == 2 )
+	    {
+	      ofs << "SMH_facScale\t\t\tlnN\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	    }
+	  else if ( isys == 4 )
+	    {
+	      ofs << "SMH_renScale\t\t\tlnN\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	    }
+	  else if ( isys == 6 )
+	    {
+	      ofs << "SMH_facRenScale\t\t\tlnN\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	    }
+	  else if ( isys > 7 )
+	    {
+	      ofs << "SMH_pdf" << ctr << "\t\t\tlnN\t\t" << smh_sys.at(isys) << "\t\t-\n";
+	      ctr++;
+	    }
 	}
-      else if ( isys == 2 )
+      ofs << "mu_Global\t\t\tparam\t\t 0 1.25\n";
+      if ( category != "highres" ) ofs << category << "_mu_Global\t\t\tparam\t\t 0 1.25\n";
+      if ( category == "hzbb" )
 	{
-	  ofs << "SMH_facScale\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
-	}
-      else if ( isys == 4 )
-	{
-	  ofs << "SMH_renScale\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
-	}
-      else if ( isys == 6 )
-	{
-	  ofs << "SMH_facRenScale\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
-	}
-      else if ( isys > 7 )
-	{
-	  ofs << "SMH_pdf" << ctr << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys) << "\t\t-\n";
-	  ctr++;
+	  ofs << "SMH_btag\t\t\tlnN\t\t" << "0.961/1.04" "\t\t-\n";
+	  ofs << "SMH_misstag\t\t\tlnN\t\t" << "0.992/1.008" << "\t\t-\n";
 	}
     }
-  ofs << "mu_Global\t\t\tparam\t\t 0 1.25\n";
-  if ( category != "highres" ) ofs << category << "_mu_Global\t\t\tparam\t\t 0 1.25\n";
-  if ( category == "hzbb" )
+  else
     {
-      ofs << "SMH_btag\t\t\tlnN\t\t-\t\t" << "0.961/1.04" "\t\t-\n";
-      ofs << "SMH_misstag\t\t\tlnN\t\t-\t\t" << "0.992/1.008" << "\t\t-\n";
+      ofs << "imax 1 number of bins\njmax 2 number of processes minus 1\nkmax * number of nuisance parameters\n";
+      ofs << "----------------------------------------------------------------------------------------\n";
+      ofs << "shapes Bkg\t\tbin"      << binNumber << "\t" << combinedRootFileName << " combineWS:" << combineBkg << "\n";
+      ofs << "shapes SMH\t\tbin"      << binNumber << "\t" << combinedRootFileName << " combineWS:" << combineSMH << "\n";
+      ofs << "shapes signal\t\tbin"   << binNumber << "\t" << combinedRootFileName << " combineWS:" << combineSignal << "\n";
+      ofs << "shapes data_obs\t\tbin" << binNumber << "\t" << combinedRootFileName << " combineWS:" << "data_bin" << binNumber << "\n";
+      ofs << "----------------------------------------------------------------------------------------\n";
+      ofs << "bin\t\tbin" << binNumber << "\n";
+      ofs << "observation\t-1.0\n";
+      ofs << "----------------------------------------------------------------------------------------\n";
+      ofs << "bin\t\t\t\t\t\tbin" << binNumber << "\t\tbin" << binNumber << "\t\tbin" << binNumber << "\n";
+      ofs << "process\t\t\t\t\t\tsignal\t\tSMH\t\tBkg\n";
+      ofs << "process\t\t\t\t\t\t0\t\t1\t\t2\n";
+      ofs << "rate\t\t\t\t\t\t1\t\t1\t\t1\n";
+      ofs << "----------------------------------------------------------------------------------------\n";
+      ofs << "CMS_Lumi\t\t\tlnN\t\t1.04\t\t1.04\t\t-\n";
+      ofs << "Photon_Trigger\t\t\tlnN\t\t1.05\t\t1.05\t\t-\n";
+      ofs << "ScaleNorm\t\t\tlnN\t\t-\t\t0.931/1.065\t\t-\n";
+      ofs << "PdfNorm\t\t\t\tlnN\t\t-\t\t0.948/1.062\t\t-\n";
+      int totalSys = smh_sys.size();
+      int ctr = 0;
+      for( int isys = 0; isys < totalSys; isys++ )
+	{
+	  if ( isys == 0 )
+	    {
+	      ofs << "SMH_JES\t\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	    }
+	  else if ( isys == 2 )
+	    {
+	      ofs << "SMH_facScale\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	    }
+	  else if ( isys == 4 )
+	    {
+	      ofs << "SMH_renScale\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	    }
+	  else if ( isys == 6 )
+	    {
+	      ofs << "SMH_facRenScale\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	    }
+	  else if ( isys > 7 )
+	    {
+	      ofs << "SMH_pdf" << ctr << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys) << "\t\t-\n";
+	      ctr++;
+	    }
+	}
+      ofs << "mu_Global\t\t\tparam\t\t 0 1.25\n";
+      if ( category != "highres" ) ofs << category << "_mu_Global\t\t\tparam\t\t 0 1.25\n";
+      if ( category == "hzbb" )
+	{
+	  ofs << "SMH_btag\t\t\tlnN\t\t-\t\t" << "0.961/1.04" "\t\t-\n";
+	  ofs << "SMH_misstag\t\t\tlnN\t\t-\t\t" << "0.992/1.008" << "\t\t-\n";
+	}
+      //ofs << "SMH_renScale\t\t\tlnN\t\t-\t\t" << SMH_renScale << "\t\t-\n";
+      //ofs << "SMH_facRenScale\t\t\tlnN\t\t-\t\t" << SMH_facRenScale << "\t\t-\n";
+      //ofs << "BkgNorm_bin" << binNumber << "\t\t\tlnN\t\t-\t\t-\t\t" << BkgNormUn << std::endl;
     }
-  //ofs << "SMH_renScale\t\t\tlnN\t\t-\t\t" << SMH_renScale << "\t\t-\n";
-  //ofs << "SMH_facRenScale\t\t\tlnN\t\t-\t\t" << SMH_facRenScale << "\t\t-\n";
-  //ofs << "BkgNorm_bin" << binNumber << "\t\t\tlnN\t\t-\t\t-\t\t" << BkgNormUn << std::endl;
   ofs.close();
   return ws;
 };
