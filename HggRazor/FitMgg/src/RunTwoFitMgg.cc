@@ -764,18 +764,21 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
 	{
 	  ws->var(tagSignal+"_muCB")->setVal( 740.0 );
 	  //Narrow Resonance
-	  /*ws->var(tagSignal+"_sigmaCB")->setVal( 8.0 );
+	  /*
+	  ws->var(tagSignal+"_sigmaCB")->setVal( 8.0 );
 	    ws->var(tagSignal+"_alpha1")->setVal( 1.0 );
 	    ws->var(tagSignal+"_alpha2")->setVal( 1.0 );
 	    ws->var(tagSignal+"_n1")->setVal( 1.8 );
-	    ws->var(tagSignal+"_n2")->setVal( 3.8 );*/
+	    ws->var(tagSignal+"_n2")->setVal( 3.8 );
+	  */
 	  //Wide Resonance
+	    
 	  ws->var(tagSignal+"_sigmaCB")->setVal( 20.0 );
 	  ws->var(tagSignal+"_alpha1")->setVal( 1.0 );
 	  ws->var(tagSignal+"_alpha2")->setVal( 1.0 );
 	  ws->var(tagSignal+"_n1")->setVal( 1.8 );
 	  ws->var(tagSignal+"_n2")->setVal( 3.8 );
-	  
+	    
 	}
       else
 	{
@@ -970,8 +973,8 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   combine_ws->var( combineSMH+"_sigma1")->setConstant(kTRUE);
   combine_ws->var( combineSMH+"_sigma2")->setConstant(kTRUE);
   */
-  if ( category != "highres" ) combineSMH = MakeDoubleCBNE( "SMH_bin"+binNumber, mgg, *combine_ws, true, true, category );//add global and cat scale uncertainty
-  else combineSMH = MakeDoubleCBNE( "SMH_bin"+binNumber, mgg, *combine_ws, true );//adding global scale uncertainty only
+  if ( category == "highres" || category == "inclusive" ) combineSMH = MakeDoubleCBNE( "SMH_bin"+binNumber, mgg, *combine_ws, true );
+  else combineSMH = MakeDoubleCBNE( "SMH_bin"+binNumber, mgg, *combine_ws, true, true, category );
   combine_ws->var( combineSMH+"_muCB")->setVal( DCB_mu_smh );
   combine_ws->var( combineSMH+"_sigmaCB")->setVal( DCB_sigma_smh );
   combine_ws->var( combineSMH+"_alpha1")->setVal( DCB_a1_smh );
@@ -1006,8 +1009,8 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   combine_ws->var( combineSignal+"_sigma1")->setConstant(kTRUE);
   combine_ws->var( combineSignal+"_sigma2")->setConstant(kTRUE);
   */
-  if ( category != "highres" ) combineSignal = MakeDoubleCBNE( "signal_bin"+binNumber, mgg, *combine_ws, true, true, category );//add global and cat scale uncertainty
-  else combineSignal = MakeDoubleCBNE( "signal_bin"+binNumber, mgg, *combine_ws, true );//add global scale uncertainty only
+  if ( category == "highres" || category == "inclusive" ) combineSignal = MakeDoubleCBNE( "signal_bin"+binNumber, mgg, *combine_ws, true );
+  else combineSignal = MakeDoubleCBNE( "signal_bin"+binNumber, mgg, *combine_ws, true, true, category );
   combine_ws->var( combineSignal+"_muCB")->setVal( DCB_mu_s );
   combine_ws->var( combineSignal+"_sigmaCB")->setVal( DCB_sigma_s );
   combine_ws->var( combineSignal+"_alpha1")->setVal( DCB_a1_s );
@@ -1015,7 +1018,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   combine_ws->var( combineSignal+"_alpha2")->setVal( DCB_a2_s );
   combine_ws->var( combineSignal+"_n2")->setVal( DCB_n1_s );
   
-  //combine_ws->var( combineSignal+"_muCB")->setConstant(kTRUE);
+  combine_ws->var( combineSignal+"_muCB")->setConstant(kTRUE);
   combine_ws->var( combineSignal+"_sigmaCB")->setConstant(kTRUE);
   combine_ws->var( combineSignal+"_alpha1")->setConstant(kTRUE);
   combine_ws->var( combineSignal+"_n1")->setConstant(kTRUE);
