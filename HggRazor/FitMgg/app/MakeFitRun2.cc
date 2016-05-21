@@ -85,7 +85,7 @@ int main( int argc, char* argv[])
       std::cerr << "[ERROR]: please provide a fit mode using --runPeriod=<run1/run2>" << std::endl; 
       return -1;
     }
-
+  
   std::string f1 = ParseCommandLine( argc, argv, "-f1=" );
   if (  f1 == "" && fitMode == "bias" )
     {
@@ -144,6 +144,31 @@ int main( int argc, char* argv[])
     {
       std::cerr << "[INFO] nDataset has not been set, please use --nDataset=" << std::endl;
     }
+
+  //Mass
+  std::string _Mass = ParseCommandLine( argc, argv, "-Mass=" );
+  float Mass = 1.0;
+  if ( _Mass != "" )
+    {
+      Mass = atof( _Mass.c_str() );
+    }
+  else
+    {
+      std::cerr << "[INFO] Mass has not been set, please use --Mass=" << std::endl;
+    }
+
+  //Width
+  std::string _Sigma = ParseCommandLine( argc, argv, "-Sigma=" );
+  float Sigma = 1.0;
+  if ( _Sigma != "" )
+    {
+      Sigma = atof( _Sigma.c_str() );
+    }
+  else
+    {
+      std::cerr << "[INFO] Sigma has not been set, please use --Sigma=" << std::endl;
+    }
+  
   std::string outputfilename = ParseCommandLine( argc, argv, "-outputFile=" );
   
   std::cout << "[INFO]: tree name is  :" << treeName << std::endl;
@@ -372,7 +397,8 @@ int main( int argc, char* argv[])
   if ( _highMassMode )
     {
       //EBEB
-      cut = "mGammaGamma > 230. && mGammaGamma < 1230. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1DefaultSC_Eta) <1.4442 && abs(pho2DefaultSC_Eta) < 1.4442 && pho1Pt> 75. && pho2Pt>75.";
+      //cut = "mGammaGamma > 230. && mGammaGamma < 1230. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1DefaultSC_Eta) <1.4442 && abs(pho2DefaultSC_Eta) < 1.4442 && pho1Pt> 75. && pho2Pt>75.";
+      cut = "mGammaGamma > 230. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.4442 && abs(pho2Eta) < 1.4442 && pho1Pt> 75. && pho2Pt>75.";
       //EBEE
       //cut = "mGammaGamma > 230. && mGammaGamma < 1230. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1Pt> 75. && pho2Pt>75. && ( (abs(pho1DefaultSC_Eta) > 1.566 && abs(pho2DefaultSC_Eta) < 1.4442) || (abs(pho1DefaultSC_Eta) < 1.4442 && abs(pho2DefaultSC_Eta) > 1.566) ) ";
       cutMETfilters = " && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
@@ -636,7 +662,8 @@ int main( int argc, char* argv[])
   else if ( fitMode == "signalFit" )
     {
       //RooWorkspace* w_sFit = DoubleGausFit( tree->CopyTree( cut ), forceSigma, sameMu, forceMu, mggName );
-      RooWorkspace* w_sFit = DoubleCBFit( tree->CopyTree( cut ), mggName, 125., 2. );
+      //RooWorkspace* w_sFit = DoubleCBFit( tree->CopyTree( cut ), mggName, 125., 2. );
+      RooWorkspace* w_sFit = DoubleCBFit( tree->CopyTree( cut ), mggName, Mass, Sigma );
       w_sFit->Write("w_sFit");
     }
   else if ( fitMode == "chooseBinning")

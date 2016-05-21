@@ -101,9 +101,13 @@ RooWorkspace* DoubleGausFit( TTree* tree, float forceSigma, bool sameMu, float f
 RooWorkspace* DoubleCBFit( TTree* tree, TString mggName, float muCB, float sigmaCB )
 {
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
-  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 103, 160, "GeV" );
-  mgg.setBins(57);
-  mgg.setRange( "signal", 103, 160. );
+  //RooRealVar mgg( mggName, "m_{#gamma#gamma}", 103, 160, "GeV" );
+  //mgg.setBins(57);
+  //mgg.setRange( "signal", 103, 160. );
+
+  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 230, 10000, "GeV" );
+  mgg.setBins(80);
+  //mgg.setRange( "signal", muCB-50*sigmaCB, muCB+50*sigmaCB );
 
   RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import( *tree ) );
   int npoints = data.numEntries();
@@ -113,19 +117,75 @@ RooWorkspace* DoubleCBFit( TTree* tree, TString mggName, float muCB, float sigma
   //---------------------------------
   TString tag = MakeDoubleCB( "Signal", mgg, *ws );
   ws->var( tag + "_Ns" )->setVal( (double)npoints );
-  
+  ws->var( tag + "_muCB")->setVal( 0.99*muCB );
+  ws->var( tag + "_sigmaCB")->setVal( 1.5*sigmaCB );
+  RooPlot* frame;
+  if ( muCB < 2000 )
+    {
+      mgg.setRange( "signal", muCB-50*sigmaCB, muCB+50*sigmaCB );
+      frame = mgg.frame( muCB-50*sigmaCB, muCB+50*sigmaCB, 100 );
+      ws->var( tag + "_muCB")->setVal( muCB );
+      ws->var( tag + "_sigmaCB")->setVal( sigmaCB );
+      ws->var( tag + "_alpha1")->setVal( 1.3 );
+      ws->var( tag + "_alpha2")->setVal( 1.8 );
+      ws->var( tag + "_n1")->setVal( 2.7 );
+      ws->var( tag + "_n2")->setVal( 4.8 );
+    }
+  else if ( muCB < 3000 )
+    {
+      mgg.setRange( "signal", muCB-50*sigmaCB, muCB+50*sigmaCB );
+      frame = mgg.frame( muCB-50*sigmaCB, muCB+50*sigmaCB, 100 );
+      ws->var( tag + "_muCB")->setVal( 0.99*muCB );
+      ws->var( tag + "_sigmaCB")->setVal( sigmaCB );
+      ws->var( tag + "_alpha1")->setVal( 1.3 );
+      ws->var( tag + "_alpha2")->setVal( 1.8 );
+      ws->var( tag + "_n1")->setVal( 2.7 );
+      ws->var( tag + "_n2")->setVal( 4.8 );
+    }
+  else if ( muCB < 4500 )
+    {
+      mgg.setRange( "signal", muCB-50*sigmaCB, muCB+50*sigmaCB );
+      frame = mgg.frame( muCB-50*sigmaCB, muCB+50*sigmaCB, 100 );
+      ws->var( tag + "_muCB")->setVal( muCB );
+      ws->var( tag + "_sigmaCB")->setVal( 1.5*sigmaCB );
+      ws->var( tag + "_alpha1")->setVal( 0.3 );
+      ws->var( tag + "_alpha2")->setVal( 0.8 );
+      ws->var( tag + "_n1")->setVal( 2.7 );
+      ws->var( tag + "_n2")->setVal( 4.8 );
+    }
+  else if ( muCB < 5000. )
+    {
+      mgg.setRange( "signal", muCB-8*sigmaCB, muCB+8*sigmaCB );
+      frame = mgg.frame( muCB-8*sigmaCB, muCB+8*sigmaCB, 100 );
+      ws->var( tag + "_muCB")->setVal( 0.988*muCB );
+      ws->var( tag + "_sigmaCB")->setVal( sigmaCB );
+      ws->var( tag + "_alpha1")->setVal( 1.3 );
+      ws->var( tag + "_alpha2")->setVal( 1.8 );
+      ws->var( tag + "_n1")->setVal( 1.5 );
+      ws->var( tag + "_n2")->setVal( 2.8 );
+    }
+  else
+    {
+      mgg.setRange( "signal", muCB-6*sigmaCB, muCB+3*sigmaCB );
+      frame = mgg.frame( muCB-6*sigmaCB, muCB+3*sigmaCB, 100 );
+      ws->var( tag + "_muCB")->setVal( 0.988*muCB );
+      ws->var( tag + "_sigmaCB")->setVal( sigmaCB );
+      ws->var( tag + "_alpha1")->setVal( 0.6 );
+      ws->var( tag + "_alpha2")->setVal( 1.6 );
+      ws->var( tag + "_n1")->setVal( 1.0 );
+      ws->var( tag + "_n2")->setVal( 2.8 );
+    }
+
   RooFitResult* sres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(2), RooFit::Extended( kTRUE ), RooFit::Save( kTRUE ), RooFit::Range("signal") );
-  
-  sres->SetName( tag + "_sres" );
+  sres->SetName( "SignalFitResult" );
   ws->import( *sres );
   
-  gSystem->Load("~/Software/git/RazorFramework/HggRazor/FitMgg/CustomPdfs.so");
-  RooPlot* frame = mgg.frame();
+  //RooPlot* frame = mgg.frame( muCB-5*sigmaCB, muCB+5*sigmaCB, 100 );
   data.plotOn( frame );
   ws->pdf( tag )->plotOn( frame, RooFit::LineColor( kBlue ), RooFit::Range("signal"), RooFit::NormRange("signal") );
   ws->import( mgg );
   ws->import( data );
-  frame->SetName( tag + "_frame" );
+  frame->SetName( "SignalFitPlot" );
   ws->import( *frame );
   
   return ws;
@@ -764,21 +824,19 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
 	{
 	  ws->var(tagSignal+"_muCB")->setVal( 740.0 );
 	  //Narrow Resonance
-	  /*
 	  ws->var(tagSignal+"_sigmaCB")->setVal( 8.0 );
-	    ws->var(tagSignal+"_alpha1")->setVal( 1.0 );
-	    ws->var(tagSignal+"_alpha2")->setVal( 1.0 );
-	    ws->var(tagSignal+"_n1")->setVal( 1.8 );
-	    ws->var(tagSignal+"_n2")->setVal( 3.8 );
-	  */
+	  ws->var(tagSignal+"_alpha1")->setVal( 1.0 );
+	  ws->var(tagSignal+"_alpha2")->setVal( 1.0 );
+	  ws->var(tagSignal+"_n1")->setVal( 1.8 );
+	  ws->var(tagSignal+"_n2")->setVal( 3.8 );
 	  //Wide Resonance
-	    
+	  /*
 	  ws->var(tagSignal+"_sigmaCB")->setVal( 20.0 );
 	  ws->var(tagSignal+"_alpha1")->setVal( 1.0 );
 	  ws->var(tagSignal+"_alpha2")->setVal( 1.0 );
 	  ws->var(tagSignal+"_n1")->setVal( 1.8 );
 	  ws->var(tagSignal+"_n2")->setVal( 3.8 );
-	    
+	  */
 	}
       else
 	{
@@ -1011,7 +1069,9 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   */
   if ( category == "highres" || category == "inclusive" ) combineSignal = MakeDoubleCBNE( "signal_bin"+binNumber, mgg, *combine_ws, true );
   else combineSignal = MakeDoubleCBNE( "signal_bin"+binNumber, mgg, *combine_ws, true, true, category );
+
   combine_ws->var( combineSignal+"_muCB")->setVal( DCB_mu_s );
+  //combine_ws->var( combineSignal+"_muCB")->setVal( 760 );
   combine_ws->var( combineSignal+"_sigmaCB")->setVal( DCB_sigma_s );
   combine_ws->var( combineSignal+"_alpha1")->setVal( DCB_a1_s );
   combine_ws->var( combineSignal+"_n1")->setVal( DCB_n1_s );
@@ -1075,43 +1135,36 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
       ofs << "process\t\t\t\t\t\t0\t\t1\n";
       ofs << "rate\t\t\t\t\t\t1\t\t1\n";
       ofs << "----------------------------------------------------------------------------------------\n";
-      ofs << "CMS_Lumi\t\t\tlnN\t\t1.04\t\t-\n";
-      ofs << "Photon_Trigger\t\t\tlnN\t\t1.03\t\t-\n";
-      ofs << "ScaleNorm\t\t\tlnN\t\t0.931/1.065\t\t-\n";
-      ofs << "PdfNorm\t\t\t\tlnN\t\t0.948/1.062\t\t-\n";
+      ofs << "CMS_Lumi\t\t\tlnN\t\t1.027\t\t-\n";
+      ofs << "Photon_Trigger\t\t\tlnN\t\t1.10\t\t-\n";
+      ofs << "PdfNorm\t\t\t\tlnN\t\t1.06\t\t-\n";
       int totalSys = smh_sys.size();
       int ctr = 0;
       for( int isys = 0; isys < totalSys; isys++ )
 	{
 	  if ( isys == 0 )
 	    {
-	      ofs << "SMH_JES\t\t\t\tlnN\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	      //ofs << "SMH_JES\t\t\t\tlnN\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
 	    }
 	  else if ( isys == 2 )
 	    {
-	      ofs << "SMH_facScale\t\t\tlnN\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	      //ofs << "SMH_facScale\t\t\tlnN\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
 	    }
 	  else if ( isys == 4 )
 	    {
-	      ofs << "SMH_renScale\t\t\tlnN\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	      //ofs << "SMH_renScale\t\t\tlnN\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
 	    }
 	  else if ( isys == 6 )
 	    {
-	      ofs << "SMH_facRenScale\t\t\tlnN\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	      //ofs << "SMH_facRenScale\t\t\tlnN\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
 	    }
 	  else if ( isys > 7 )
 	    {
-	      ofs << "SMH_pdf" << ctr << "\t\t\tlnN\t\t" << smh_sys.at(isys) << "\t\t-\n";
+	      //ofs << "SMH_pdf" << ctr << "\t\t\tlnN\t\t" << smh_sys.at(isys) << "\t\t-\n";
 	      ctr++;
 	    }
 	}
-      ofs << "mu_Global\t\t\tparam\t\t 0 1.25\n";
-      if ( category != "highres" ) ofs << category << "_mu_Global\t\t\tparam\t\t 0 1.25\n";
-      if ( category == "hzbb" )
-	{
-	  ofs << "SMH_btag\t\t\tlnN\t\t" << "0.961/1.04" "\t\t-\n";
-	  ofs << "SMH_misstag\t\t\tlnN\t\t" << "0.992/1.008" << "\t\t-\n";
-	}
+      ofs << "mu_Global\t\t\tparam\t\t 0 7.5\n";
     }
   else
     {
