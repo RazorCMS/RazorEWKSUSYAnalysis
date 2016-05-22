@@ -1073,11 +1073,13 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
     {
       combineSignal = MakeDoubleCBNE( "signal_bin"+binNumber, mgg, *combine_ws, true );
       tagSignalInterpol = MakeDoubleCBInterpolateNE( "SignalInterpol" + binNumber, mgg, *combine_ws, true );
+      combine_ws->var( tagSignalInterpol+"_mass" )->setConstant(kTRUE);
     }
   else
     {
       combineSignal = MakeDoubleCBNE( "signal_bin"+binNumber, mgg, *combine_ws, true, true, category );
       tagSignalInterpol = MakeDoubleCBInterpolateNE( "SignalInterpol" + binNumber, mgg, *combine_ws, true, true, category );
+      combine_ws->var( tagSignalInterpol+"_mass" )->setConstant(kTRUE);
     }
 
   combine_ws->var( combineSignal+"_muCB")->setVal( DCB_mu_s );
