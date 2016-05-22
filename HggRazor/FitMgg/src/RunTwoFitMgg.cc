@@ -798,7 +798,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   //C r e a t e  doubleGaus
   //-----------------------
   bool sameMu = false;
-  TString tagSignal, tagSMH;
+  TString tagSignal, tagSignalInterpol, tagSMH;
   TString tag;
   RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import(*treeData) );
   RooDataSet dataSignal( "dataSignal", "", RooArgSet(mgg), RooFit::Import(*treeSignal) );
@@ -816,7 +816,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
     {
       //tagSignal = MakeFullDoubleGauss( "DG_signal_bin"+binNumber , mgg, *ws );
       //ws->var(tagSignal+"_Ns")->setVal( (double)npoints );
-      
+
       tagSignal = MakeDoubleCB( "DCB_Signal_bin"+ binNumber, mgg, *ws );
       ws->var(tagSignal+"_Ns")->setVal( (double)npoints );
       //--------------------------
@@ -1069,8 +1069,16 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   combine_ws->var( combineSignal+"_sigma1")->setConstant(kTRUE);
   combine_ws->var( combineSignal+"_sigma2")->setConstant(kTRUE);
   */
-  if ( category == "highres" || category == "inclusive" ) combineSignal = MakeDoubleCBNE( "signal_bin"+binNumber, mgg, *combine_ws, true );
-  else combineSignal = MakeDoubleCBNE( "signal_bin"+binNumber, mgg, *combine_ws, true, true, category );
+  if ( category == "highres" || category == "inclusive" )
+    {
+      combineSignal = MakeDoubleCBNE( "signal_bin"+binNumber, mgg, *combine_ws, true );
+      tagSignalInterpol = MakeDoubleCBInterpolateNE( "SignalInterpol" + binNumber, mgg, *combine_ws, true );
+    }
+  else
+    {
+      combineSignal = MakeDoubleCBNE( "signal_bin"+binNumber, mgg, *combine_ws, true, true, category );
+      tagSignalInterpol = MakeDoubleCBInterpolateNE( "SignalInterpol" + binNumber, mgg, *combine_ws, true, true, category );
+    }
 
   combine_ws->var( combineSignal+"_muCB")->setVal( DCB_mu_s );
   //combine_ws->var( combineSignal+"_muCB")->setVal( 760 );
@@ -1126,7 +1134,8 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
       ofs << "imax 1 number of bins\njmax 1 number of processes minus 1\nkmax * number of nuisance parameters\n";
       ofs << "----------------------------------------------------------------------------------------\n";
       ofs << "shapes Bkg\t\tbin"      << binNumber << "\t" << combinedRootFileName << " combineWS:" << combineBkg << "\n";
-      ofs << "shapes signal\t\tbin"   << binNumber << "\t" << combinedRootFileName << " combineWS:" << combineSignal << "\n";
+      //ofs << "shapes signal\t\tbin"   << binNumber << "\t" << combinedRootFileName << " combineWS:" << combineSignal << "\n";
+      ofs << "shapes signal\t\tbin"   << binNumber << "\t" << combinedRootFileName << " combineWS:" << tagSignalInterpol << "\n";
       ofs << "shapes data_obs\t\tbin" << binNumber << "\t" << combinedRootFileName << " combineWS:" << "data_bin" << binNumber << "\n";
       ofs << "----------------------------------------------------------------------------------------\n";
       ofs << "bin\t\tbin" << binNumber << "\n";
