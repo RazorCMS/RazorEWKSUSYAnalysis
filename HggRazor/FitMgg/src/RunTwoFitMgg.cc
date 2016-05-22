@@ -187,6 +187,8 @@ RooWorkspace* DoubleCBFit( TTree* tree, TString mggName, float muCB, float sigma
   ws->import( data );
   frame->SetName( "SignalFitPlot" );
   ws->import( *frame );
+
+  TString tag2 = MakeDoubleCBInterpolateNE( "SignalInterpol", mgg, *ws );
   
   return ws;
 };
