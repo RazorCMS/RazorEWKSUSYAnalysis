@@ -726,6 +726,195 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   return ws;
 }
 
+void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std::string Signal_CF, float mass, TString binNumber, TString category )
+{
+  std::cout << "entering datacard: " << Signal_Yield << std::endl;
+  std::stringstream ss_signal;
+  ss_signal << Signal_CF;
+  float tmp;
+  std::vector<float> signal_sys;
+  //------------------------------
+  //Signal systematics into vector
+  //------------------------------
+  while ( ss_signal.good() )
+    {
+      ss_signal >> tmp;
+      signal_sys.push_back( 1.0 + tmp );
+      //std::cout << "tmp: " << tmp << std::endl;
+      if ( ss_signal.eof() ) break;
+    }
+
+  //------------------------------------------------
+  // Define Workspace and create variables
+  //------------------------------------------------
+  TString combinedRootFileName = Form("HggRazorWorkspace_m%.0f_tmp.root", mass);
+  TFile* ftmp = new TFile( combinedRootFileName, "recreate");
+  RooWorkspace* ws = new RooWorkspace( "ws", "" );
+
+  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 0, 10000, "GeV" );
+  mgg.SetNameTitle( mggName, "m_{#gamma#gamma}" );
+  mgg.setMin( 230. );
+  mgg.setMax( 1230. );
+  mgg.setUnit( "GeV" );
+  mgg.setBins(50);
+  mgg.setRange( "signal", 600., 900. );
+  mgg.setRange( "full", 230., 10000. );
+  mgg.setRange( "high", 850., 10000.);
+  mgg.setRange( "low", 230., 650.);
+
+  //----------------
+  //Retreive dataset
+  //----------------
+  RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import(*treeData) );
+  
+  //------------------------------------
+  // C r e a t e   b k g  s h a p e
+  //------------------------------------
+  TString tag_bkg;
+  
+  //Initializing Nbkg
+  int npoints = data.numEntries();
+  //set Nbkg Initial Value
+  
+  //---------------------
+  //F i t   t o   D a t a
+  //---------------------
+  float sExp_a;
+  float Nbkg;
+  float NbkgUn;
+  float BkgNormUn;
+  //HighMassDiphoton
+  float hmd_a;
+  float hmd_b;
+  RooFitResult* bres;
+  tag_bkg = MakeHMDiphoton( "Bkg_fit_HMDiphoton", mgg, *ws );
+  ws->var(tag_bkg+"_Nbkg")->setVal( npoints );
+  bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+  bres->SetName("BkgOnlyFitResult");
+  ws->import( *bres );
+  hmd_a = ws->var( tag_bkg+"_a")->getVal();
+  hmd_b = ws->var( tag_bkg+"_b")->getVal();
+  Nbkg   = ws->var( tag_bkg+"_Nbkg")->getVal();
+  NbkgUn = ws->var( tag_bkg+"_Nbkg")->getError();
+  
+  RooAbsData* data_toys = ws->pdf( tag_bkg )->generateBinned( mgg, npoints, RooFit::ExpectedData() );
+  data_toys->SetName( Form("data_m%.0f", mass) );
+  data.SetName( Form("data_m%.0f", mass) );
+  //--------------------------------
+  // m o d e l   1   p l o t t i n g
+  //--------------------------------
+  RooPlot *fmgg = mgg.frame();
+  //data_toys->plotOn(fmgg);
+  data.plotOn(fmgg);
+  ws->pdf( tag_bkg)->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("Full"),RooFit::NormRange("Full"));
+  ws->pdf( tag_bkg)->plotOn(fmgg,RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
+  fmgg->SetName( "BkgOnlyFitPlot" );
+  //ws->import( *model );
+  ws->import( *bres );
+  ws->import( *fmgg );
+   
+  for ( int i = 0; i < 3501; i++ )
+    {
+      float _mass = 500. + (float)i;
+      TFile* _fout = new TFile( Form("HggRazorWorkspace_m%0.f.root",_mass), "RECREATE" );
+      //-------------------------------------------------------
+      // P r e p a r a t i o n   t o   C o m b i n e  I n p u t
+      //-------------------------------------------------------
+      RooWorkspace* combine_ws = new RooWorkspace( "combine_ws", "" );
+      //------------
+      //Signal Model
+      //------------
+      TString tagSignalInterpol;
+      if ( category == "highres" || category == "inclusive" )
+	{
+	  tagSignalInterpol = MakeDoubleCBInterpolateNE( Form("SignalInterpol_m%.0f", _mass) , mgg, *combine_ws, true );
+	  combine_ws->var( tagSignalInterpol+"_mass" )->setVal( _mass );
+	  combine_ws->var( tagSignalInterpol+"_mass" )->setConstant(kTRUE);
+	  RooRealVar SignalInterpol_norm( tagSignalInterpol + "_norm", "", Signal_Yield );
+	  combine_ws->import( SignalInterpol_norm );
+	}
+      else
+	{
+	  tagSignalInterpol = MakeDoubleCBInterpolateNE( Form("SignalInterpol_m%.0f", _mass), mgg, *combine_ws, true, true, category );
+	  combine_ws->var( tagSignalInterpol+"_mass" )->setVal( _mass );
+	  combine_ws->var( tagSignalInterpol+"_mass" )->setConstant(kTRUE);
+	  RooRealVar SignalInterpol_norm( tagSignalInterpol + "_norm", "", Signal_Yield );
+	  combine_ws->import( SignalInterpol_norm );
+	}
+      
+      //---------
+      //Bkg model
+      //---------
+      TString combineBkg = MakeHMDiphotonNE( Form("Bkg_m%.0f", _mass), mgg, *combine_ws );
+      combine_ws->var( combineBkg + "_a" )->setVal( hmd_a );
+      combine_ws->var( combineBkg + "_b" )->setVal( hmd_b );
+      RooRealVar Bkg_norm(  combineBkg + "_norm", "", Nbkg );
+      Bkg_norm.setConstant(kFALSE);
+      combine_ws->import( Bkg_norm );
+      
+      
+      //combine_ws->import( *data_toys );
+      data.SetName( Form("data_m%0.f", _mass) );
+      combine_ws->import( data );
+      
+      ws->Write("w_sb");
+      combine_ws->Write("combineWS");
+      _fout->Close();
+      
+      TString dataCardName = Form("HggRazorCombinedCard_m%.0f.txt", _mass);
+      std::ofstream ofs( dataCardName , std::ofstream::out );
+      
+      ofs << "imax 1 number of bins\njmax 1 number of processes minus 1\nkmax * number of nuisance parameters\n";
+      ofs << "----------------------------------------------------------------------------------------\n";
+      ofs << "shapes Bkg\t\tbin"      << binNumber << "\t" << combinedRootFileName << " combineWS:" << combineBkg << "\n";
+      ofs << "shapes signal\t\tbin"   << binNumber << "\t" << combinedRootFileName << " combineWS:" << tagSignalInterpol << "\n";
+      ofs << "shapes data_obs\t\tbin" << binNumber << "\t" << combinedRootFileName << " combineWS:" << Form("data_m%.0f", _mass) << "\n";
+      ofs << "----------------------------------------------------------------------------------------\n";
+      ofs << "bin\t\tbin" << binNumber << "\n";
+      ofs << "observation\t-1.0\n";
+      ofs << "----------------------------------------------------------------------------------------\n";
+      ofs << "bin\t\t\t\t\t\tbin" << binNumber << "\t\tbin" << binNumber << "\n";
+      ofs << "process\t\t\t\t\t\tsignal\t\tBkg\n";
+      ofs << "process\t\t\t\t\t\t0\t\t1\n";
+      ofs << "rate\t\t\t\t\t\t1\t\t1\n";
+      ofs << "----------------------------------------------------------------------------------------\n";
+      ofs << "CMS_Lumi\t\t\tlnN\t\t1.027\t\t-\n";
+      ofs << "Photon_Trigger\t\t\tlnN\t\t1.10\t\t-\n";
+      ofs << "PdfNorm\t\t\t\tlnN\t\t1.06\t\t-\n";
+      int totalSys = signal_sys.size();
+      int ctr = 0;
+      for( int isys = 0; isys < totalSys; isys++ )
+	{
+	  if ( isys == 0 )
+	    {
+	      //ofs << "SMH_JES\t\t\t\tlnN\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	    }
+	  else if ( isys == 2 )
+	    {
+	      //ofs << "SMH_facScale\t\t\tlnN\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	    }
+	  else if ( isys == 4 )
+	    {
+	      //ofs << "SMH_renScale\t\t\tlnN\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	    }
+	  else if ( isys == 6 )
+	    {
+	      //ofs << "SMH_facRenScale\t\t\tlnN\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	    }
+	  else if ( isys > 7 )
+	    {
+	      //ofs << "SMH_pdf" << ctr << "\t\t\tlnN\t\t" << smh_sys.at(isys) << "\t\t-\n";
+	      ctr++;
+	    }
+	}
+      ofs << "mu_Global\t\t\tparam\t\t 0 7.5\n";
+      
+      ofs.close();
+      //ws->Write();
+    }
+  return;
+};
+
 RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, TString mggName, float SMH_Yield, std::string SMH_CF,
 			    float Signal_Yield, std::string Signal_CF, TString binNumber, TString category, bool isHighMass )
 {
@@ -772,8 +961,8 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
       mgg.setUnit( "GeV" );
       mgg.setBins(50);
       mgg.setRange( "signal", 600., 900. );
-      mgg.setRange( "full", 230., 1230. );
-      mgg.setRange( "high", 850., 1230.);
+      mgg.setRange( "full", 230., 10000. );
+      mgg.setRange( "high", 850., 10000.);
       mgg.setRange( "low", 230., 650.);
     }
   else

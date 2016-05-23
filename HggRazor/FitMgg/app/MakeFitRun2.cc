@@ -147,7 +147,7 @@ int main( int argc, char* argv[])
 
   //Mass
   std::string _Mass = ParseCommandLine( argc, argv, "-Mass=" );
-  float Mass = 1.0;
+  float Mass = -1.0;
   if ( _Mass != "" )
     {
       Mass = atof( _Mass.c_str() );
@@ -183,17 +183,28 @@ int main( int argc, char* argv[])
   if ( fitMode == "biasSignal" ) std::cout << "[INFO]: signal Fraction  :" << _signalFraction << std::endl;
   
 
+  //----------------
+  //High Mass Option
+  //----------------
+  bool _highMassMode = false;
+  std::string isHighMass = ParseCommandLine( argc, argv, "-isHighMass=" );
+  
+  if (  isHighMass == "yes" )
+    {
+      _highMassMode = true;
+    }
+  
   //------------------------
   //combine datacard related
   //------------------------
   std::string inputFileSignal = ParseCommandLine( argc, argv, "-inputFileSignal=" );
-  if (  inputFileSignal == "" && fitMode == "datacard" )
+  if (  inputFileSignal == "" && fitMode == "datacard" && !_highMassMode )
     {
       std::cerr << "[WARNING]: please provide an input file using --inputFileSignal=<path_to_file>" << std::endl;
     }
 
   std::string inputFileSMH = ParseCommandLine( argc, argv, "-inputFileSMH=" );
-  if (  inputFileSMH == "" && fitMode == "datacard")
+  if (  inputFileSMH == "" && fitMode == "datacard" && !_highMassMode )
     {
       std::cerr << "[WARNING]: please provide an input file using --inputFileSMH=<path_to_file>" << std::endl;
     }
@@ -201,9 +212,9 @@ int main( int argc, char* argv[])
   //SMH nominal yield
   std::string SMH_Yield = ParseCommandLine( argc, argv, "-SMH_Yield=" );
   float _SMH_Yield = 1.e-2;
-  if (  SMH_Yield == "" && fitMode == "datacard" )
+  if (  SMH_Yield == "" && fitMode == "datacard" && !_highMassMode )
     {
-      std::cerr << "[WARNING]: please provide an input SMH_Yield, --SMH_Yield=<Yield>" << std::endl;
+      std::cerr << "[WARNING]: please provide an input SMH_Yield, --SMH_Yield=<Yield>\nEXIT" << std::endl;
     }
   else
     {
@@ -213,35 +224,41 @@ int main( int argc, char* argv[])
   //SMH Config Line
   std::string SMH_CL = ParseCommandLine( argc, argv, "-SMH_CL=" );
   std::stringstream _SMH_CL;
-  if (  SMH_CL == "" && fitMode == "datacard" )
+  if (  SMH_CL == "" && fitMode == "datacard" && !_highMassMode )
     {
-      std::cerr << "[ERROR]: please provide an input SMH_CL, --SMH_CL=<SMH config line>" << std::endl;
+      std::cerr << "[ERROR]: please provide an input SMH_CL, --SMH_CL=<SMH config line>\nEXIT" << std::endl;
       return -1;
     }
-  _SMH_CL << SMH_CL;
-
+  else
+    {
+      _SMH_CL << SMH_CL;
+    }
   //Signal Config Line
   std::string Signal_CL = ParseCommandLine( argc, argv, "-Signal_CL=" );
   std::stringstream _Signal_CL;
   if (  Signal_CL == "" && fitMode == "datacard" )
     {
-      std::cerr << "[ERROR]: please provide an input Signal_CL, --Signal_CL=<Signal config line>" << std::endl;
+      std::cerr << "[ERROR]: please provide an input Signal_CL, --Signal_CL=<Signal config line>\nEXIT" << std::endl;
       return -1;
     }
-  _Signal_CL << Signal_CL;
+  else
+    {
+      _Signal_CL << Signal_CL;
+    }
 
   //signal nominal yield
   std::string Signal_Yield = ParseCommandLine( argc, argv, "-Signal_Yield=" );
   float _Signal_Yield = 1.;
   if (  Signal_Yield == "" && fitMode == "datacard" )
     {
-      std::cerr << "[WARNING]: please provide an input Signal_Yield, --Signal_Yield=<Yield>" << std::endl;
+      std::cerr << "[ERROR]: please provide an input Signal_Yield, --Signal_Yield=<Yield>\nEXIT" << std::endl;
+      return -1;
     }
   else
     {
       _Signal_Yield = atof( Signal_Yield.c_str() );
     }
-
+  
   std::string binNumber = ParseCommandLine( argc, argv, "-binNumber=" );
   TString _binNumber = "-666";
   if (  binNumber == "" && fitMode == "datacard" )
@@ -253,17 +270,6 @@ int main( int argc, char* argv[])
       _binNumber = binNumber;
     }
   
-
-  //----------------
-  //High Mass Option
-  //----------------
-  bool _highMassMode = false;
-  std::string isHighMass = ParseCommandLine( argc, argv, "-isHighMass=" );
-  
-  if (  isHighMass == "yes" )
-    {
-      _highMassMode = true;
-    }
   
   
   if (  f1 != "" ) std::cout << "[INFO]: f1    :" << f1 << std::endl;
@@ -527,10 +533,17 @@ int main( int argc, char* argv[])
     {
       RooWorkspace* w_sb;
       std::cout << "calling MakeDataCard" << std::endl;
-      w_sb = MakeDataCard( tree->CopyTree( cut ), treeSignal->CopyTree( cut ), treeSMH->CopyTree( cut ), mggName, _SMH_Yield, SMH_CL,
-      			   _Signal_Yield, Signal_CL, binNumber, categoryMode, _highMassMode );
+      if ( _highMassMode )
+	{
+	  w_sb = MakeDataCardHMD( tree->CopyTree( cut ), mggName, _Signal_Yield, Signal_CL, Mass, binNumber, categoryMode );
+	}
+      else
+	{
+	  w_sb = MakeDataCard( tree->CopyTree( cut ), treeSignal->CopyTree( cut ), treeSMH->CopyTree( cut ), mggName, _SMH_Yield, SMH_CL,
+			       _Signal_Yield, Signal_CL, binNumber, categoryMode, _highMassMode );
+	}
       std::cout << "finish MakeDataCard" << std::endl;
-      w_sb->Write("w_sb");
+      //w_sb->Write("w_sb");
     }
   else if ( fitMode == "AIC" )
     {
