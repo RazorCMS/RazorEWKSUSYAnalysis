@@ -816,7 +816,8 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
   for ( int i = 0; i < 3501; i++ )
     {
       float _mass = 500. + (float)i;
-      TFile* _fout = new TFile( Form("HggRazorWorkspace_m%0.f.root",_mass), "RECREATE" );
+      TString combineRootFile = Form("HggRazorWorkspace_m%0.f.root", _mass);
+      TFile* _fout = new TFile( combineRootFile, "RECREATE" );
       //-------------------------------------------------------
       // P r e p a r a t i o n   t o   C o m b i n e  I n p u t
       //-------------------------------------------------------
@@ -866,9 +867,9 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
       
       ofs << "imax 1 number of bins\njmax 1 number of processes minus 1\nkmax * number of nuisance parameters\n";
       ofs << "----------------------------------------------------------------------------------------\n";
-      ofs << "shapes Bkg\t\tbin"      << binNumber << "\t" << combinedRootFileName << " combineWS:" << combineBkg << "\n";
-      ofs << "shapes signal\t\tbin"   << binNumber << "\t" << combinedRootFileName << " combineWS:" << tagSignalInterpol << "\n";
-      ofs << "shapes data_obs\t\tbin" << binNumber << "\t" << combinedRootFileName << " combineWS:" << Form("data_m%.0f", _mass) << "\n";
+      ofs << "shapes Bkg\t\tbin"      << binNumber << "\t" << combineRootFile << " combineWS:" << combineBkg << "\n";
+      ofs << "shapes signal\t\tbin"   << binNumber << "\t" << combineRootFile << " combineWS:" << tagSignalInterpol << "\n";
+      ofs << "shapes data_obs\t\tbin" << binNumber << "\t" << combineRootFile << " combineWS:" << Form("data_m%.0f", _mass) << "\n";
       ofs << "----------------------------------------------------------------------------------------\n";
       ofs << "bin\t\tbin" << binNumber << "\n";
       ofs << "observation\t-1.0\n";
