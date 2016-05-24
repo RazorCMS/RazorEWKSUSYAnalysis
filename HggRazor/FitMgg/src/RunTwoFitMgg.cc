@@ -751,14 +751,14 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
   TFile* ftmp = new TFile( combinedRootFileName, "recreate");
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
 
-  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 230, 4000, "GeV" );
+  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 230, 1600, "GeV" );
   //mgg.setMin( 230. );
   //mgg.setMax( 10000. );
   //mgg.setUnit( "GeV" );
   //mgg.setBins(50);
   mgg.setRange( "signal", 600., 900. );
-  mgg.setRange( "full", 230., 4000. );
-  mgg.setRange( "high", 850., 4000.);
+  mgg.setRange( "full", 230., 16000. );
+  mgg.setRange( "high", 850., 1600.);
   mgg.setRange( "low", 230., 650.);
 
   //----------------
@@ -800,7 +800,7 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
   //--------------------------------
   // m o d e l   1   p l o t t i n g
   //--------------------------------
-  RooPlot *fmgg = mgg.frame(230,10000, 488);
+  RooPlot *fmgg = mgg.frame(230,1600, 69);
   //data_toys->plotOn(fmgg);
   data.plotOn(fmgg);
   ws->pdf( tag_bkg )->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("full"),RooFit::NormRange("full"));
