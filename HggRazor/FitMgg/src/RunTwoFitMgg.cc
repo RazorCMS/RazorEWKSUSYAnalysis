@@ -751,15 +751,14 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
   TFile* ftmp = new TFile( combinedRootFileName, "recreate");
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
 
-  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 0, 10000, "GeV" );
-  mgg.SetNameTitle( mggName, "m_{#gamma#gamma}" );
-  mgg.setMin( 230. );
-  mgg.setMax( 1230. );
-  mgg.setUnit( "GeV" );
-  mgg.setBins(50);
+  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 230, 4000, "GeV" );
+  //mgg.setMin( 230. );
+  //mgg.setMax( 10000. );
+  //mgg.setUnit( "GeV" );
+  //mgg.setBins(50);
   mgg.setRange( "signal", 600., 900. );
-  mgg.setRange( "full", 230., 10000. );
-  mgg.setRange( "high", 850., 10000.);
+  mgg.setRange( "full", 230., 4000. );
+  mgg.setRange( "high", 850., 4000.);
   mgg.setRange( "low", 230., 650.);
 
   //----------------
@@ -789,33 +788,33 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
   RooFitResult* bres;
   tag_bkg = MakeHMDiphoton( "Bkg_fit_HMDiphoton", mgg, *ws );
   ws->var(tag_bkg+"_Nbkg")->setVal( npoints );
-  bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+  //bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("full") );
+  bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE));
   bres->SetName("BkgOnlyFitResult");
-  ws->import( *bres );
   hmd_a = ws->var( tag_bkg+"_a")->getVal();
   hmd_b = ws->var( tag_bkg+"_b")->getVal();
   Nbkg   = ws->var( tag_bkg+"_Nbkg")->getVal();
   NbkgUn = ws->var( tag_bkg+"_Nbkg")->getError();
   
   RooAbsData* data_toys = ws->pdf( tag_bkg )->generateBinned( mgg, npoints, RooFit::ExpectedData() );
-  data_toys->SetName( Form("data_m%.0f", mass) );
-  data.SetName( Form("data_m%.0f", mass) );
   //--------------------------------
   // m o d e l   1   p l o t t i n g
   //--------------------------------
-  RooPlot *fmgg = mgg.frame();
+  RooPlot *fmgg = mgg.frame(230,10000, 488);
   //data_toys->plotOn(fmgg);
   data.plotOn(fmgg);
-  ws->pdf( tag_bkg)->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("Full"),RooFit::NormRange("Full"));
-  ws->pdf( tag_bkg)->plotOn(fmgg,RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
+  ws->pdf( tag_bkg )->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("full"),RooFit::NormRange("full"));
+  ws->pdf( tag_bkg )->plotOn(fmgg,RooFit::LineColor(kGreen));
+  ws->pdf( tag_bkg )->plotOn(fmgg,RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
   fmgg->SetName( "BkgOnlyFitPlot" );
-  //ws->import( *model );
+  
   ws->import( *bres );
   ws->import( *fmgg );
+  ws->import( data );
    
-  for ( int i = 0; i < 3501; i++ )
+  for ( int i = 0; i < 301; i++ )
     {
-      float _mass = 500. + (float)i;
+      float _mass = 500. + (float)10*i;
       TString combineRootFile = Form("HggRazorWorkspace_m%0.f.root", _mass);
       TFile* _fout = new TFile( combineRootFile, "RECREATE" );
       //-------------------------------------------------------

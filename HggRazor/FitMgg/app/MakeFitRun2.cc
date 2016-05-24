@@ -535,7 +535,7 @@ int main( int argc, char* argv[])
       std::cout << "calling MakeDataCard" << std::endl;
       if ( _highMassMode )
 	{
-	  w_sb = MakeDataCardHMD( tree->CopyTree( cut ), mggName, _Signal_Yield, Signal_CL, Mass, binNumber, categoryMode );
+	  MakeDataCardHMD( tree->CopyTree( cut ), mggName, _Signal_Yield, Signal_CL, Mass, binNumber, categoryMode );
 	}
       else
 	{
