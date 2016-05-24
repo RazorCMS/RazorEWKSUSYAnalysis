@@ -16,6 +16,7 @@
 #pragma link C++ class RooRelBW+;
 #pragma link C++ class Triangle+;
 #pragma link C++ class RooLevelledExp+;
+#pragma link C++ class RooDoubleCBInterpolate+;
 
 #endif
 

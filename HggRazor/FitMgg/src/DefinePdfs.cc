@@ -258,13 +258,13 @@ TString MakeDoubleCB( TString tag, RooRealVar& mgg, RooWorkspace& w )
   mu->setConstant(kFALSE);
   sigma->setConstant(kFALSE);
   alpha1->setConstant(kFALSE);
-  alpha1->setRange(0, 100);
+  alpha1->setRange(0, 1000);
   alpha2->setConstant(kFALSE);
-  alpha2->setRange(0, 100);
+  alpha2->setRange(0, 1000);
   n1->setConstant(kFALSE);
-  n1->setRange(0, 100);
+  n1->setRange(0, 1000);
   n2->setConstant(kFALSE);
-  n2->setRange(0, 100);
+  n2->setRange(0, 1000);
   
   RooRealVar* Ns     = new RooRealVar( tag + "_DCB_Ns", "N_{s}", 1e5, "events");
   Ns->setConstant(kFALSE);
@@ -281,7 +281,7 @@ TString MakeDoubleCB( TString tag, RooRealVar& mgg, RooWorkspace& w )
   return ex_pdf_name;
 };
 
-TString MakeDoubleCBNE( TString tag, RooRealVar& mgg, RooWorkspace& w )
+TString MakeDoubleCBNE( TString tag, RooRealVar& mgg, RooWorkspace& w, bool _globalScale, bool _categoryScale, TString category )
 {
   //------------------------------
   //C r e a t e  V a r i a b l e s
@@ -296,16 +296,104 @@ TString MakeDoubleCBNE( TString tag, RooRealVar& mgg, RooWorkspace& w )
   mu->setConstant(kFALSE);
   sigma->setConstant(kFALSE);
   alpha1->setConstant(kFALSE);
-  alpha1->setRange(0, 100);
+  alpha1->setRange(0, 1000);
   alpha2->setConstant(kFALSE);
-  alpha2->setRange(0, 100);
+  alpha2->setRange(0, 1000);
   n1->setConstant(kFALSE);
-  n1->setRange(0, 100);
+  n1->setRange(0, 1000);
   n2->setConstant(kFALSE);
-  n2->setRange(0, 100);
+  n2->setRange(0, 1000);
 
   TString pdf_name = tag + "_DCB";
-  RooDoubleCB* dCB = new RooDoubleCB( pdf_name , "", mgg, *mu, *sigma, *alpha1, *n1, *alpha2, *n2 );
+  RooDoubleCB* dCB;
+  if ( _globalScale && _categoryScale )
+    {
+      RooRealVar* muGlobal = new RooRealVar( "mu_Global", "#mu_{global}", 0, "" );
+      RooRealVar* muCat    = new RooRealVar( category+"_mu_Global", "#mu_{"+category+"}", 0, "" );
+      RooFormulaVar* mggp  = new RooFormulaVar( tag + "_DG_mggp", "m_{gg} - #mu_{g} - #mu_{"+category+"}", "(@0-@1-@2)", RooArgList(mgg, *muGlobal, *muCat) );
+      dCB = new RooDoubleCB( pdf_name , "", *mggp, *mu, *sigma, *alpha1, *n1, *alpha2, *n2 );
+    }
+  else if ( _globalScale && !_categoryScale )
+    {
+      RooRealVar* muGlobal = new RooRealVar( "mu_Global", "#mu_{g}", 0, "" );
+      RooFormulaVar* mggp  = new RooFormulaVar( tag + "_DG_muG", "m_{gg} - #mu_{g}", "(@0-@1)", RooArgList(mgg, *muGlobal) );
+      dCB = new RooDoubleCB( pdf_name , "", *mggp, *mu, *sigma, *alpha1, *n1, *alpha2, *n2 );
+    }
+  else if ( !_globalScale && _categoryScale )
+    {
+      RooRealVar* muCat    = new RooRealVar( category+"_mu_Global", "#mu_{"+category+"}", 0, "" );
+      RooFormulaVar* mggp  = new RooFormulaVar( tag + "_DG_muG", "mgg - #mu_{"+category+"}", "(@0-@1)", RooArgList(mgg, *muCat) );
+      dCB = new RooDoubleCB( pdf_name , "", *mggp, *mu, *sigma, *alpha1, *n1, *alpha2, *n2 );
+    }
+  else
+    {
+      dCB = new RooDoubleCB( pdf_name , "", mgg, *mu, *sigma, *alpha1, *n1, *alpha2, *n2 );
+    }
+
+  
+  w.import( *dCB );
+  
+  return pdf_name;
+};
+
+
+TString MakeDoubleCBInterpolate( TString tag, RooRealVar& mgg, RooWorkspace& w )
+{
+   //------------------------------
+  //C r e a t e  V a r i a b l e s
+  //------------------------------
+  //DCB: Double Crystal Ball Interpolation
+  RooRealVar* mass     = new RooRealVar( tag + "_DCBI_mass", "#mass_{CB}", 750, "" );
+  mass->setConstant(kFALSE);
+    
+  
+  RooRealVar* Ns     = new RooRealVar( tag + "_DCBI_Ns", "N_{s}", 1e5, "events");
+  Ns->setConstant(kFALSE);
+  
+  RooDoubleCBInterpolate* dCB = new RooDoubleCBInterpolate( tag + "DCBI_pdf", "", mgg, *mass );
+  
+  //------------------------------------
+  //C r e a t e   E x t e n d e d  p.d.f
+  //------------------------------------
+  TString ex_pdf_name          = tag + "_DCBI";
+  RooAddPdf* ex_dCB = new RooAddPdf( ex_pdf_name, "extDCBI", RooArgList(*dCB), RooArgList(*Ns) );
+  w.import( *ex_dCB );
+  
+  return ex_pdf_name;
+};
+
+TString MakeDoubleCBInterpolateNE( TString tag, RooRealVar& mgg, RooWorkspace& w, bool _globalScale, bool _categoryScale, TString category )
+{
+  RooRealVar* mass     = new RooRealVar( tag + "_DCBI_mass", "#mass_{CB}", 750, "" );
+  mass->setConstant(kFALSE);
+  
+  TString pdf_name = tag + "_DCBI";
+  RooDoubleCBInterpolate* dCB;
+  if ( _globalScale && _categoryScale )
+    {
+      RooRealVar* muGlobal = new RooRealVar( "mu_Global", "#mu_{global}", 0, "" );
+      RooRealVar* muCat    = new RooRealVar( category+"_mu_Global", "#mu_{"+category+"}", 0, "" );
+      RooFormulaVar* mggp  = new RooFormulaVar( tag + "_DG_mggp", "m_{gg} - #mu_{g} - #mu_{"+category+"}", "(@0-@1-@2)", RooArgList(mgg, *muGlobal, *muCat) );
+      dCB = new RooDoubleCBInterpolate( pdf_name , "", *mggp, *mass );
+    }
+  else if ( _globalScale && !_categoryScale )
+    {
+      RooRealVar* muGlobal = new RooRealVar( "mu_Global", "#mu_{g}", 0, "" );
+      RooFormulaVar* mggp  = new RooFormulaVar( tag + "_DG_muG", "m_{gg} - #mu_{g}", "(@0-@1)", RooArgList(mgg, *muGlobal) );
+      dCB = new RooDoubleCBInterpolate( pdf_name , "", *mggp, *mass );
+    }
+  else if ( !_globalScale && _categoryScale )
+    {
+      RooRealVar* muCat    = new RooRealVar( category+"_mu_Global", "#mu_{"+category+"}", 0, "" );
+      RooFormulaVar* mggp  = new RooFormulaVar( tag + "_DG_muG", "mgg - #mu_{"+category+"}", "(@0-@1)", RooArgList(mgg, *muCat) );
+      dCB = new RooDoubleCBInterpolate( pdf_name , "", *mggp, *mass );
+    }
+  else
+    {
+      dCB = new RooDoubleCBInterpolate( pdf_name , "", mgg, *mass );
+    }
+
+  
   w.import( *dCB );
   
   return pdf_name;
@@ -450,17 +538,18 @@ TString MakeSingleExpNE( TString tag, RooRealVar& mgg, RooWorkspace& w )
 
 TString MakeHMDiphoton( TString tag, RooRealVar& mgg, RooWorkspace& w )
 {
-  RooRealVar* a = new RooRealVar( tag + "_a", "", -0.06, "a.u"); 
+  TString pdfName = tag + "_HMDiphoton_ext";
+  RooRealVar* a = new RooRealVar( pdfName + "_a", "", -0.06, "a.u"); 
   a->setConstant(kFALSE);
-  RooRealVar* b = new RooRealVar( tag + "_b", "", -0.06, "a.u"); 
+  RooRealVar* b = new RooRealVar( pdfName + "_b", "", -0.06, "a.u"); 
   b->setConstant(kFALSE);
 
-  RooRealVar* Nbkg = new RooRealVar( tag + "_Nbkg","",10., "events");
+  RooRealVar* Nbkg = new RooRealVar( pdfName + "_Nbkg","",10., "events");
   Nbkg->setConstant(kFALSE);
   
-  RooHMDiphoton* hmDiphoton = new RooHMDiphoton( tag + "_HMDiphoton", "", mgg, *a, *b );
+  RooHMDiphoton* hmDiphoton = new RooHMDiphoton( pdfName + "_HMDiphoton", "", mgg, *a, *b );
   
-  TString pdfName = tag + "_HMDiphoton_ext";
+ 
   RooAddPdf* ext_HMDiphoton = new RooAddPdf( pdfName,"", RooArgList( *hmDiphoton ), RooArgList( *Nbkg ) );
   w.import( *ext_HMDiphoton );
   return pdfName;
@@ -468,12 +557,13 @@ TString MakeHMDiphoton( TString tag, RooRealVar& mgg, RooWorkspace& w )
 
 TString MakeHMDiphotonNE( TString tag, RooRealVar& mgg, RooWorkspace& w )
 {
-  RooRealVar* a = new RooRealVar( tag + "_a", "", -0.06, "a.u"); 
+  TString pdfName = tag + "_HMDiphoton";
+  RooRealVar* a = new RooRealVar( pdfName + "_a", "", -0.06, "a.u"); 
   a->setConstant(kFALSE);
-  RooRealVar* b = new RooRealVar( tag + "_b", "", -0.06, "a.u"); 
+  RooRealVar* b = new RooRealVar( pdfName + "_b", "", -0.06, "a.u"); 
   b->setConstant(kFALSE);
 
-  TString pdfName = tag + "_HMDiphoton";
+  
   RooHMDiphoton* hmDiphoton = new RooHMDiphoton( pdfName, "", mgg, *a, *b );
   
   w.import( *hmDiphoton );

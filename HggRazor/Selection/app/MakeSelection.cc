@@ -117,6 +117,23 @@ int HggRazorClass::n_njets = 11;
 float HggRazorClass::njets_l = .0;
 float HggRazorClass::njets_h = 10;
 
+
+int HggRazorClass::n_unroll_highPt  = 15;
+int HggRazorClass::n_unroll_highRes = 10;
+
+float HggRazorClass::highPt_MR[6] = {150., 200., 300., 500., 1600., 10000.};
+float HggRazorClass::highPt_R0[6] = {0.0, 0.05, 0.1, 0.15, 0.2, 2.0};
+float HggRazorClass::highPt_R1[5] = {0.0, 0.05, 0.1, 0.15, 2.0};
+float HggRazorClass::highPt_R2[4] = {0.0, 0.05, 0.1, 2.0};
+float HggRazorClass::highPt_R3[3] = {0.0, 0.05, 2.0};
+float HggRazorClass::highPt_R4[2] = {0.0, 2.0};
+
+float HggRazorClass::highRes_MR[5] = {150., 250., 400., 1400., 10000.};
+float HggRazorClass::highRes_R0[5] = {0.0, 0.05, 0.1, 0.15, 2.0};
+float HggRazorClass::highRes_R1[4] = {0.0, 0.05, 0.1, 2.0};
+float HggRazorClass::highRes_R2[3] = {0.0, 0.05, 1.0};
+float HggRazorClass::highRes_R3[2] = {0.0, 2.0};
+
 //C u s t o m MR_RSQ_BINNING
 //--------------------------
 //HighPt
