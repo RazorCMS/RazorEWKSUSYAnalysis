@@ -85,6 +85,11 @@ int main( int argc, char** argv )
   int npoints = mymap.size();
   float x[npoints];
   float expL[npoints];
+  float obsL[npoints];
+  
+  float xp[2*npoints];
+  float OneS[2*npoints];
+  float TwoS[2*npoints];
    
 
   int ctr = 0;
@@ -92,15 +97,33 @@ int main( int argc, char** argv )
     {
       //std::cout << "mass: " << tmp.first << " expL: " << tmp.second.exp0p5 << std::endl;
       x[ctr]    = tmp.first;
+      obsL[ctr] = tmp.second.obs;
       expL[ctr] = tmp.second.exp0p5;
+      
+      xp[ctr] = tmp.first;
+      xp[2*npoints-(ctr+1)] = tmp.first;     
+
+      OneS[ctr] = tmp.second.exp0p16;
+      OneS[2*npoints-(ctr+1)] = tmp.second.exp0p84;
+
+      TwoS[ctr] = tmp.second.exp0p025;
+      TwoS[2*npoints-(ctr+1)] = tmp.second.exp0p975;
+       
       ctr++;
     }
 
   TFile* out = new TFile("out_test.root", "recreate");
-  TGraph* g1 = new TGraph(npoints, x, expL);
+  TGraph* gObs = new TGraph(npoints, x, obsL);
+  TGraph* gExp = new TGraph(npoints, x, expL);
+  TGraph* gOneS = new TGraph(2*npoints, xp, OneS);
+  TGraph* gTwoS = new TGraph(2*npoints, xp, TwoS);
 
-  g1->Write("g1");
-  g1->GetXaxis()->SetRangeUser(0, 30);
+  gObs->GetXaxis()->SetRangeUser(0, 30);
+  gObs->Write("gObs");
+  gExp->Write("gExp");
+  gOneS->Write("gOneS");
+  gTwoS->Write("gTwoS");
+  
   out->Close();
   return 0;
 }
