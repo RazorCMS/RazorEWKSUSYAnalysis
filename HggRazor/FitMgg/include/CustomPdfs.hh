@@ -95,7 +95,40 @@ private:
 
   ClassDef(RooDoubleCB,1)
 };
- 
+
+
+class RooDoubleCBInterpolate : public RooAbsPdf {
+public:
+  RooDoubleCBInterpolate();
+  RooDoubleCBInterpolate(const char *name, const char *title,
+			 RooAbsReal& _x,
+			 RooAbsReal& _mass
+			 );
+  RooDoubleCBInterpolate(const RooDoubleCBInterpolate& other, const char* name=0) ;
+  virtual TObject* clone(const char* newname) const { return new RooDoubleCBInterpolate(*this,newname); }
+  inline virtual ~RooDoubleCBInterpolate() { }
+  Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName=0) const ;
+  Double_t analyticalIntegral(Int_t code, const char* rangeName=0) const ;
+  Double_t getMean( Double_t m ) const;
+  Double_t getSigma( Double_t m ) const;
+  Double_t getN1( Double_t m) const;
+  Double_t getAlpha1( Double_t m ) const;
+  Double_t getN2( Double_t m ) const;
+  Double_t getAlpha2( Double_t m ) const;
+  
+  
+protected:
+
+  RooRealProxy x ;
+  RooRealProxy mass;
+  
+  Double_t evaluate() const ;
+  
+private:
+
+  ClassDef(RooDoubleCBInterpolate,1)
+};
+
 class RooFermi : public RooAbsPdf {
 public:
   RooFermi();
