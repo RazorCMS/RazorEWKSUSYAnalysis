@@ -10,6 +10,8 @@
 #include <TAxis.h>
 #include <TCanvas.h>
 #include <TStyle.h>
+#include <TLatex.h>
+#include <TLegend.h>
 //LOCAL INCLUDES
 #include "CommandLineInput.hh"
 
@@ -47,7 +49,9 @@ const float bottomMargin = 0.12;
 TString CMSText = "CMS";
 TString extraText   = "Preliminary";
 //TString lumiText = "2.32 fb^{-1} (13 TeV)";
-TString lumiText = "27 pb^{-1} (13 TeV)";
+TString lumiText = "2.69 fb^{-1} (13 TeV)";
+
+bool AddCMS( TCanvas* C );
 
 int main( int argc, char** argv )
 {
@@ -161,19 +165,41 @@ int main( int argc, char** argv )
   gStyle->SetPaintTextFormat("4.3f");
   
   gTwoS->SetFillColor(kSpring-3);
+  gTwoS->SetLineColor(kSpring-3);
   gOneS->SetFillColor(kSpring+10);
+  gOneS->SetLineColor(kSpring+10);
   gExp->SetLineWidth(3);
   gExp->SetLineStyle(2);
   gObs->SetLineWidth(3);
 
   gTwoS->SetTitle("");
+  gTwoS->GetXaxis()->SetTitleSize(0.05);
   gTwoS->GetXaxis()->SetTitle("M_{G} (GeV)");
+  gTwoS->GetYaxis()->SetTitleSize(0.05);
   gTwoS->GetYaxis()->CenterTitle(kTRUE);
   gTwoS->GetYaxis()->SetTitle("95% C.L. limit #sigma(pp#rightarrowG#rightarrow#gamma#gamma) (fb)");
+
+  gTwoS->GetYaxis()->SetRangeUser(0,30);
   gTwoS->Draw("AFC");
   gOneS->Draw("FC");
   gExp->Draw("C");
   gObs->Draw("C");
+
+  TLegend* leg = new TLegend( 0.6, 0.58, 0.89, 0.89, NULL, "brNDC" );
+  leg->SetBorderSize(0);
+  leg->SetLineColor(1);
+  leg->SetLineStyle(1);
+  leg->SetLineWidth(1);
+  leg->SetFillColor(0);
+  leg->SetFillStyle(1001);
+  leg->SetTextSize(0.04);
+  leg->AddEntry( gExp, " Expected limit", "l" );
+  leg->AddEntry( gOneS, " #pm1 #sigma", "f" );
+  leg->AddEntry( gTwoS, " #pm2 #sigma", "f" );
+  leg->AddEntry( gObs, " Observed limit", "l" );
+  leg->Draw();
+
+  AddCMS(c);
 
   c->SaveAs("NarrowResLimit.pdf");
   c->SaveAs("NarrowResLimit.C");
@@ -187,3 +213,42 @@ int main( int argc, char** argv )
   out->Close();
   return 0;
 }
+
+
+bool AddCMS( TCanvas* C )
+{
+  C->cd();
+  float lumix = 0.955;
+  float lumiy = 0.945;
+  float lumifont = 42;
+  
+  float cmsx = 0.28;
+  float cmsy = 0.875;
+  float cmsTextFont   = 61;  // default is helvetic-bold
+  float extrax = cmsx + 0.078;
+  float extray = cmsy - 0.04;
+  float extraTextFont = 52;  // default is helvetica-italics
+  // ratio of "CMS" and extra text size
+  float extraOverCmsTextSize  = 0.76;
+  float cmsSize = 0.06;
+  TLatex latex;
+  latex.SetNDC();
+  latex.SetTextAngle(0);
+  latex.SetTextColor(kBlack);    
+  float extraTextSize = extraOverCmsTextSize*cmsSize;
+  latex.SetTextFont(lumifont);
+  latex.SetTextAlign(31); 
+  latex.SetTextSize(cmsSize);    
+  latex.DrawLatex(lumix, lumiy,lumiText);
+
+  latex.SetTextFont(cmsTextFont);
+  latex.SetTextAlign(31); 
+  latex.SetTextSize(cmsSize);
+  latex.DrawLatex(cmsx, cmsy, CMSText);
+   
+  latex.SetTextFont(extraTextFont);
+  latex.SetTextAlign(31); 
+  latex.SetTextSize(extraTextSize);
+  latex.DrawLatex(extrax, extray, extraText);
+  return true;
+};
