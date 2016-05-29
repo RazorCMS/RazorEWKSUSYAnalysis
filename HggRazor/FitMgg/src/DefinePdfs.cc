@@ -543,6 +543,7 @@ TString MakeHMDiphoton( TString tag, RooRealVar& mgg, RooWorkspace& w )
   a->setConstant(kFALSE);
   RooRealVar* b = new RooRealVar( pdfName + "_b", "", -0.06, "a.u"); 
   b->setConstant(kFALSE);
+  b->setRange(-5,5);
 
   RooRealVar* Nbkg = new RooRealVar( pdfName + "_Nbkg","",10., "events");
   Nbkg->setConstant(kFALSE);
@@ -562,6 +563,7 @@ TString MakeHMDiphotonNE( TString tag, RooRealVar& mgg, RooWorkspace& w )
   a->setConstant(kFALSE);
   RooRealVar* b = new RooRealVar( pdfName + "_b", "", -0.06, "a.u"); 
   b->setConstant(kFALSE);
+  b->setRange(-5,5);
 
   
   RooHMDiphoton* hmDiphoton = new RooHMDiphoton( pdfName, "", mgg, *a, *b );

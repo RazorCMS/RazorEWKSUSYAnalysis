@@ -751,14 +751,15 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
   TFile* ftmp = new TFile( combinedRootFileName, "recreate");
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
 
-  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 230, 1600, "GeV" );
+  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 230, 6000, "GeV" );
   //mgg.setMin( 230. );
   //mgg.setMax( 10000. );
   //mgg.setUnit( "GeV" );
-  //mgg.setBins(50);
+  mgg.setBins(23080);//230-6000
+  //mgg.setBins(5480);//230-1600
   mgg.setRange( "signal", 600., 900. );
-  mgg.setRange( "full", 230., 16000. );
-  mgg.setRange( "high", 850., 1600.);
+  mgg.setRange( "full", 230., 6000. );
+  mgg.setRange( "high", 850., 6000.);
   mgg.setRange( "low", 230., 650.);
 
   //----------------
@@ -788,6 +789,9 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
   RooFitResult* bres;
   tag_bkg = MakeHMDiphoton( "Bkg_fit_HMDiphoton", mgg, *ws );
   ws->var(tag_bkg+"_Nbkg")->setVal( npoints );
+  ws->var(tag_bkg+"_a")->setVal( 1.54 );
+  ws->var(tag_bkg+"_b")->setVal( -0.48 );
+  
   //bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("full") );
   bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE));
   bres->SetName("BkgOnlyFitResult");
@@ -800,21 +804,23 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
   //--------------------------------
   // m o d e l   1   p l o t t i n g
   //--------------------------------
-  RooPlot *fmgg = mgg.frame(230,1600, 69);
+  RooPlot *fmgg = mgg.frame(230, 1630, 56);
   //data_toys->plotOn(fmgg);
   data.plotOn(fmgg);
   ws->pdf( tag_bkg )->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("full"),RooFit::NormRange("full"));
-  ws->pdf( tag_bkg )->plotOn(fmgg,RooFit::LineColor(kGreen));
-  ws->pdf( tag_bkg )->plotOn(fmgg,RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
+  //ws->pdf( tag_bkg )->plotOn(fmgg,RooFit::LineColor(kGreen));
+  //ws->pdf( tag_bkg )->plotOn(fmgg,RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
   fmgg->SetName( "BkgOnlyFitPlot" );
   
   ws->import( *bres );
   ws->import( *fmgg );
   ws->import( data );
-   
+
+  float SignaYieldOriginal = Signal_Yield;
   for ( int i = 0; i < 301; i++ )
     {
       float _mass = 500. + (float)10*i;
+      Signal_Yield = SignaYieldOriginal*(1.00/0.402153)*(0.398352+(0.000164685)*_mass-(2.3037e-08)*_mass*_mass)*(0.83769+(1.95668e-05)*_mass - (2.87399e-09)*_mass*_mass);
       TString combineRootFile = Form("HggRazorWorkspace_m%0.f.root", _mass);
       TFile* _fout = new TFile( combineRootFile, "RECREATE" );
       //-------------------------------------------------------
