@@ -105,7 +105,7 @@ RooWorkspace* DoubleCBFit( TTree* tree, TString mggName, float muCB, float sigma
   //mgg.setBins(57);
   //mgg.setRange( "signal", 103, 160. );
 
-  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 230, 10000, "GeV" );
+  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 230, 6000, "GeV" );
   mgg.setBins(80);
   //mgg.setRange( "signal", muCB-50*sigmaCB, muCB+50*sigmaCB );
 
@@ -116,9 +116,10 @@ RooWorkspace* DoubleCBFit( TTree* tree, TString mggName, float muCB, float sigma
   //C r e a t e  Double Crystall Ball
   //---------------------------------
   TString tag = MakeDoubleCB( "Signal", mgg, *ws );
+  
   ws->var( tag + "_Ns" )->setVal( (double)npoints );
-  ws->var( tag + "_muCB")->setVal( 0.99*muCB );
-  ws->var( tag + "_sigmaCB")->setVal( 1.5*sigmaCB );
+  ws->var( tag + "_muCB")->setVal( muCB );
+  ws->var( tag + "_sigmaCB")->setVal( 1.0*sigmaCB );
   RooPlot* frame;
   if ( muCB < 2000 )
     {
@@ -126,32 +127,32 @@ RooWorkspace* DoubleCBFit( TTree* tree, TString mggName, float muCB, float sigma
       frame = mgg.frame( muCB-50*sigmaCB, muCB+50*sigmaCB, 100 );
       ws->var( tag + "_muCB")->setVal( muCB );
       ws->var( tag + "_sigmaCB")->setVal( sigmaCB );
-      ws->var( tag + "_alpha1")->setVal( 1.3 );
+      ws->var( tag + "_alpha1")->setVal( 1. );
       ws->var( tag + "_alpha2")->setVal( 1.8 );
       ws->var( tag + "_n1")->setVal( 2.7 );
-      ws->var( tag + "_n2")->setVal( 4.8 );
+      ws->var( tag + "_n2")->setVal( 2.7 );
     }
   else if ( muCB < 3000 )
     {
       mgg.setRange( "signal", muCB-50*sigmaCB, muCB+50*sigmaCB );
-      frame = mgg.frame( muCB-50*sigmaCB, muCB+50*sigmaCB, 100 );
-      ws->var( tag + "_muCB")->setVal( 0.99*muCB );
+      frame = mgg.frame( muCB-50*sigmaCB, muCB+50*sigmaCB, 200 );
+      ws->var( tag + "_muCB")->setVal( muCB );
       ws->var( tag + "_sigmaCB")->setVal( sigmaCB );
-      ws->var( tag + "_alpha1")->setVal( 1.3 );
-      ws->var( tag + "_alpha2")->setVal( 1.8 );
-      ws->var( tag + "_n1")->setVal( 2.7 );
-      ws->var( tag + "_n2")->setVal( 4.8 );
+      ws->var( tag + "_alpha1")->setVal( 0.9 );
+      ws->var( tag + "_alpha2")->setVal( 2.0 );
+      ws->var( tag + "_n1")->setVal( 3.2 );
+      ws->var( tag + "_n2")->setVal( 2.8 );
     }
   else if ( muCB < 4500 )
     {
       mgg.setRange( "signal", muCB-50*sigmaCB, muCB+50*sigmaCB );
       frame = mgg.frame( muCB-50*sigmaCB, muCB+50*sigmaCB, 100 );
       ws->var( tag + "_muCB")->setVal( muCB );
-      ws->var( tag + "_sigmaCB")->setVal( 1.5*sigmaCB );
-      ws->var( tag + "_alpha1")->setVal( 0.3 );
-      ws->var( tag + "_alpha2")->setVal( 0.8 );
-      ws->var( tag + "_n1")->setVal( 2.7 );
-      ws->var( tag + "_n2")->setVal( 4.8 );
+      ws->var( tag + "_sigmaCB")->setVal( sigmaCB );
+      ws->var( tag + "_alpha1")->setVal( 0.8 );
+      ws->var( tag + "_alpha2")->setVal( 2.0 );
+      ws->var( tag + "_n1")->setVal( 3.7 );
+      ws->var( tag + "_n2")->setVal( 3.0 );
     }
   else if ( muCB < 5000. )
     {
@@ -176,9 +177,11 @@ RooWorkspace* DoubleCBFit( TTree* tree, TString mggName, float muCB, float sigma
       ws->var( tag + "_n2")->setVal( 2.8 );
     }
 
+  
   RooFitResult* sres = ws->pdf( tag )->fitTo( data, RooFit::Strategy(2), RooFit::Extended( kTRUE ), RooFit::Save( kTRUE ), RooFit::Range("signal") );
   sres->SetName( "SignalFitResult" );
   ws->import( *sres );
+  
   
   //RooPlot* frame = mgg.frame( muCB-5*sigmaCB, muCB+5*sigmaCB, 100 );
   data.plotOn( frame );

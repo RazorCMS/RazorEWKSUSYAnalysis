@@ -7,6 +7,7 @@
 #include <TDirectory.h>
 #include <TFile.h>
 #include <TH1F.h>
+#include <TF1.h>
 #include <TTree.h>
 #include <TGraph.h>
 #include <TGraphErrors.h>
@@ -116,7 +117,8 @@ int main( int argc, char** argv )
 	  tmp.eff     = accEff;
 	  tmp.errUp   = errUp;
 	  tmp.errDown = errDown;
-	  std::cout << "mass: " << mass << "-> " << accEff << " +/-" << errUp << " " << errDown << std::endl;
+	  std::cout << "mass: " << mass << " " << selected->Integral() << " " << nevents->Integral()
+		    << "-> " << accEff << " +/-" << errUp << " " << errDown << std::endl;
 	  
 	  //<< " " << exp0p975 << " " << obs << std::endl;
 	  if ( mymap.find( _mass ) == mymap.end() )
@@ -152,10 +154,18 @@ int main( int argc, char** argv )
       ctr++;
     }
 
-  TString mFname = "AccEff_GluGlu_1p4_EBEB";
+  TString mFname = "AccEff_GluGlu_5p6_EBEB";
   TFile* out = new TFile(mFname+".root", "recreate");
   TGraph* gAccEff = new TGraph(npoints, x, AccEff);
+
+  TF1 *fpol = new TF1 ("fpol", "pol4", 490., 4010.);
   TGraphAsymmErrors* gr = new TGraphAsymmErrors(npoints,x,AccEff,xerrU,xerrD,yerrU,yerrD);
+  gr->Fit( fpol, "RF+EX0" );
+  gr->SetMarkerStyle(20);
+  gr->SetMarkerColor(kBlue-3);
+  gr->SetMarkerSize(0.7);
+  gr->SetLineColor(kBlue-3);
+  gr->SetLineWidth(1);
 
   TCanvas* c = new TCanvas( "c", "c", 2119, 33, 800, 700 );
   c->SetHighLightColor(2);
@@ -171,19 +181,18 @@ int main( int argc, char** argv )
 
   gStyle->SetPaintTextFormat("4.3f");
 
-  gAccEff->SetLineColor(kBlue-3);
-  gAccEff->SetLineWidth(3);
+ 
 
-  gAccEff->SetTitle("");
-  gAccEff->GetXaxis()->SetTitleSize(0.05);
-  gAccEff->GetXaxis()->SetTitle("M_{G} (GeV)");
-  gAccEff->GetYaxis()->SetTitleSize(0.05);
+  gr->SetTitle("");
+  gr->GetXaxis()->SetTitleSize(0.05);
+  gr->GetXaxis()->SetTitle("M_{G} (GeV)");
+  gr->GetYaxis()->SetTitleSize(0.05);
   //gAccEff->GetYaxis()->CenterTitle(kTRUE);
-  gAccEff->GetYaxis()->SetTitle("#epsilon #times A");
+  gr->GetYaxis()->SetTitle("#epsilon #times A");
 
-  gAccEff->GetYaxis()->SetRangeUser(0,1);
-  gAccEff->GetXaxis()->SetRangeUser(500,4300);
-  gAccEff->Draw("AC");
+  gr->GetYaxis()->SetRangeUser(0,1);
+  gr->GetXaxis()->SetRangeUser(500,4300);
+  gr->Draw("AP");
 
   TLegend* leg = new TLegend( 0.6, 0.78, 0.89, 0.89, NULL, "brNDC" );
   leg->SetBorderSize(0);
@@ -193,7 +202,7 @@ int main( int argc, char** argv )
   leg->SetFillColor(0);
   leg->SetFillStyle(1001);
   leg->SetTextSize(0.04);
-  leg->AddEntry( gAccEff, " EBEB J=0", "l" );
+  leg->AddEntry( gr, " EBEB J=0", "ep" );
   leg->Draw();
 
   AddCMS(c);
@@ -203,7 +212,9 @@ int main( int argc, char** argv )
   c->SaveAs(mFname+".C");
   
   gAccEff->Write("gAccEff");
+  fpol->Write("pol3Fit");
   gr->Write("gr");
+ 
   
   out->Close();
   return 0;
