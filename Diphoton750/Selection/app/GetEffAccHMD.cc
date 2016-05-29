@@ -4,9 +4,14 @@
 #include <map>
 #include <stdlib.h>
 //ROOT
+#include <TDirectory.h>
 #include <TFile.h>
+#include <TH1F.h>
 #include <TTree.h>
 #include <TGraph.h>
+#include <TGraphErrors.h>
+#include <TEfficiency.h>
+#include <TGraphAsymmErrors.h>
 #include <TAxis.h>
 #include <TCanvas.h>
 #include <TStyle.h>
@@ -15,14 +20,11 @@
 //LOCAL INCLUDES
 #include "CommandLineInput.hh"
 
-struct Limit
+struct Eff
 {
-  double obs;
-  double exp0p025;
-  double exp0p16;
-  double exp0p5;
-  double exp0p84;
-  double exp0p975;
+  double eff;
+  double errUp;
+  double errDown;
 };
 
 
@@ -66,10 +68,28 @@ int main( int argc, char** argv )
       return -1;
     }
 
+  //-----------------
+  //Selection TString
+  //-----------------
+  std::string categoryMode = ParseCommandLine( argc, argv, "-category=" );
+  if (  categoryMode == "" )
+    {
+      std::cerr << "[ERROR]: please provide the category. Use --category=<ebeb,ebee>" << std::endl;
+      return -1;
+    }
+  
+  TString cut = "pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1Pt> 75. && pho2Pt>75.";
+  TString categoryCutString;
+
+  if (categoryMode == "ebeb") categoryCutString = " && mGammaGamma >= 230 && abs(pho1DefaultSC_Eta) <1.4442 && abs(pho2DefaultSC_Eta) < 1.4442";
+  else if (categoryMode == "ebee") categoryCutString = " && mGammaGamma >= 320 && ( (abs(pho1DefaultSC_Eta) < 1.4442 && abs(pho2DefaultSC_Eta) > 1.566) || (abs(pho1DefaultSC_Eta) > 1.566 && abs(pho2DefaultSC_Eta) < 1.4442) )";
+  
+  cut = cut + categoryCutString;
+
   std::ifstream ifs ( inputList.c_str(), std::ifstream::in );
 
 
-  std::map<float, Limit> mymap;
+  std::map<float, Eff> mymap;
   
   std::string fname;
   if( ifs.is_open() )
@@ -80,31 +100,28 @@ int main( int argc, char** argv )
 	  if ( ifs.eof() ) break;
 	  //std::cout << "fname: " << fname << std::endl;
 	  TFile* fin = new TFile( fname.c_str(), "READ" );
-	  int low  = fname.find(".mH")+3;
-	  int high = fname.find(".root") - low;
+	  int low  = fname.find("_M-")+3;
+	  int high = fname.find("_TuneCUEP8M1_13TeV-pythia8") - low;
 	  std::string mass = fname.substr( low, high );
 	  float _mass = atof( mass.c_str() );
-	  TTree* tree = (TTree*)fin->Get("limit");
-	  double limit;
-	  Limit tmpLimit;
-	  tree->SetBranchAddress( "limit", &limit );
-	  tree->GetEntry(0);
-	  tmpLimit.exp0p025 = limit*10.;
-	  tree->GetEntry(1);
-	  tmpLimit.exp0p16 = limit*10.;
-	  tree->GetEntry(2);
-	  tmpLimit.exp0p5 = limit*10.;
-	  tree->GetEntry(3);
-	  tmpLimit.exp0p84 = limit*10.;
-	  tree->GetEntry(4);
-	  tmpLimit.exp0p975 = limit*10.;
-	  tree->GetEntry(5);
-	  tmpLimit.obs = limit*10.;
-	  //std::cout << "mass: " << mass << "-> " << exp0p025 << " " << exp0p16 << " " << exp0p5 << " " << exp0p84
+	  TTree* tree = (TTree*)fin->Get("HggRazor");
+	  TH1F* nevents = (TH1F*)fin->Get("NEvents");
+	  tree->Draw("mGammaGamma>>tmp1(10000,0,10000)", cut, "goff");
+	  TH1F* selected = (TH1F*)gDirectory->Get("tmp1");
+	  float accEff = selected->Integral()/nevents->Integral();
+	  //float err = sqrt( accEff*(1-accEff)/nevents->Integral());
+	  float errUp   = fabs( accEff-TEfficiency::ClopperPearson( nevents->Integral(), selected->Integral(), 0.68, 1 ) );
+	  float errDown = fabs( accEff-TEfficiency::ClopperPearson( nevents->Integral(), selected->Integral(), 0.68, 0 ) );
+	  Eff tmp;
+	  tmp.eff     = accEff;
+	  tmp.errUp   = errUp;
+	  tmp.errDown = errDown;
+	  std::cout << "mass: " << mass << "-> " << accEff << " +/-" << errUp << " " << errDown << std::endl;
+	  
 	  //<< " " << exp0p975 << " " << obs << std::endl;
 	  if ( mymap.find( _mass ) == mymap.end() )
 	    {
-	      mymap[_mass] = tmpLimit;
+	      mymap[_mass] = tmp;
 	    }
 	  delete fin;
 	}
@@ -116,39 +133,29 @@ int main( int argc, char** argv )
 
   int npoints = mymap.size();
   float x[npoints];
-  float expL[npoints];
-  float obsL[npoints];
+  float AccEff[npoints];
+  float xerrU[npoints];
+  float xerrD[npoints];
+  float yerrU[npoints];
+  float yerrD[npoints];
   
-  float xp[2*npoints];
-  float OneS[2*npoints];
-  float TwoS[2*npoints];
-   
-
   int ctr = 0;
   for ( auto tmp : mymap )
     {
       //if ( tmp.first > 1000 && tmp.first < 1300 ) std::cout << "mass: " << tmp.first << " expL: " << tmp.second.exp0p5 << std::endl;
       x[ctr]    = tmp.first;
-      obsL[ctr] = tmp.second.obs;
-      expL[ctr] = tmp.second.exp0p5;
-      
-      xp[ctr] = tmp.first;
-      xp[2*npoints-(ctr+1)] = tmp.first;     
-
-      OneS[ctr] = tmp.second.exp0p16;
-      OneS[2*npoints-(ctr+1)] = tmp.second.exp0p84;
-
-      TwoS[ctr] = tmp.second.exp0p025;
-      TwoS[2*npoints-(ctr+1)] = tmp.second.exp0p975;
-       
+      AccEff[ctr] = tmp.second.eff;
+      xerrU[ctr] = 0;
+      xerrD[ctr] = 0;
+      yerrU[ctr] = tmp.second.errUp;
+      yerrD[ctr] = tmp.second.errDown;
       ctr++;
     }
 
-  TFile* out = new TFile("out_test.root", "recreate");
-  TGraph* gObs = new TGraph(npoints, x, obsL);
-  TGraph* gExp = new TGraph(npoints, x, expL);
-  TGraph* gOneS = new TGraph(2*npoints, xp, OneS);
-  TGraph* gTwoS = new TGraph(2*npoints, xp, TwoS);
+  TString mFname = "AccEff_GluGlu_1p4_EBEB";
+  TFile* out = new TFile(mFname+".root", "recreate");
+  TGraph* gAccEff = new TGraph(npoints, x, AccEff);
+  TGraphAsymmErrors* gr = new TGraphAsymmErrors(npoints,x,AccEff,xerrU,xerrD,yerrU,yerrD);
 
   TCanvas* c = new TCanvas( "c", "c", 2119, 33, 800, 700 );
   c->SetHighLightColor(2);
@@ -163,29 +170,22 @@ int main( int argc, char** argv )
   c->SetFrameBorderMode(0);
 
   gStyle->SetPaintTextFormat("4.3f");
-  
-  gTwoS->SetFillColor(kSpring-3);
-  gTwoS->SetLineColor(kSpring-3);
-  gOneS->SetFillColor(kSpring+10);
-  gOneS->SetLineColor(kSpring+10);
-  gExp->SetLineWidth(3);
-  gExp->SetLineStyle(2);
-  gObs->SetLineWidth(3);
 
-  gTwoS->SetTitle("");
-  gTwoS->GetXaxis()->SetTitleSize(0.05);
-  gTwoS->GetXaxis()->SetTitle("M_{G} (GeV)");
-  gTwoS->GetYaxis()->SetTitleSize(0.05);
-  gTwoS->GetYaxis()->CenterTitle(kTRUE);
-  gTwoS->GetYaxis()->SetTitle("95% C.L. limit #sigma(pp#rightarrowG#rightarrow#gamma#gamma) (fb)");
+  gAccEff->SetLineColor(kBlue-3);
+  gAccEff->SetLineWidth(3);
 
-  gTwoS->GetYaxis()->SetRangeUser(0,30);
-  gTwoS->Draw("AFC");
-  gOneS->Draw("FC");
-  gExp->Draw("C");
-  gObs->Draw("C");
+  gAccEff->SetTitle("");
+  gAccEff->GetXaxis()->SetTitleSize(0.05);
+  gAccEff->GetXaxis()->SetTitle("M_{G} (GeV)");
+  gAccEff->GetYaxis()->SetTitleSize(0.05);
+  //gAccEff->GetYaxis()->CenterTitle(kTRUE);
+  gAccEff->GetYaxis()->SetTitle("#epsilon #times A");
 
-  TLegend* leg = new TLegend( 0.6, 0.58, 0.89, 0.89, NULL, "brNDC" );
+  gAccEff->GetYaxis()->SetRangeUser(0,1);
+  gAccEff->GetXaxis()->SetRangeUser(500,4300);
+  gAccEff->Draw("AC");
+
+  TLegend* leg = new TLegend( 0.6, 0.78, 0.89, 0.89, NULL, "brNDC" );
   leg->SetBorderSize(0);
   leg->SetLineColor(1);
   leg->SetLineStyle(1);
@@ -193,22 +193,17 @@ int main( int argc, char** argv )
   leg->SetFillColor(0);
   leg->SetFillStyle(1001);
   leg->SetTextSize(0.04);
-  leg->AddEntry( gExp, " Expected limit", "l" );
-  leg->AddEntry( gOneS, " #pm1 #sigma", "f" );
-  leg->AddEntry( gTwoS, " #pm2 #sigma", "f" );
-  leg->AddEntry( gObs, " Observed limit", "l" );
+  leg->AddEntry( gAccEff, " EBEB J=0", "l" );
   leg->Draw();
 
   AddCMS(c);
 
-  c->SaveAs("NarrowResLimit.pdf");
-  c->SaveAs("NarrowResLimit.C");
   
-  gObs->GetXaxis()->SetRangeUser(0, 30);
-  gObs->Write("gObs");
-  gExp->Write("gExp");
-  gOneS->Write("gOneS");
-  gTwoS->Write("gTwoS");
+  c->SaveAs(mFname+".pdf");
+  c->SaveAs(mFname+".C");
+  
+  gAccEff->Write("gAccEff");
+  gr->Write("gr");
   
   out->Close();
   return 0;

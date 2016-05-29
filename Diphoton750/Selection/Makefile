@@ -13,10 +13,10 @@ LDFLAGS := $(shell root-config --glibs) $(STDLIBDIR)
 CPPFLAGS += -g -std=c++11
 
 TARGET = MakeSelection
-TARGET2 = PrintEventInfo
+TARGET2 = GetEffAccHMD
 
-SRC = app/MakeSelection.cc src/HggTree.cc src/HggRazorClass.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc $(Aux)/src/TChainTools.cc
-SRC2 = app/PrintEventInfo.cc $(CommonTools)/src/HggTree.cc src/HggRazorClass.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc $(Aux)/src/TChainTools.cc
+SRC = app/MakeSelection.cc $(CommonTools)/src/HggTree.cc src/HggRazorClass.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc $(Aux)/src/TChainTools.cc
+SRC2 = app/GetEffAccHMD.cc $(Aux)/src/CommandLineInput.cc
 
 OBJ = $(SRC:.cc=.o)
 OBJ2 = $(SRC2:.cc=.o)

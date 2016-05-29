@@ -35,7 +35,7 @@ int main( int argc, char* argv[] )
   TString categoryCutString;
 
   if (categoryMode == "ebeb") categoryCutString = " && mGammaGamma >= 230 && abs(pho1DefaultSC_Eta) <1.4442 && abs(pho2DefaultSC_Eta) < 1.4442";
-  else if (categoryMode == "ebee") categoryCutString = " && mGammaGamma >= 340 && ( (abs(pho1DefaultSC_Eta) < 1.4442 && abs(pho2DefaultSC_Eta) > 1.566) || (abs(pho1DefaultSC_Eta) > 1.566 && abs(pho2DefaultSC_Eta) < 1.4442) )";
+  else if (categoryMode == "ebee") categoryCutString = " && mGammaGamma >= 320 && ( (abs(pho1DefaultSC_Eta) < 1.4442 && abs(pho2DefaultSC_Eta) > 1.566) || (abs(pho1DefaultSC_Eta) > 1.566 && abs(pho2DefaultSC_Eta) < 1.4442) )";
   
   cut = cut + categoryCutString;
 
