@@ -88,7 +88,51 @@ double GetEffSigma( TH1* hist )
   
   return widmin;
   
-}
+};
+
+double GetFWHM( TH1* h )
+{
+  double _maxY = h->GetMaximum();
+  double bw    = h->GetBinWidth(1);
+  double xlow  = h->GetBinLowEdge(1);
+  double _maxX = xlow + bw*((double)h->GetMaximumBin() - 1.) + bw*0.50;
+  int _maxBin  = h->GetMaximumBin();
+
+  int niter = h->GetNbinsX()/3;
+  double lowEnd  = -1;
+  double highEnd = -1;
+  //--------------
+  //Low End
+  //--------------
+  for ( int i = 1; i <= niter; i++ )
+    {
+      int iBin = _maxBin+i;
+      if ( h->GetBinContent( iBin ) < 0.50*_maxY )
+	{
+	  double slope = (h->GetBinContent( iBin ) - h->GetBinContent( iBin-1 ))/(h->GetBinLowEdge( iBin )-h->GetBinLowEdge( iBin-1 ));
+	  highEnd = (0.50*_maxY-h->GetBinContent( iBin-1 ))/slope + h->GetBinLowEdge( iBin-1 );
+	  //highEnd = h->GetBinLowEdge( iBin-1 );
+	  break;
+	}
+    }
+
+  //------------------
+  //HighEnd
+  //------------------
+  for ( int i = 1; i <= niter; i++ )
+    {
+      int iBin = _maxBin-i;
+      if ( h->GetBinContent( iBin ) < 0.50*_maxY )
+	{
+	  double slope = (h->GetBinContent( iBin+1 ) - h->GetBinContent( iBin ))/(h->GetBinLowEdge( iBin+1 )-h->GetBinLowEdge( iBin ));
+	  lowEnd = (0.50*_maxY-h->GetBinContent( iBin ))/slope + h->GetBinLowEdge( iBin );
+	  //lowEnd = h->GetBinLowEdge( _maxBin-i+1 );
+	  break;
+	}
+    }
+   
+   return highEnd-lowEnd;
+};
 
 
 double GetBestFitSignalStrength( int n, double* b, double* s, double* obs )

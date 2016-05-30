@@ -121,34 +121,33 @@ int main( int argc, char** argv )
   int npoints = mymass.size();
 
   //Loop for mu;
-  TString className = "RooIntepolateDSCB_W0p014_Spin0";
-  std::cout << "====================" << std::endl;
-  std::cout << className << "::getMu( float m )\n{\n";
+  //TString className = "double RooIntepolateDSCB_W0p014_Spin0_EBEB";
+  TString className = "double RooIntepolateDSCB_W0p014_Spin0_EBEE";
+  std::cout << className << "::getMean( double m ) const\n{\n";
   for ( int i = 0; i < npoints; i++ )
     {
       float slope = (mymap[mymass[i+1]].mu - mymap[mymass[i]].mu)/(mymass[i+1] - mymass[i]);
       if ( i != npoints-1)
 	{
 	  std::cout << "\tif( m >=  " << mymass[i] << " && m < " << mymass[i+1] << " ) ";
-	  std::cout << "return " << slope << "*(m-" << mymass[i] << ") + " << mymap[mymass[i]].mu << "\n";
+	  std::cout << "return " << slope << "*(m-" << mymass[i] << ") + " << mymap[mymass[i]].mu << ";\n";
 	}
       else
 	{
-	  std::cout << "\treturn 0;\n}\n\n";
+	  std::cout << "\treturn 0;\n};\n\n";
 	}
     }
 
 
   //Loop for sigma
-  std::cout << "====================" << std::endl;
-  std::cout << className << "::getSigma( float m )\n{\n";
+  std::cout << className << "::getSigma( double m ) const\n{\n";
   for ( int i = 0; i < npoints; i++ )
     {
       float slope = (mymap[mymass[i+1]].sigma - mymap[mymass[i]].sigma)/(mymass[i+1] - mymass[i]);
       if ( i != npoints-1)
 	{
 	  std::cout << "\tif( m >=  " << mymass[i] << " && m < " << mymass[i+1] << " ) ";
-	  std::cout << "return " << slope << "*(m-" << mymass[i] << ") + " << mymap[mymass[i]].sigma << "\n";
+	  std::cout << "return " << slope << "*(m-" << mymass[i] << ") + " << mymap[mymass[i]].sigma << ";\n";
 	}
       else
 	{
@@ -159,15 +158,14 @@ int main( int argc, char** argv )
   //-----------
   //Loop for n1
   //-----------
-  std::cout << "====================" << std::endl;
-  std::cout << className << "::getN1( float m )\n{\n";
+  std::cout << className << "::getN1( double m ) const\n{\n";
   for ( int i = 0; i < npoints; i++ )
     {
       float slope = (mymap[mymass[i+1]].n1 - mymap[mymass[i]].n1)/(mymass[i+1] - mymass[i]);
       if ( i != npoints-1)
 	{
 	  std::cout << "\tif( m >=  " << mymass[i] << " && m < " << mymass[i+1] << " ) ";
-	  std::cout << "return " << slope << "*(m-" << mymass[i] << ") + " << mymap[mymass[i]].n1 << "\n";
+	  std::cout << "return " << slope << "*(m-" << mymass[i] << ") + " << mymap[mymass[i]].n1 << ";\n";
 	}
       else
 	{
@@ -178,15 +176,14 @@ int main( int argc, char** argv )
   //-----------
   //Loop for n2
   //-----------
-  std::cout << "====================" << std::endl;
-  std::cout << className << "::getN2( float m )\n{\n";
+  std::cout << className << "::getN2( double m ) const\n{\n";
   for ( int i = 0; i < npoints; i++ )
     {
       float slope = (mymap[mymass[i+1]].n2 - mymap[mymass[i]].n2)/(mymass[i+1] - mymass[i]);
       if ( i != npoints-1)
 	{
 	  std::cout << "\tif( m >=  " << mymass[i] << " && m < " << mymass[i+1] << " ) ";
-	  std::cout << "return " << slope << "*(m-" << mymass[i] << ") + " << mymap[mymass[i]].n2 << "\n";
+	  std::cout << "return " << slope << "*(m-" << mymass[i] << ") + " << mymap[mymass[i]].n2 << ";\n";
 	}
       else
 	{
@@ -197,15 +194,14 @@ int main( int argc, char** argv )
   //-----------
   //Loop for a1
   //-----------
-  std::cout << "====================" << std::endl;
-  std::cout << className << "::getA1( float m )\n{\n";
+  std::cout << className << "::getAlpha1( double m ) const\n{\n";
   for ( int i = 0; i < npoints; i++ )
     {
       float slope = (mymap[mymass[i+1]].a1 - mymap[mymass[i]].a1)/(mymass[i+1] - mymass[i]);
       if ( i != npoints-1)
 	{
 	  std::cout << "\tif( m >=  " << mymass[i] << " && m < " << mymass[i+1] << " ) ";
-	  std::cout << "return " << slope << "*(m-" << mymass[i] << ") + " << mymap[mymass[i]].a1 << "\n";
+	  std::cout << "return " << slope << "*(m-" << mymass[i] << ") + " << mymap[mymass[i]].a1 << ";\n";
 	}
       else
 	{
@@ -216,15 +212,14 @@ int main( int argc, char** argv )
   //-----------
   //Loop for a2
   //-----------
-  std::cout << "====================" << std::endl;
-  std::cout << className << "::getA2( float m )\n{\n";
+  std::cout << className << "::getAlpha2( double m ) const\n{\n";
   for ( int i = 0; i < npoints; i++ )
     {
       float slope = (mymap[mymass[i+1]].a2 - mymap[mymass[i]].a2)/(mymass[i+1] - mymass[i]);
       if ( i != npoints-1)
 	{
 	  std::cout << "\tif( m >=  " << mymass[i] << " && m < " << mymass[i+1] << " ) ";
-	  std::cout << "return " << slope << "*(m-" << mymass[i] << ") + " << mymap[mymass[i]].a1 << "\n";
+	  std::cout << "return " << slope << "*(m-" << mymass[i] << ") + " << mymap[mymass[i]].a2 << ";\n";
 	}
       else
 	{

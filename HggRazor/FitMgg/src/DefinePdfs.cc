@@ -350,7 +350,8 @@ TString MakeDoubleCBInterpolate( TString tag, RooRealVar& mgg, RooWorkspace& w )
   RooRealVar* Ns     = new RooRealVar( tag + "_DCBI_Ns", "N_{s}", 1e5, "events");
   Ns->setConstant(kFALSE);
   
-  RooDoubleCBInterpolate* dCB = new RooDoubleCBInterpolate( tag + "DCBI_pdf", "", mgg, *mass );
+  //RooDoubleCBInterpolate* dCB = new RooDoubleCBInterpolate( tag + "DCBI_pdf", "", mgg, *mass );
+  RooIntepolateDSCB_W0p014_Spin0_EBEE* dCB = new RooIntepolateDSCB_W0p014_Spin0_EBEE( tag + "DCBI_pdf", "", mgg, *mass );
   
   //------------------------------------
   //C r e a t e   E x t e n d e d  p.d.f
@@ -368,29 +369,30 @@ TString MakeDoubleCBInterpolateNE( TString tag, RooRealVar& mgg, RooWorkspace& w
   mass->setConstant(kFALSE);
   
   TString pdf_name = tag + "_DCBI";
-  RooDoubleCBInterpolate* dCB;
+  //RooDoubleCBInterpolate* dCB;
+  RooIntepolateDSCB_W0p014_Spin0_EBEE* dCB;
   if ( _globalScale && _categoryScale )
     {
       RooRealVar* muGlobal = new RooRealVar( "mu_Global", "#mu_{global}", 0, "" );
       RooRealVar* muCat    = new RooRealVar( category+"_mu_Global", "#mu_{"+category+"}", 0, "" );
       RooFormulaVar* mggp  = new RooFormulaVar( tag + "_DG_mggp", "m_{gg} - #mu_{g} - #mu_{"+category+"}", "(@0-@1-@2)", RooArgList(mgg, *muGlobal, *muCat) );
-      dCB = new RooDoubleCBInterpolate( pdf_name , "", *mggp, *mass );
+      dCB = new RooIntepolateDSCB_W0p014_Spin0_EBEE( pdf_name , "", *mggp, *mass );
     }
   else if ( _globalScale && !_categoryScale )
     {
-      RooRealVar* muGlobal = new RooRealVar( "mu_Global", "#mu_{g}", 0, "" );
+      RooRealVar* muGlobal = new RooRealVar( "mu_Global_EBEE", "#mu_{g}", 0, "" );
       RooFormulaVar* mggp  = new RooFormulaVar( tag + "_DG_muG", "m_{gg} - #mu_{g}", "(@0-@1)", RooArgList(mgg, *muGlobal) );
-      dCB = new RooDoubleCBInterpolate( pdf_name , "", *mggp, *mass );
+      dCB = new RooIntepolateDSCB_W0p014_Spin0_EBEE( pdf_name , "", *mggp, *mass );
     }
   else if ( !_globalScale && _categoryScale )
     {
       RooRealVar* muCat    = new RooRealVar( category+"_mu_Global", "#mu_{"+category+"}", 0, "" );
       RooFormulaVar* mggp  = new RooFormulaVar( tag + "_DG_muG", "mgg - #mu_{"+category+"}", "(@0-@1)", RooArgList(mgg, *muCat) );
-      dCB = new RooDoubleCBInterpolate( pdf_name , "", *mggp, *mass );
+      dCB = new RooIntepolateDSCB_W0p014_Spin0_EBEE( pdf_name , "", *mggp, *mass );
     }
   else
     {
-      dCB = new RooDoubleCBInterpolate( pdf_name , "", mgg, *mass );
+      dCB = new RooIntepolateDSCB_W0p014_Spin0_EBEE( pdf_name , "", mgg, *mass );
     }
 
   

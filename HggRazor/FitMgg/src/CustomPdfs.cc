@@ -821,6 +821,515 @@ Double_t RooDoubleCBInterpolate::analyticalIntegral(Int_t code, const char* rang
  
 };
 
+
+//-----------
+//-----------
+
+ClassImp(RooIntepolateDSCB_W0p014_Spin0_EBEB)
+
+RooIntepolateDSCB_W0p014_Spin0_EBEB::RooIntepolateDSCB_W0p014_Spin0_EBEB( ){ };
+
+RooIntepolateDSCB_W0p014_Spin0_EBEB::RooIntepolateDSCB_W0p014_Spin0_EBEB(const char *name, const char *title, 
+					       RooAbsReal& _x,
+					       RooAbsReal& _mass
+					       ) :
+  RooAbsPdf(name,title), 
+  x("x","x",this,_x),
+  mass("mass","mass",this, _mass)
+{
+};
+
+
+RooIntepolateDSCB_W0p014_Spin0_EBEB::RooIntepolateDSCB_W0p014_Spin0_EBEB(const RooIntepolateDSCB_W0p014_Spin0_EBEB& other, const char* name) :  
+  RooAbsPdf(other,name), 
+  x("x",this,other.x),
+  mass("mass",this, other.mass)
+{ 
+};
+
+double RooIntepolateDSCB_W0p014_Spin0_EBEB::evaluate() const 
+{
+  double mean   = getMean( mass );
+  double width  = getSigma( mass );
+  double n1     = getN1( mass );
+  double alpha1 = getAlpha1( mass );
+  double n2     = getN2( mass );
+  double alpha2 = getAlpha2( mass );
+  
+  double t = (x-mean)/width;
+  if( t >= -alpha1 && t <= alpha2 )
+    {
+      return exp(-0.5*t*t);
+    }
+  else if ( t < -alpha1 )
+    {
+      double A1 = pow(n1/fabs(alpha1),n1)*exp(-alpha1*alpha1/2);
+      double B1 = n1/fabs(alpha1)-fabs(alpha1);
+      return A1*pow(B1-t,-n1);
+    }
+  else if ( t > alpha2 )
+    {
+      double A2 = pow(n2/fabs(alpha2),n2)*exp(-alpha2*alpha2/2);
+      double B2 = n2/fabs(alpha2)-fabs(alpha2);
+      return A2*pow(B2+t,-n2);
+    }
+  else
+    {
+      cout << "ERROR evaluating range... t = " << t << endl;
+      return 99;
+    }
+   
+};
+
+Int_t RooIntepolateDSCB_W0p014_Spin0_EBEB::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* range) const 
+{
+  if (matchArgs(allVars,analVars,x)) return 1;
+  return 0;
+};
+
+Double_t RooIntepolateDSCB_W0p014_Spin0_EBEB::analyticalIntegral(Int_t code, const char* rangeName) const 
+{
+  assert(code==1) ;
+  //
+  double mean   = getMean( mass );
+  double width  = getSigma( mass );
+  double n1     = getN1( mass );
+  double alpha1 = getAlpha1( mass );
+  double n2     = getN2( mass );
+  double alpha2 = getAlpha2( mass );
+  //
+  
+  double central=0;
+  double left=0;
+  double right=0;
+ 
+  static const Double_t root2 = sqrt(2) ;
+  static const Double_t rootPiBy2 = sqrt(atan2(0.0,-1.0)/2.0);
+  Double_t xscale = root2*width;
+ 
+  //compute gaussian contribution
+  double central_low =max(x.min(rangeName),mean - alpha1*width );
+  double central_high=min(x.max(rangeName),mean + alpha2*width );
+  if(central_low < central_high) // is the gaussian part in range?
+    central = rootPiBy2*width*(TMath::Erf((central_high-mean)/xscale)-TMath::Erf((central_low-mean)/xscale));
+ 
+  //compute left tail;
+  double A1 = pow(n1/fabs(alpha1),n1)*exp(-alpha1*alpha1/2);
+  double B1 = n1/fabs(alpha1)-fabs(alpha1);
+ 
+  double left_low=x.min(rangeName);
+  double left_high=min(x.max(rangeName),mean - alpha1*width);
+  if(left_low < left_high){ //is the left tail in range?
+    if(fabs(n1-1.0)>1.e-5)
+      left = A1/(-n1+1.0)*width*(pow(B1-(left_low-mean)/width,-n1+1.)-pow(B1-(left_high-mean)/width,-n1+1.));
+    else
+      left = A1*width*(log(B1-(left_low-mean)/width) - log(B1-(left_high-mean)/width) );
+  }
+ 
+  //compute right tail;
+  double A2 = pow(n2/fabs(alpha2),n2)*exp(-alpha2*alpha2/2);
+  double B2 = n2/fabs(alpha2)-fabs(alpha2);
+ 
+  double right_low=max(x.min(rangeName),mean + alpha2*width);
+  double right_high=x.max(rangeName);
+  if(right_low < right_high){ //is the right tail in range?
+    if(fabs(n2-1.0)>1.e-5)
+      right = A2/(-n2+1.0)*width*(pow(B2+(right_high-mean)/width,-n2+1.)-pow(B2+(right_low-mean)/width,-n2+1.));
+    else
+      right = A2*width*(log(B2+(right_high-mean)/width) - log(B2+(right_low-mean)/width) );
+  }
+     
+  return left+central+right;
+ 
+};
+
+double RooIntepolateDSCB_W0p014_Spin0_EBEB::getMean( double m ) const
+{
+	if( m >=  500 && m < 740 ) return 0.995233*(m-500) + 499.561;
+	if( m >=  740 && m < 745 ) return 1.01341*(m-740) + 738.417;
+	if( m >=  745 && m < 750 ) return 0.957619*(m-745) + 743.484;
+	if( m >=  750 && m < 755 ) return 1.01426*(m-750) + 748.272;
+	if( m >=  755 && m < 760 ) return 0.98425*(m-755) + 753.344;
+	if( m >=  760 && m < 1000 ) return 0.992843*(m-760) + 758.265;
+	if( m >=  1000 && m < 1250 ) return 0.990799*(m-1000) + 996.547;
+	if( m >=  1250 && m < 1500 ) return 0.990036*(m-1250) + 1244.25;
+	if( m >=  1500 && m < 1750 ) return 0.989696*(m-1500) + 1491.76;
+	if( m >=  1750 && m < 2000 ) return 0.990009*(m-1750) + 1739.18;
+	if( m >=  2000 && m < 2250 ) return 0.989139*(m-2000) + 1986.68;
+	if( m >=  2250 && m < 2500 ) return 0.988745*(m-2250) + 2233.97;
+	if( m >=  2500 && m < 2750 ) return 0.98721*(m-2500) + 2481.15;
+	if( m >=  2750 && m < 3000 ) return 0.986992*(m-2750) + 2727.96;
+	if( m >=  3000 && m < 3250 ) return 0.983576*(m-3000) + 2974.7;
+	if( m >=  3250 && m < 3500 ) return 0.986441*(m-3250) + 3220.6;
+	if( m >=  3500 && m < 3750 ) return 0.981139*(m-3500) + 3467.21;
+	return 0;
+};
+
+double RooIntepolateDSCB_W0p014_Spin0_EBEB::getSigma( double m ) const
+{
+	if( m >=  500 && m < 740 ) return 0.00509383*(m-500) + 2.47406;
+	if( m >=  740 && m < 745 ) return 0.0153767*(m-740) + 3.69658;
+	if( m >=  745 && m < 750 ) return -0.00723399*(m-745) + 3.77346;
+	if( m >=  750 && m < 755 ) return 0.031826*(m-750) + 3.73729;
+	if( m >=  755 && m < 760 ) return 0.00510904*(m-755) + 3.89642;
+	if( m >=  760 && m < 1000 ) return 0.00543278*(m-760) + 3.92196;
+	if( m >=  1000 && m < 1250 ) return 0.00573415*(m-1000) + 5.22583;
+	if( m >=  1250 && m < 1500 ) return 0.00621868*(m-1250) + 6.65937;
+	if( m >=  1500 && m < 1750 ) return 0.00601291*(m-1500) + 8.21404;
+	if( m >=  1750 && m < 2000 ) return 0.00606272*(m-1750) + 9.71727;
+	if( m >=  2000 && m < 2250 ) return 0.00782916*(m-2000) + 11.2329;
+	if( m >=  2250 && m < 2500 ) return 0.00702413*(m-2250) + 13.1902;
+	if( m >=  2500 && m < 2750 ) return 0.00721286*(m-2500) + 14.9463;
+	if( m >=  2750 && m < 3000 ) return 0.00739916*(m-2750) + 16.7495;
+	if( m >=  3000 && m < 3250 ) return 0.00962035*(m-3000) + 18.5993;
+	if( m >=  3250 && m < 3500 ) return 0.0064117*(m-3250) + 21.0044;
+	if( m >=  3500 && m < 3750 ) return 0.0118098*(m-3500) + 22.6073;
+	return 0;
+};
+
+double RooIntepolateDSCB_W0p014_Spin0_EBEB::getN1( double m ) const
+{
+	if( m >=  500 && m < 740 ) return -0.000124128*(m-500) + 2.43985;
+	if( m >=  740 && m < 745 ) return 0.00511854*(m-740) + 2.41006;
+	if( m >=  745 && m < 750 ) return 0.00624646*(m-745) + 2.43565;
+	if( m >=  750 && m < 755 ) return -0.0110372*(m-750) + 2.46688;
+	if( m >=  755 && m < 760 ) return 0.0157781*(m-755) + 2.4117;
+	if( m >=  760 && m < 1000 ) return 0.00050326*(m-760) + 2.49059;
+	if( m >=  1000 && m < 1250 ) return 0.000769021*(m-1000) + 2.61137;
+	if( m >=  1250 && m < 1500 ) return 0.00032275*(m-1250) + 2.80362;
+	if( m >=  1500 && m < 1750 ) return 0.001056*(m-1500) + 2.88431;
+	if( m >=  1750 && m < 2000 ) return 0.000843238*(m-1750) + 3.14831;
+	if( m >=  2000 && m < 2250 ) return 0.000501159*(m-2000) + 3.35912;
+	if( m >=  2250 && m < 2500 ) return 0.00102144*(m-2250) + 3.48441;
+	if( m >=  2500 && m < 2750 ) return 0.000513676*(m-2500) + 3.73977;
+	if( m >=  2750 && m < 3000 ) return -5.43402e-05*(m-2750) + 3.86819;
+	if( m >=  3000 && m < 3250 ) return 0.00111297*(m-3000) + 3.8546;
+	if( m >=  3250 && m < 3500 ) return -0.00029722*(m-3250) + 4.13285;
+	if( m >=  3500 && m < 3750 ) return -0.000791708*(m-3500) + 4.05854;
+	return 0;
+};
+
+double RooIntepolateDSCB_W0p014_Spin0_EBEB::getN2( double m ) const
+{
+	if( m >=  500 && m < 740 ) return -1.96607e-05*(m-500) + 2.71034;
+	if( m >=  740 && m < 745 ) return -0.0447118*(m-740) + 2.70562;
+	if( m >=  745 && m < 750 ) return 0.012665*(m-745) + 2.48206;
+	if( m >=  750 && m < 755 ) return 0.0124647*(m-750) + 2.54538;
+	if( m >=  755 && m < 760 ) return 0.00451816*(m-755) + 2.60771;
+	if( m >=  760 && m < 1000 ) return -0.000291722*(m-760) + 2.6303;
+	if( m >=  1000 && m < 1250 ) return 4.76262e-06*(m-1000) + 2.56028;
+	if( m >=  1250 && m < 1500 ) return -0.000311196*(m-1250) + 2.56148;
+	if( m >=  1500 && m < 1750 ) return 0.000951612*(m-1500) + 2.48368;
+	if( m >=  1750 && m < 2000 ) return -0.00119126*(m-1750) + 2.72158;
+	if( m >=  2000 && m < 2250 ) return 0.00111321*(m-2000) + 2.42377;
+	if( m >=  2250 && m < 2500 ) return 0.000440332*(m-2250) + 2.70207;
+	if( m >=  2500 && m < 2750 ) return 0.00156959*(m-2500) + 2.81215;
+	if( m >=  2750 && m < 3000 ) return -0.000654391*(m-2750) + 3.20455;
+	if( m >=  3000 && m < 3250 ) return 0.00245968*(m-3000) + 3.04095;
+	if( m >=  3250 && m < 3500 ) return 0.00103691*(m-3250) + 3.65587;
+	if( m >=  3500 && m < 3750 ) return 0.00270934*(m-3500) + 3.9151;
+	return 0;
+};
+
+double RooIntepolateDSCB_W0p014_Spin0_EBEB::getAlpha1( double m ) const
+{
+	if( m >=  500 && m < 740 ) return 0.000122125*(m-500) + 1.02017;
+	if( m >=  740 && m < 745 ) return 0.000180336*(m-740) + 1.04948;
+	if( m >=  745 && m < 750 ) return -0.00409982*(m-745) + 1.05038;
+	if( m >=  750 && m < 755 ) return 0.00608684*(m-750) + 1.02988;
+	if( m >=  755 && m < 760 ) return -0.00175266*(m-755) + 1.06032;
+	if( m >=  760 && m < 1000 ) return -0.000197785*(m-760) + 1.05155;
+	if( m >=  1000 && m < 1250 ) return -0.000214956*(m-1000) + 1.00409;
+	if( m >=  1250 && m < 1500 ) return -2.87657e-05*(m-1250) + 0.950346;
+	if( m >=  1500 && m < 1750 ) return -0.000187497*(m-1500) + 0.943155;
+	if( m >=  1750 && m < 2000 ) return -0.000143084*(m-1750) + 0.89628;
+	if( m >=  2000 && m < 2250 ) return -3.99843e-05*(m-2000) + 0.860509;
+	if( m >=  2250 && m < 2500 ) return -0.000157892*(m-2250) + 0.850513;
+	if( m >=  2500 && m < 2750 ) return -0.00011494*(m-2500) + 0.811041;
+	if( m >=  2750 && m < 3000 ) return -3.43362e-05*(m-2750) + 0.782306;
+	if( m >=  3000 && m < 3250 ) return -1.16888e-05*(m-3000) + 0.773722;
+	if( m >=  3250 && m < 3500 ) return -0.000160483*(m-3250) + 0.770799;
+	if( m >=  3500 && m < 3750 ) return 0.000115844*(m-3500) + 0.730679;
+	return 0;
+};
+
+double RooIntepolateDSCB_W0p014_Spin0_EBEB::getAlpha2( double m ) const
+{
+	if( m >=  500 && m < 740 ) return 0.000469855*(m-500) + 1.68028;
+	if( m >=  740 && m < 745 ) return 0.0137783*(m-740) + 1.79305;
+	if( m >=  745 && m < 750 ) return -0.00695327*(m-745) + 1.86194;
+	if( m >=  750 && m < 755 ) return 0.00589827*(m-750) + 1.82717;
+	if( m >=  755 && m < 760 ) return -0.00432675*(m-755) + 1.85666;
+	if( m >=  760 && m < 1000 ) return 0.000232167*(m-760) + 1.83503;
+	if( m >=  1000 && m < 1250 ) return 0.000298243*(m-1000) + 1.89075;
+	if( m >=  1250 && m < 1500 ) return 0.000204203*(m-1250) + 1.96531;
+	if( m >=  1500 && m < 1750 ) return -0.000120374*(m-1500) + 2.01636;
+	if( m >=  1750 && m < 2000 ) return 0.000452141*(m-1750) + 1.98627;
+	if( m >=  2000 && m < 2250 ) return 8.86976e-05*(m-2000) + 2.0993;
+	if( m >=  2250 && m < 2500 ) return -0.00010566*(m-2250) + 2.12148;
+	if( m >=  2500 && m < 2750 ) return -0.000160125*(m-2500) + 2.09506;
+	if( m >=  2750 && m < 3000 ) return 0.000289497*(m-2750) + 2.05503;
+	if( m >=  3000 && m < 3250 ) return -0.00038714*(m-3000) + 2.12741;
+	if( m >=  3250 && m < 3500 ) return -0.000326643*(m-3250) + 2.03062;
+	if( m >=  3500 && m < 3750 ) return -0.000183002*(m-3500) + 1.94896;
+	return 0;
+};
+
+//-----------
+//-----------
+
+ClassImp(RooIntepolateDSCB_W0p014_Spin0_EBEE)
+
+RooIntepolateDSCB_W0p014_Spin0_EBEE::RooIntepolateDSCB_W0p014_Spin0_EBEE( ){ };
+
+RooIntepolateDSCB_W0p014_Spin0_EBEE::RooIntepolateDSCB_W0p014_Spin0_EBEE(const char *name, const char *title, 
+					       RooAbsReal& _x,
+					       RooAbsReal& _mass
+					       ) :
+  RooAbsPdf(name,title), 
+  x("x","x",this,_x),
+  mass("mass","mass",this, _mass)
+{
+};
+
+
+RooIntepolateDSCB_W0p014_Spin0_EBEE::RooIntepolateDSCB_W0p014_Spin0_EBEE(const RooIntepolateDSCB_W0p014_Spin0_EBEE& other, const char* name) :  
+  RooAbsPdf(other,name), 
+  x("x",this,other.x),
+  mass("mass",this, other.mass)
+{ 
+};
+
+double RooIntepolateDSCB_W0p014_Spin0_EBEE::evaluate() const 
+{
+  double mean   = getMean( mass );
+  double width  = getSigma( mass );
+  double n1     = getN1( mass );
+  double alpha1 = getAlpha1( mass );
+  double n2     = getN2( mass );
+  double alpha2 = getAlpha2( mass );
+  
+  double t = (x-mean)/width;
+  if( t >= -alpha1 && t <= alpha2 )
+    {
+      return exp(-0.5*t*t);
+    }
+  else if ( t < -alpha1 )
+    {
+      double A1 = pow(n1/fabs(alpha1),n1)*exp(-alpha1*alpha1/2);
+      double B1 = n1/fabs(alpha1)-fabs(alpha1);
+      return A1*pow(B1-t,-n1);
+    }
+  else if ( t > alpha2 )
+    {
+      double A2 = pow(n2/fabs(alpha2),n2)*exp(-alpha2*alpha2/2);
+      double B2 = n2/fabs(alpha2)-fabs(alpha2);
+      return A2*pow(B2+t,-n2);
+    }
+  else
+    {
+      cout << "ERROR evaluating range... t = " << t << endl;
+      return 99;
+    }
+   
+};
+
+Int_t RooIntepolateDSCB_W0p014_Spin0_EBEE::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* range) const 
+{
+  if (matchArgs(allVars,analVars,x)) return 1;
+  return 0;
+};
+
+Double_t RooIntepolateDSCB_W0p014_Spin0_EBEE::analyticalIntegral(Int_t code, const char* rangeName) const 
+{
+  assert(code==1) ;
+  //
+  double mean   = getMean( mass );
+  double width  = getSigma( mass );
+  double n1     = getN1( mass );
+  double alpha1 = getAlpha1( mass );
+  double n2     = getN2( mass );
+  double alpha2 = getAlpha2( mass );
+  //
+  
+  double central=0;
+  double left=0;
+  double right=0;
+ 
+  static const Double_t root2 = sqrt(2) ;
+  static const Double_t rootPiBy2 = sqrt(atan2(0.0,-1.0)/2.0);
+  Double_t xscale = root2*width;
+ 
+  //compute gaussian contribution
+  double central_low =max(x.min(rangeName),mean - alpha1*width );
+  double central_high=min(x.max(rangeName),mean + alpha2*width );
+  if(central_low < central_high) // is the gaussian part in range?
+    central = rootPiBy2*width*(TMath::Erf((central_high-mean)/xscale)-TMath::Erf((central_low-mean)/xscale));
+ 
+  //compute left tail;
+  double A1 = pow(n1/fabs(alpha1),n1)*exp(-alpha1*alpha1/2);
+  double B1 = n1/fabs(alpha1)-fabs(alpha1);
+ 
+  double left_low=x.min(rangeName);
+  double left_high=min(x.max(rangeName),mean - alpha1*width);
+  if(left_low < left_high){ //is the left tail in range?
+    if(fabs(n1-1.0)>1.e-5)
+      left = A1/(-n1+1.0)*width*(pow(B1-(left_low-mean)/width,-n1+1.)-pow(B1-(left_high-mean)/width,-n1+1.));
+    else
+      left = A1*width*(log(B1-(left_low-mean)/width) - log(B1-(left_high-mean)/width) );
+  }
+ 
+  //compute right tail;
+  double A2 = pow(n2/fabs(alpha2),n2)*exp(-alpha2*alpha2/2);
+  double B2 = n2/fabs(alpha2)-fabs(alpha2);
+ 
+  double right_low=max(x.min(rangeName),mean + alpha2*width);
+  double right_high=x.max(rangeName);
+  if(right_low < right_high){ //is the right tail in range?
+    if(fabs(n2-1.0)>1.e-5)
+      right = A2/(-n2+1.0)*width*(pow(B2+(right_high-mean)/width,-n2+1.)-pow(B2+(right_low-mean)/width,-n2+1.));
+    else
+      right = A2*width*(log(B2+(right_high-mean)/width) - log(B2+(right_low-mean)/width) );
+  }
+     
+  return left+central+right;
+ 
+};
+
+double RooIntepolateDSCB_W0p014_Spin0_EBEE::getMean( double m ) const
+{
+	if( m >=  500 && m < 740 ) return 0.997025*(m-500) + 499.727;
+	if( m >=  740 && m < 745 ) return 0.962343*(m-740) + 739.013;
+	if( m >=  745 && m < 750 ) return 0.993297*(m-745) + 743.825;
+	if( m >=  750 && m < 755 ) return 1.00325*(m-750) + 748.791;
+	if( m >=  755 && m < 760 ) return 1.00437*(m-755) + 753.808;
+	if( m >=  760 && m < 1000 ) return 0.994681*(m-760) + 758.829;
+	if( m >=  1000 && m < 1250 ) return 0.995925*(m-1000) + 997.553;
+	if( m >=  1250 && m < 1500 ) return 0.993433*(m-1250) + 1246.53;
+	if( m >=  1500 && m < 1750 ) return 0.990196*(m-1500) + 1494.89;
+	if( m >=  1750 && m < 2000 ) return 0.993818*(m-1750) + 1742.44;
+	if( m >=  2000 && m < 2250 ) return 0.991113*(m-2000) + 1990.9;
+	if( m >=  2250 && m < 2500 ) return 0.988857*(m-2250) + 2238.67;
+	if( m >=  2500 && m < 2750 ) return 0.993646*(m-2500) + 2485.89;
+	if( m >=  2750 && m < 3000 ) return 0.990195*(m-2750) + 2734.3;
+	if( m >=  3000 && m < 3250 ) return 0.986493*(m-3000) + 2981.85;
+	if( m >=  3250 && m < 3500 ) return 1.00037*(m-3250) + 3228.47;
+	if( m >=  3500 && m < 3750 ) return 0.994141*(m-3500) + 3478.56;
+	return 0;
+};
+
+double RooIntepolateDSCB_W0p014_Spin0_EBEE::getSigma( double m ) const
+{
+	if( m >=  500 && m < 740 ) return 0.00764799*(m-500) + 3.65328;
+	if( m >=  740 && m < 745 ) return 0.00815498*(m-740) + 5.4888;
+	if( m >=  745 && m < 750 ) return 0.0506011*(m-745) + 5.52957;
+	if( m >=  750 && m < 755 ) return -0.00620412*(m-750) + 5.78258;
+	if( m >=  755 && m < 760 ) return -0.018742*(m-755) + 5.75156;
+	if( m >=  760 && m < 1000 ) return 0.00759418*(m-760) + 5.65785;
+	if( m >=  1000 && m < 1250 ) return 0.00810497*(m-1000) + 7.48045;
+	if( m >=  1250 && m < 1500 ) return 0.00613537*(m-1250) + 9.50669;
+	if( m >=  1500 && m < 1750 ) return 0.0109545*(m-1500) + 11.0405;
+	if( m >=  1750 && m < 2000 ) return 0.0075094*(m-1750) + 13.7792;
+	if( m >=  2000 && m < 2250 ) return 0.00628405*(m-2000) + 15.6565;
+	if( m >=  2250 && m < 2500 ) return 0.0134128*(m-2250) + 17.2275;
+	if( m >=  2500 && m < 2750 ) return 0.00826788*(m-2500) + 20.5807;
+	if( m >=  2750 && m < 3000 ) return 0.0109576*(m-2750) + 22.6477;
+	if( m >=  3000 && m < 3250 ) return 0.00908623*(m-3000) + 25.3871;
+	if( m >=  3250 && m < 3500 ) return 0.00193595*(m-3250) + 27.6586;
+	if( m >=  3500 && m < 3750 ) return 0.00677562*(m-3500) + 28.1426;
+	return 0;
+};
+
+double RooIntepolateDSCB_W0p014_Spin0_EBEE::getN1( double m ) const
+{
+	if( m >=  500 && m < 740 ) return -0.00018166*(m-500) + 3.17382;
+	if( m >=  740 && m < 745 ) return -0.0842916*(m-740) + 3.13022;
+	if( m >=  745 && m < 750 ) return 0.0040361*(m-745) + 2.70876;
+	if( m >=  750 && m < 755 ) return 0.0497264*(m-750) + 2.72894;
+	if( m >=  755 && m < 760 ) return 0.0118946*(m-755) + 2.97758;
+	if( m >=  760 && m < 1000 ) return 4.27835e-05*(m-760) + 3.03705;
+	if( m >=  1000 && m < 1250 ) return 0.000210549*(m-1000) + 3.04732;
+	if( m >=  1250 && m < 1500 ) return 0.00153572*(m-1250) + 3.09995;
+	if( m >=  1500 && m < 1750 ) return -0.000657399*(m-1500) + 3.48388;
+	if( m >=  1750 && m < 2000 ) return -0.000653139*(m-1750) + 3.31953;
+	if( m >=  2000 && m < 2250 ) return 0.00291341*(m-2000) + 3.15625;
+	if( m >=  2250 && m < 2500 ) return -0.00335439*(m-2250) + 3.8846;
+	if( m >=  2500 && m < 2750 ) return -8.98483e-05*(m-2500) + 3.046;
+	if( m >=  2750 && m < 3000 ) return -0.00133974*(m-2750) + 3.02354;
+	if( m >=  3000 && m < 3250 ) return -9.63975e-05*(m-3000) + 2.68861;
+	if( m >=  3250 && m < 3500 ) return 0.00116046*(m-3250) + 2.66451;
+	if( m >=  3500 && m < 3750 ) return 0.000906946*(m-3500) + 2.95462;
+	return 0;
+};
+
+double RooIntepolateDSCB_W0p014_Spin0_EBEE::getN2( double m ) const
+{
+	if( m >=  500 && m < 740 ) return 0.00101567*(m-500) + 3.3634;
+	if( m >=  740 && m < 745 ) return -0.0068998*(m-740) + 3.60716;
+	if( m >=  745 && m < 750 ) return -0.065187*(m-745) + 3.57266;
+	if( m >=  750 && m < 755 ) return 0.0647723*(m-750) + 3.24673;
+	if( m >=  755 && m < 760 ) return 0.0673129*(m-755) + 3.57059;
+	if( m >=  760 && m < 1000 ) return -0.00382269*(m-760) + 3.90715;
+	if( m >=  1000 && m < 1250 ) return 0.000752247*(m-1000) + 2.98971;
+	if( m >=  1250 && m < 1500 ) return 0.000746126*(m-1250) + 3.17777;
+	if( m >=  1500 && m < 1750 ) return 0.00268341*(m-1500) + 3.3643;
+	if( m >=  1750 && m < 2000 ) return -0.00167498*(m-1750) + 4.03515;
+	if( m >=  2000 && m < 2250 ) return 0.00784976*(m-2000) + 3.61641;
+	if( m >=  2250 && m < 2500 ) return -0.00453351*(m-2250) + 5.57885;
+	if( m >=  2500 && m < 2750 ) return 0.000448148*(m-2500) + 4.44547;
+	if( m >=  2750 && m < 3000 ) return -0.0114426*(m-2750) + 4.55751;
+	if( m >=  3000 && m < 3250 ) return 0.00919366*(m-3000) + 1.69686;
+	if( m >=  3250 && m < 3500 ) return 0.00341344*(m-3250) + 3.99527;
+	if( m >=  3500 && m < 3750 ) return 0.000518258*(m-3500) + 4.84863;
+	return 0;
+};
+
+double RooIntepolateDSCB_W0p014_Spin0_EBEE::getAlpha1( double m ) const
+{
+	if( m >=  500 && m < 740 ) return 0.000154848*(m-500) + 1.04727;
+	if( m >=  740 && m < 745 ) return 0.0129722*(m-740) + 1.08443;
+	if( m >=  745 && m < 750 ) return 0.0135625*(m-745) + 1.14929;
+	if( m >=  750 && m < 755 ) return -0.0129353*(m-750) + 1.21711;
+	if( m >=  755 && m < 760 ) return -0.0055582*(m-755) + 1.15243;
+	if( m >=  760 && m < 1000 ) return -1.31371e-05*(m-760) + 1.12464;
+	if( m >=  1000 && m < 1250 ) return -0.000254834*(m-1000) + 1.12149;
+	if( m >=  1250 && m < 1500 ) return -0.000230376*(m-1250) + 1.05778;
+	if( m >=  1500 && m < 1750 ) return 0.00039943*(m-1500) + 1.00018;
+	if( m >=  1750 && m < 2000 ) return -3.94059e-05*(m-1750) + 1.10004;
+	if( m >=  2000 && m < 2250 ) return -0.000458439*(m-2000) + 1.09019;
+	if( m >=  2250 && m < 2500 ) return 0.000728199*(m-2250) + 0.97558;
+	if( m >=  2500 && m < 2750 ) return 2.30681e-05*(m-2500) + 1.15763;
+	if( m >=  2750 && m < 3000 ) return 0.000130566*(m-2750) + 1.1634;
+	if( m >=  3000 && m < 3250 ) return 3.27577e-05*(m-3000) + 1.19604;
+	if( m >=  3250 && m < 3500 ) return -0.000561415*(m-3250) + 1.20423;
+	if( m >=  3500 && m < 3750 ) return -0.000431754*(m-3500) + 1.06387;
+	return 0;
+};
+
+double RooIntepolateDSCB_W0p014_Spin0_EBEE::getAlpha2( double m ) const
+{
+	if( m >=  500 && m < 740 ) return 0.000358977*(m-500) + 1.59417;
+	if( m >=  740 && m < 745 ) return -0.0108386*(m-740) + 1.68033;
+	if( m >=  745 && m < 750 ) return 0.0310258*(m-745) + 1.62614;
+	if( m >=  750 && m < 755 ) return -0.00642566*(m-750) + 1.78126;
+	if( m >=  755 && m < 760 ) return -0.00926719*(m-755) + 1.74914;
+	if( m >=  760 && m < 1000 ) return 0.000476135*(m-760) + 1.7028;
+	if( m >=  1000 && m < 1250 ) return 0.00058311*(m-1000) + 1.81707;
+	if( m >=  1250 && m < 1500 ) return 0.000231203*(m-1250) + 1.96285;
+	if( m >=  1500 && m < 1750 ) return 0.000273754*(m-1500) + 2.02065;
+	if( m >=  1750 && m < 2000 ) return 3.41876e-05*(m-1750) + 2.08909;
+	if( m >=  2000 && m < 2250 ) return -0.000575592*(m-2000) + 2.09764;
+	if( m >=  2250 && m < 2500 ) return 0.00106999*(m-2250) + 1.95374;
+	if( m >=  2500 && m < 2750 ) return 0.000241727*(m-2500) + 2.22124;
+	if( m >=  2750 && m < 3000 ) return 0.00218827*(m-2750) + 2.28167;
+	if( m >=  3000 && m < 3250 ) return -0.00205948*(m-3000) + 2.82873;
+	if( m >=  3250 && m < 3500 ) return 0.000342669*(m-3250) + 2.31386;
+	if( m >=  3500 && m < 3750 ) return -0.00129466*(m-3500) + 2.39953;
+	return 0;
+};
+
+//---------------------
+
 ClassImp(RooFermi) 
 
 RooFermi::RooFermi(){};

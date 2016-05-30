@@ -34,8 +34,19 @@ int main( int argc, char* argv[] )
   TString cut = "pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1Pt> 75. && pho2Pt>75.";
   TString categoryCutString;
 
-  if (categoryMode == "ebeb") categoryCutString = " && mGammaGamma >= 230 && abs(pho1DefaultSC_Eta) <1.4442 && abs(pho2DefaultSC_Eta) < 1.4442";
-  else if (categoryMode == "ebee") categoryCutString = " && mGammaGamma >= 320 && ( (abs(pho1DefaultSC_Eta) < 1.4442 && abs(pho2DefaultSC_Eta) > 1.566) || (abs(pho1DefaultSC_Eta) > 1.566 && abs(pho2DefaultSC_Eta) < 1.4442) )";
+  if (categoryMode == "ebeb")
+    {
+      categoryCutString = " && mGammaGamma >= 230 && abs(pho1DefaultSC_Eta) <1.4442 && abs(pho2DefaultSC_Eta) < 1.4442";
+    }
+  else if (categoryMode == "ebee")
+    {
+      categoryCutString = " && mGammaGamma >= 320 && ( (abs(pho1DefaultSC_Eta) < 1.4442 && abs(pho2DefaultSC_Eta) > 1.566) || (abs(pho1DefaultSC_Eta) > 1.566 && abs(pho2DefaultSC_Eta) < 1.4442) )";
+    }
+  else
+    {
+      std::cerr << "category: " << categoryMode << ", NOT VALID; Terminating" << std::endl;
+      return -1;
+    }
   
   cut = cut + categoryCutString;
 
@@ -53,11 +64,12 @@ int main( int argc, char* argv[] )
   TFile* tmp = new TFile("tmp.root", "RECREATE");
   TTree* cutTree = tree->CopyTree( cut );
   
-  cutTree->Draw("mGammaGamma>>h_mgg(720,230,2030)", "weight*pileupWeight*(1)", "goff");
+  cutTree->Draw("mGammaGamma>>h_mgg(10000,0,10000)", "weight*pileupWeight*(1)", "goff");
     
   TH1F* h_mgg = (TH1F*)tmp->Get("h_mgg");
   double effSigma = GetEffSigma( h_mgg );
-  std::cout << "[RESULT]: category: " << categoryMode << "; Effective Sigma = " << effSigma << std::endl;
+  double fwhm     = GetFWHM( h_mgg );
+  std::cout << "[RESULT]: category: " << categoryMode << "; Effective Sigma = " << effSigma << "; FWHM = " << fwhm << std::endl;
   h_mgg->Write("mgg");
   tmp->Close();
   

@@ -754,17 +754,19 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
   TFile* ftmp = new TFile( combinedRootFileName, "recreate");
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
 
-  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 230, 6000, "GeV" );
-  //mgg.setMin( 230. );
-  //mgg.setMax( 10000. );
-  //mgg.setUnit( "GeV" );
+  bool isEBEB = false;
+  //RooRealVar mgg( mggName, "m_{#gamma#gamma}", 230, 6000, "GeV" );//EBEBE
+  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 320, 6000, "GeV" );//EBEE
+  mgg.setUnit( "GeV" );
   mgg.setBins(23080);//230-6000
-  //mgg.setBins(5480);//230-1600
   mgg.setRange( "signal", 600., 900. );
-  mgg.setRange( "full", 230., 6000. );
   mgg.setRange( "high", 850., 6000.);
-  mgg.setRange( "low", 230., 650.);
-
+  //mgg.setRange( "low", 230., 650.);//EBEB
+  //mgg.setRange( "full", 230., 6000. );//EBEB
+  mgg.setRange( "low", 320., 650.);//EBEE
+  mgg.setRange( "full", 320., 6000. );//EBEE
+      
+  
   //----------------
   //Retreive dataset
   //----------------
@@ -807,8 +809,9 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
   //--------------------------------
   // m o d e l   1   p l o t t i n g
   //--------------------------------
-  RooPlot *fmgg = mgg.frame(230, 1630, 56);
-  //data_toys->plotOn(fmgg);
+  RooPlot *fmgg;
+  if ( isEBEB ) fmgg = mgg.frame(230, 1630, 70);//EBEB
+  else fmgg = mgg.frame(320, 1620, 65);//EBEE
   data.plotOn(fmgg);
   ws->pdf( tag_bkg )->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("full"),RooFit::NormRange("full"));
   //ws->pdf( tag_bkg )->plotOn(fmgg,RooFit::LineColor(kGreen));
@@ -823,8 +826,18 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
   for ( int i = 0; i < 301; i++ )
     {
       float _mass = 500. + (float)10*i;
-      Signal_Yield = SignaYieldOriginal*(1.00/0.402153)*(0.398352+(0.000164685)*_mass-(2.3037e-08)*_mass*_mass)*(0.83769+(1.95668e-05)*_mass - (2.87399e-09)*_mass*_mass);
-      TString combineRootFile = Form("HggRazorWorkspace_m%0.f.root", _mass);
+      if ( isEBEB )
+	{
+	  Signal_Yield = SignaYieldOriginal*(1.00/0.402153)*(0.398352+(0.000164685)*_mass-(2.3037e-08)*_mass*_mass)*(0.83769+(1.95668e-05)*_mass - (2.87399e-09)*_mass*_mass);
+	}
+      else
+	{
+	  Signal_Yield = SignaYieldOriginal*(1.0/0.184193)*(0.737974+(4.55241e-05)*_mass-(5.50793e-09)*_mass*_mass)*(0.293253-(0.000108474)*_mass+(1.41917e-08)*_mass*_mass);
+	}
+      
+      TString combineRootFile;
+      if ( isEBEB ) combineRootFile = Form("HggRazorWorkspace_EBEB_m%0.f.root", _mass);
+      else combineRootFile = Form("HggRazorWorkspace_EBEE_m%0.f.root", _mass);
       TFile* _fout = new TFile( combineRootFile, "RECREATE" );
       //-------------------------------------------------------
       // P r e p a r a t i o n   t o   C o m b i n e  I n p u t
@@ -836,7 +849,7 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
       TString tagSignalInterpol;
       if ( category == "highres" || category == "inclusive" )
 	{
-	  tagSignalInterpol = MakeDoubleCBInterpolateNE( Form("SignalInterpol_m%.0f", _mass) , mgg, *combine_ws, true );
+	  tagSignalInterpol = MakeDoubleCBInterpolateNE( Form("SignalInterpol_EBEE_m%.0f", _mass) , mgg, *combine_ws, true );
 	  combine_ws->var( tagSignalInterpol+"_mass" )->setVal( _mass );
 	  combine_ws->var( tagSignalInterpol+"_mass" )->setConstant(kTRUE);
 	  RooRealVar SignalInterpol_norm( tagSignalInterpol + "_norm", "", Signal_Yield );
@@ -854,7 +867,7 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
       //---------
       //Bkg model
       //---------
-      TString combineBkg = MakeHMDiphotonNE( Form("Bkg_m%.0f", _mass), mgg, *combine_ws );
+      TString combineBkg = MakeHMDiphotonNE( Form("Bkg_EBEE_m%.0f", _mass), mgg, *combine_ws );
       combine_ws->var( combineBkg + "_a" )->setVal( hmd_a );
       combine_ws->var( combineBkg + "_b" )->setVal( hmd_b );
       RooRealVar Bkg_norm(  combineBkg + "_norm", "", Nbkg );
@@ -863,21 +876,24 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
       
       
       //combine_ws->import( *data_toys );
-      data.SetName( Form("data_m%0.f", _mass) );
+      data.SetName( Form("data_EBEE_m%0.f", _mass) );
       combine_ws->import( data );
       
       ws->Write("w_sb");
       combine_ws->Write("combineWS");
       _fout->Close();
       
-      TString dataCardName = Form("HggRazorCombinedCard_m%.0f.txt", _mass);
+      TString dataCardName;
+      if ( isEBEB ) dataCardName = Form("HggRazorCombinedCard_EBEB_m%.0f.txt", _mass);
+      else dataCardName = Form("HggRazorCombinedCard_EBEE_m%.0f.txt", _mass);
+      
       std::ofstream ofs( dataCardName , std::ofstream::out );
       
       ofs << "imax 1 number of bins\njmax 1 number of processes minus 1\nkmax * number of nuisance parameters\n";
       ofs << "----------------------------------------------------------------------------------------\n";
       ofs << "shapes Bkg\t\tbin"      << binNumber << "\t" << combineRootFile << " combineWS:" << combineBkg << "\n";
       ofs << "shapes signal\t\tbin"   << binNumber << "\t" << combineRootFile << " combineWS:" << tagSignalInterpol << "\n";
-      ofs << "shapes data_obs\t\tbin" << binNumber << "\t" << combineRootFile << " combineWS:" << Form("data_m%.0f", _mass) << "\n";
+      ofs << "shapes data_obs\t\tbin" << binNumber << "\t" << combineRootFile << " combineWS:" << Form("data_EBEE_m%.0f", _mass) << "\n";
       ofs << "----------------------------------------------------------------------------------------\n";
       ofs << "bin\t\tbin" << binNumber << "\n";
       ofs << "observation\t-1.0\n";
@@ -888,8 +904,8 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
       ofs << "rate\t\t\t\t\t\t1\t\t1\n";
       ofs << "----------------------------------------------------------------------------------------\n";
       ofs << "CMS_Lumi\t\t\tlnN\t\t1.027\t\t-\n";
-      ofs << "Photon_Trigger\t\t\tlnN\t\t1.10\t\t-\n";
-      ofs << "PdfNorm\t\t\t\tlnN\t\t1.06\t\t-\n";
+      ofs << "Photon_Trigger_EBEE\t\t\tlnN\t\t1.10\t\t-\n";
+      ofs << "PdfNorm_EBEE\t\t\t\tlnN\t\t1.06\t\t-\n";
       int totalSys = signal_sys.size();
       int ctr = 0;
       for( int isys = 0; isys < totalSys; isys++ )
@@ -916,7 +932,7 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
 	      ctr++;
 	    }
 	}
-      ofs << "mu_Global\t\t\tparam\t\t 0 7.5\n";
+      ofs << "mu_Global_EBEE\t\t\tparam\t\t 0 " <<  _mass*0.01 <<  "\n";
       
       ofs.close();
       //ws->Write();
