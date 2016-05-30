@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <map>
 #include <fstream>
 #include <assert.h>
 //ROOT INCLUDES
@@ -11,6 +12,12 @@
 #include "AssortedFunctions.hh"
 #include "CommandLineInput.hh"
 
+struct Res
+{
+  float effSigma;
+  float FWHM;
+};
+
 int main( int argc, char* argv[] )
 {
 
@@ -20,6 +27,16 @@ int main( int argc, char* argv[] )
     {
       std::cerr << "[ERROR]: please provide an input list file using --inputFile=<path_to_list_file>" << std::endl;
       return -1;
+    }
+
+  std::string isList = ParseCommandLine( argc, argv, "-isList=" );
+  if (  isList == "yes" )
+    {
+      std::cout << "[INFO]: Running on list mode: you have use --isList=yes" << std::endl;
+    }
+  else
+    {
+      std::cout << "[INFO]: Running on ROOT file mode: if you want to provide a list of ROOT files use --isList=yes" << std::endl;
     }
   //-----------------
   //Selection TString
@@ -50,28 +67,96 @@ int main( int argc, char* argv[] )
   
   cut = cut + categoryCutString;
 
-  TFile* fin = new TFile( inputFile.c_str(), "READ");
-  std::cout << "[INFO]: checking file: " << inputFile << std::endl;
-  assert( fin );
-  std::cout << "[INFO]: file: " << inputFile << " passed check\n\n"<< std::endl;
+
+  if ( isList == "yes")
+    {
+      TFile* fin;
+      TTree* tree;
+      TH1F* h_mgg;
+      std::map<float,Res> mymap;
+      std::ifstream ifs ( inputFile.c_str(), std::ifstream::in );
+      if ( ifs.is_open() )
+	{
+	  while ( ifs.good() )
+	    {
+	      std::string fname;
+	      ifs >> fname;
+	      if ( ifs.eof() ) break;
+	      fin = new TFile( fname.c_str(), "READ");
+	      //std::cout << "[INFO]: checking file: " << inputFile << std::endl;
+	      assert( fin );
+	      //std::cout << "[INFO]: file: " << inputFile << " passed check\n\n"<< std::endl;
+
+	      int low  = fname.find("_M-")+3;
+	      int high = fname.find("_TuneCUEP8M1_13TeV-pythia8.root") - low;
+	      std::string mass = fname.substr( low, high );
+	      float _mass = atof( mass.c_str() );
+	      //------------------------
+	      //Getting TTree and Histos
+	      //------------------------
+	      tree = (TTree*)fin->Get("HggRazor");
+	      assert( tree );
+	      
+	      TFile* tmp = new TFile("tmp.root", "RECREATE");
+	      TTree* cutTree = tree->CopyTree( cut );
+	      
+	      cutTree->Draw("mGammaGamma>>h_mgg(10000,0,10000)", "weight*pileupWeight*(1)", "goff");
+	      
+	      h_mgg = (TH1F*)tmp->Get("h_mgg");
+	      double effSigma = GetEffSigma( h_mgg );
+	      double fwhm     = GetFWHM( h_mgg );
+	      //std::cout << mass << " & " << effSigma << " & " << fwhm << std::endl;
+	      Res tmpRes;
+	      tmpRes.effSigma = effSigma;
+	      tmpRes.FWHM = fwhm;
+	      if ( mymap.find(_mass) == mymap.end() )
+		{
+		  mymap[_mass] = tmpRes;
+		}
+	      h_mgg->Write("mgg");
+	      tmp->Close();
+	    }
+	  
+	  std::cout << "\\begin{table}\n\\centering\n\\caption{\\label{tab:Resolution} my resolution table}\n";
+	  std::cout << "\\begin{tabular}{r*{4}{c}}\n\\hline\n";
+	  std::cout << "$\\mathrm{M_{G}}$ (GeV) & $\\sigma_{eff}$ (GeV) & FWHM (GeV)\\\\\n\\hline\n";
+	  for ( auto tmp : mymap )
+	    {
+	      TString formatTable = Form("%0.f & %.2f & %.2f\\\\",  tmp.first, tmp.second.effSigma, tmp.second.FWHM );
+	      //std::cout << tmp.first << " & " << tmp.second.effSigma << " & " << tmp.second.FWHM << std::endl;
+	      std::cout << formatTable << std::endl;
+	    }
+	  std::cout << "\\hline\n\\end{tabular}\n\\end{table}\n";
+	}
+      else
+	{
+	  std::cerr << "Unable to open file: " << inputFile << std::endl;
+	}
+    }
+  else
+    {
+      TFile* fin = new TFile( inputFile.c_str(), "READ");
+      std::cout << "[INFO]: checking file: " << inputFile << std::endl;
+      assert( fin );
+      std::cout << "[INFO]: file: " << inputFile << " passed check\n\n"<< std::endl;
       
-  //------------------------
-  //Getting TTree and Histos
-  //------------------------
-  TTree* tree = (TTree*)fin->Get("HggRazor");
-  assert( tree );
-  
-  TFile* tmp = new TFile("tmp.root", "RECREATE");
-  TTree* cutTree = tree->CopyTree( cut );
-  
-  cutTree->Draw("mGammaGamma>>h_mgg(10000,0,10000)", "weight*pileupWeight*(1)", "goff");
-    
-  TH1F* h_mgg = (TH1F*)tmp->Get("h_mgg");
-  double effSigma = GetEffSigma( h_mgg );
-  double fwhm     = GetFWHM( h_mgg );
-  std::cout << "[RESULT]: category: " << categoryMode << "; Effective Sigma = " << effSigma << "; FWHM = " << fwhm << std::endl;
-  h_mgg->Write("mgg");
-  tmp->Close();
-  
+      //------------------------
+      //Getting TTree and Histos
+      //------------------------
+      TTree* tree = (TTree*)fin->Get("HggRazor");
+      assert( tree );
+      
+      TFile* tmp = new TFile("tmp.root", "RECREATE");
+      TTree* cutTree = tree->CopyTree( cut );
+      
+      cutTree->Draw("mGammaGamma>>h_mgg(10000,0,10000)", "weight*pileupWeight*(1)", "goff");
+      
+      TH1F* h_mgg = (TH1F*)tmp->Get("h_mgg");
+      double effSigma = GetEffSigma( h_mgg );
+      double fwhm     = GetFWHM( h_mgg );
+      std::cout << "[RESULT]: category: " << categoryMode << "; Effective Sigma = " << effSigma << "; FWHM = " << fwhm << std::endl;
+      h_mgg->Write("mgg");
+      tmp->Close();
+    }
   return 0;
 }

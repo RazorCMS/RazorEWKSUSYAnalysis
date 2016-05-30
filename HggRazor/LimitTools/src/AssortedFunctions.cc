@@ -2,6 +2,7 @@
 
 //ROOT INCLUDES
 #include <TH1.h>
+#include <TF1.h>
 #include <TAxis.h>
 //LOCAL INCLUDES
 #include "AssortedFunctions.hh"
@@ -84,7 +85,11 @@ double GetEffSigma( TH1* hist )
   }
   
   if(ismin == nrms || ismin == -nrms) ierr=3;
-  if(ierr != 0) std::cout << "effsigma: Error of type " << ierr << std::endl;
+  if(ierr != 0)
+    {
+      std::cout << "effsigma: Error of type " << ierr << std::endl;
+      return -1;
+    }
   
   return widmin;
   
@@ -92,12 +97,18 @@ double GetEffSigma( TH1* hist )
 
 double GetFWHM( TH1* h )
 {
+  
   double _maxY = h->GetMaximum();
   double bw    = h->GetBinWidth(1);
   double xlow  = h->GetBinLowEdge(1);
   double _maxX = xlow + bw*((double)h->GetMaximumBin() - 1.) + bw*0.50;
   int _maxBin  = h->GetMaximumBin();
 
+  TF1* gaus = new TF1("gaus", "gaus",  xlow + h->GetBinLowEdge(_maxBin-4), xlow + h->GetBinLowEdge(_maxBin+5));
+  h->Fit( gaus, "RLQ");
+  double fitMax = gaus->GetParameter(0);
+  std::cout << "MAX FIT: " << fitMax << " histoMax: " << _maxY << std::endl;
+  
   int niter = h->GetNbinsX()/3;
   double lowEnd  = -1;
   double highEnd = -1;
@@ -107,11 +118,11 @@ double GetFWHM( TH1* h )
   for ( int i = 1; i <= niter; i++ )
     {
       int iBin = _maxBin+i;
-      if ( h->GetBinContent( iBin ) < 0.50*_maxY )
+      if ( h->GetBinContent( iBin ) < 0.50*fitMax )
 	{
 	  double slope = (h->GetBinContent( iBin ) - h->GetBinContent( iBin-1 ))/(h->GetBinLowEdge( iBin )-h->GetBinLowEdge( iBin-1 ));
-	  highEnd = (0.50*_maxY-h->GetBinContent( iBin-1 ))/slope + h->GetBinLowEdge( iBin-1 );
-	  //highEnd = h->GetBinLowEdge( iBin-1 );
+	  //highEnd = (0.50*fitMax-h->GetBinContent( iBin-1 ))/slope + h->GetBinLowEdge( iBin-1 );
+	  highEnd = h->GetBinLowEdge( iBin );
 	  break;
 	}
     }
@@ -122,15 +133,15 @@ double GetFWHM( TH1* h )
   for ( int i = 1; i <= niter; i++ )
     {
       int iBin = _maxBin-i;
-      if ( h->GetBinContent( iBin ) < 0.50*_maxY )
+      if ( h->GetBinContent( iBin ) < 0.50*fitMax )
 	{
 	  double slope = (h->GetBinContent( iBin+1 ) - h->GetBinContent( iBin ))/(h->GetBinLowEdge( iBin+1 )-h->GetBinLowEdge( iBin ));
-	  lowEnd = (0.50*_maxY-h->GetBinContent( iBin ))/slope + h->GetBinLowEdge( iBin );
-	  //lowEnd = h->GetBinLowEdge( _maxBin-i+1 );
+	  //lowEnd = (0.50*fitMax-h->GetBinContent( iBin ))/slope + h->GetBinLowEdge( iBin );
+	  lowEnd = h->GetBinLowEdge( _maxBin-i );
 	  break;
 	}
     }
-   
+  std::cout << highEnd << " "  << lowEnd << std::endl;
    return highEnd-lowEnd;
 };
 
