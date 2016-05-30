@@ -18,6 +18,7 @@ TARGET2 = PlotAllBiasTest
 TARGET4 = CreateDataCardCommands
 TARGET5 = testCustomPdf
 TARGET6 = GetDCBParameters
+TARGET7 = PrintSignalSnipped
 
 SRC = app/testapp.cc src/makeInvertedANFit_v2.cc $(Aux)/src/CommandLineInput.cc
 SRC1 = app/MakeFitRun2.cc src/RunTwoFitMgg.cc src/DefinePdfs.cc src/PrintAIC.cc $(Aux)/src/CommandLineInput.cc
@@ -25,6 +26,7 @@ SRC2 = app/PlotAllBiasTest.cc src/PlotBias.cc $(Aux)/src/CommandLineInput.cc $(C
 SRC4 = app/CreateDataCardCommands.cc $(Aux)/src/CommandLineInput.cc
 SRC5 = app/testCustomPdf.cc
 SRC6 = app/GetDCBParameters.cc
+SRC7 = app/PrintSignalSnipped.cc $(Aux)/src/CommandLineInput.cc
 
 OBJ = $(SRC:.cc=.o)
 OBJ1 = $(SRC1:.cc=.o)
@@ -32,8 +34,9 @@ OBJ2 = $(SRC2:.cc=.o)
 OBJ4 = $(SRC4:.cc=.o)
 OBJ5 = $(SRC5:.cc=.o)
 OBJ6 = $(SRC6:.cc=.o)
+OBJ7 = $(SRC7:.cc=.o)
 
-all : $(TARGET) $(TARGET1) $(TARGET2) $(TARGET4) $(TARGET5) $(TARGET6)
+all : $(TARGET) $(TARGET1) $(TARGET2) $(TARGET4) $(TARGET5) $(TARGET6) $(TARGET7)
 
 $(TARGET) : $(OBJ)
 	$(LD) $(CPPFLAGS) -o $(TARGET) $(OBJ) $(LDFLAGS)
@@ -73,6 +76,12 @@ $(TARGET6) : $(OBJ6)
 	@echo $<
 	@echo $^
 
+$(TARGET7) : $(OBJ7)
+	$(LD) $(CPPFLAGS) -o $(TARGET7) $(OBJ7) $(LDFLAGS)
+	@echo $@
+	@echo $<
+	@echo $^
+
 %.o : %.cc
 	$(CXX) $(CPPFLAGS) -o $@ -c $<
 	@echo $@
@@ -80,4 +89,4 @@ $(TARGET6) : $(OBJ6)
 
 
 clean :
-	rm -f *.o app/*.o src/*.o $(CommonTools)/src/*.o $(Aux)/src/*.o $(TARGET) $(TARGET1) $(TARGET2) $(TARGET4) $(TARGET5) $(TARGET6) *~
+	rm -f *.o app/*.o src/*.o $(CommonTools)/src/*.o $(Aux)/src/*.o $(TARGET) $(TARGET1) $(TARGET2) $(TARGET4) $(TARGET5) $(TARGET6) $(TARGET7) *~
