@@ -100,7 +100,8 @@ int main( int argc, char* argv[] )
 	      TFile* tmp = new TFile("tmp.root", "RECREATE");
 	      TTree* cutTree = tree->CopyTree( cut );
 	      
-	      cutTree->Draw("mGammaGamma>>h_mgg(10000,0,10000)", "weight*pileupWeight*(1)", "goff");
+	      if ( categoryMode == "ebeb") cutTree->Draw("mGammaGamma>>h_mgg(10000,0,10000)", "weight*pileupWeight*(1)", "goff");
+	      else cutTree->Draw("mGammaGamma>>h_mgg(5000,0,10000)", "weight*pileupWeight*(1)", "goff");
 	      
 	      h_mgg = (TH1F*)tmp->Get("h_mgg");
 	      double effSigma = GetEffSigma( h_mgg );
@@ -149,7 +150,8 @@ int main( int argc, char* argv[] )
       TFile* tmp = new TFile("tmp.root", "RECREATE");
       TTree* cutTree = tree->CopyTree( cut );
       
-      cutTree->Draw("mGammaGamma>>h_mgg(10000,0,10000)", "weight*pileupWeight*(1)", "goff");
+      if ( categoryMode == "ebeb") cutTree->Draw("mGammaGamma>>h_mgg(10000,0,10000)", "weight*pileupWeight*(1)", "goff");
+      else cutTree->Draw("mGammaGamma>>h_mgg(5000,0,10000)", "weight*pileupWeight*(1)", "goff");
       
       TH1F* h_mgg = (TH1F*)tmp->Get("h_mgg");
       double effSigma = GetEffSigma( h_mgg );
