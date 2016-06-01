@@ -108,8 +108,8 @@ int main( int argc, char* argv[] )
 	      double fwhm     = GetFWHM( h_mgg );
 	      //std::cout << mass << " & " << effSigma << " & " << fwhm << std::endl;
 	      Res tmpRes;
-	      tmpRes.effSigma = effSigma;
-	      tmpRes.FWHM = fwhm;
+	      tmpRes.effSigma = effSigma/(2.35*_mass);
+	      tmpRes.FWHM = fwhm/(2.35*_mass);
 	      if ( mymap.find(_mass) == mymap.end() )
 		{
 		  mymap[_mass] = tmpRes;
@@ -123,7 +123,7 @@ int main( int argc, char* argv[] )
 	  std::cout << "$\\mathrm{M_{G}}$ (GeV) & $\\sigma_{eff}$ (GeV) & FWHM (GeV)\\\\\n\\hline\n";
 	  for ( auto tmp : mymap )
 	    {
-	      TString formatTable = Form("%0.f & %.2f & %.2f\\\\",  tmp.first, tmp.second.effSigma, tmp.second.FWHM );
+	      TString formatTable = Form("%0.f & %.3f & %.3f\\\\",  tmp.first, tmp.second.effSigma, tmp.second.FWHM );
 	      //std::cout << tmp.first << " & " << tmp.second.effSigma << " & " << tmp.second.FWHM << std::endl;
 	      std::cout << formatTable << std::endl;
 	    }

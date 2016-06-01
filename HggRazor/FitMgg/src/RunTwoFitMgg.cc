@@ -130,7 +130,7 @@ RooWorkspace* DoubleCBFit( TTree* tree, TString mggName, float muCB, float sigma
       ws->var( tag + "_alpha1")->setVal( 1. );
       ws->var( tag + "_alpha2")->setVal( 1.8 );
       ws->var( tag + "_n1")->setVal( 2.7 );
-      ws->var( tag + "_n2")->setVal( 2.7 );
+      ws->var( tag + "_n2")->setVal( 4.5 );
     }
   else if ( muCB < 3000 )
     {
@@ -141,7 +141,7 @@ RooWorkspace* DoubleCBFit( TTree* tree, TString mggName, float muCB, float sigma
       ws->var( tag + "_alpha1")->setVal( 0.9 );
       ws->var( tag + "_alpha2")->setVal( 2.0 );
       ws->var( tag + "_n1")->setVal( 3.2 );
-      ws->var( tag + "_n2")->setVal( 2.8 );
+      ws->var( tag + "_n2")->setVal( 4.4 );
     }
   else if ( muCB < 4500 )
     {
@@ -149,10 +149,10 @@ RooWorkspace* DoubleCBFit( TTree* tree, TString mggName, float muCB, float sigma
       frame = mgg.frame( muCB-50*sigmaCB, muCB+50*sigmaCB, 100 );
       ws->var( tag + "_muCB")->setVal( muCB );
       ws->var( tag + "_sigmaCB")->setVal( sigmaCB );
-      ws->var( tag + "_alpha1")->setVal( 0.8 );
+      ws->var( tag + "_alpha1")->setVal( 1.1 );
       ws->var( tag + "_alpha2")->setVal( 2.0 );
       ws->var( tag + "_n1")->setVal( 3.7 );
-      ws->var( tag + "_n2")->setVal( 3.0 );
+      ws->var( tag + "_n2")->setVal( 5.0 );
     }
   else if ( muCB < 5000. )
     {
