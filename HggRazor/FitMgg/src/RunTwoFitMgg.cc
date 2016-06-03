@@ -754,14 +754,14 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
   TFile* ftmp = new TFile( combinedRootFileName, "recreate");
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
 
-  bool isEBEB = true;
+  bool isEBEB = false;
   
   if ( isEBEB) mggName = "mGammaGamma_EBEB";
   else mggName = "mGammaGamma_EBEE";
 
   
-  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 230, 6000, "GeV" );//EBEBE
-  //RooRealVar mgg( mggName, "m_{#gamma#gamma}", 320, 6000, "GeV" );//EBEE
+  //RooRealVar mgg( mggName, "m_{#gamma#gamma}", 230, 6000, "GeV" );//EBEBE
+  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 320, 6000, "GeV" );//EBEE
   
   mgg.setUnit( "GeV" );
   mgg.setRange( "signal", 600., 900. );
@@ -819,7 +819,7 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
   ws->var(tag_bkg+"_a")->setVal( 0.03 );
   ws->var(tag_bkg+"_b")->setVal( -0.403 );
   
-  bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("ebee") );
+  bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("full") );
   //bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE));
   //bres->SetName("BkgOnlyFitResult");
   hmd_a = ws->var( tag_bkg+"_a")->getVal();
