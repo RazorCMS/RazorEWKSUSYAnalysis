@@ -127,7 +127,7 @@ int main( int argc, char** argv )
   int ctr = 0;
   for ( auto tmp : mymap )
     {
-      //if ( tmp.first > 1000 && tmp.first < 1300 ) std::cout << "mass: " << tmp.first << " expL: " << tmp.second.exp0p5 << std::endl;
+      if ( tmp.first > 1000 && tmp.first < 1300 ) std::cout << "mass: " << tmp.first << " expL: " << tmp.second.exp0p5 << std::endl;
       x[ctr]    = tmp.first;
       obsL[ctr] = tmp.second.obs;
       expL[ctr] = tmp.second.exp0p5;
@@ -179,11 +179,13 @@ int main( int argc, char** argv )
   gTwoS->GetYaxis()->CenterTitle(kTRUE);
   gTwoS->GetYaxis()->SetTitle("95% C.L. limit #sigma(pp#rightarrowG#rightarrow#gamma#gamma) (fb)");
 
-  gTwoS->GetYaxis()->SetRangeUser(0,30);
+  gTwoS->GetYaxis()->SetRangeUser(0,20.6);
+  gTwoS->GetXaxis()->SetRangeUser(450,3300);
+  
   gTwoS->Draw("AFC");
   gOneS->Draw("FC");
   gExp->Draw("C");
-  gObs->Draw("C");
+  gObs->Draw("L");
 
   TLegend* leg = new TLegend( 0.6, 0.58, 0.89, 0.89, NULL, "brNDC" );
   leg->SetBorderSize(0);
@@ -201,6 +203,7 @@ int main( int argc, char** argv )
 
   AddCMS(c);
 
+  c->SetLogx();
   c->SaveAs("NarrowResLimit.pdf");
   c->SaveAs("NarrowResLimit.C");
   

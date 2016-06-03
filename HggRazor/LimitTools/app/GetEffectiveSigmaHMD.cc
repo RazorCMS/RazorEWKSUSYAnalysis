@@ -108,8 +108,8 @@ int main( int argc, char* argv[] )
 	      double fwhm     = GetFWHM( h_mgg );
 	      //std::cout << mass << " & " << effSigma << " & " << fwhm << std::endl;
 	      Res tmpRes;
-	      tmpRes.effSigma = effSigma/(2.35*_mass);
-	      tmpRes.FWHM = fwhm/(2.35*_mass);
+	      tmpRes.effSigma = effSigma;
+	      tmpRes.FWHM = fwhm;
 	      if ( mymap.find(_mass) == mymap.end() )
 		{
 		  mymap[_mass] = tmpRes;
@@ -120,10 +120,11 @@ int main( int argc, char* argv[] )
 	  
 	  std::cout << "\\begin{table}\n\\centering\n\\caption{\\label{tab:Resolution} my resolution table}\n";
 	  std::cout << "\\begin{tabular}{r*{4}{c}}\n\\hline\n";
-	  std::cout << "$\\mathrm{M_{G}}$ (GeV) & $\\sigma_{eff}$ (GeV) & FWHM (GeV)\\\\\n\\hline\n";
+	  std::cout << "$\\mathrm{M_{G}}$ (GeV) & $\\sigma_{eff}$ (GeV) & FWHM (GeV) & FWHM/(2.35*M_{G})  \\\\\n\\hline\n";
 	  for ( auto tmp : mymap )
 	    {
-	      TString formatTable = Form("%0.f & %.3f & %.3f\\\\",  tmp.first, tmp.second.effSigma, tmp.second.FWHM );
+	      TString formatTable = Form("%0.f & %.3f & %.3f & %.2e\\\\",  tmp.first, tmp.second.effSigma, tmp.second.FWHM,
+					 tmp.second.FWHM/(2.35*tmp.first) );
 	      //std::cout << tmp.first << " & " << tmp.second.effSigma << " & " << tmp.second.FWHM << std::endl;
 	      std::cout << formatTable << std::endl;
 	    }

@@ -18,7 +18,7 @@ TString MakeFullDoubleGaussNE( TString tag, RooRealVar& mgg, RooWorkspace& w, bo
 TString MakeDoubleCB( TString tag, RooRealVar& mgg, RooWorkspace& w );
 TString MakeDoubleCBNE( TString tag, RooRealVar& mgg, RooWorkspace& w, bool _globalScale = false, bool _categoryScale = false, TString category = "category" );
 TString MakeDoubleCBInterpolate( TString tag, RooRealVar& mgg, RooWorkspace& w );
-TString MakeDoubleCBInterpolateNE( TString tag, RooRealVar& mgg, RooWorkspace& w, bool _globalScale = false, bool _categoryScale = false, TString category = "category" );
+TString MakeDoubleCBInterpolateNE( TString tag, RooRealVar& mgg, RooWorkspace& w, TString category = "" );
 
 TString MakeFullTripleGauss( TString tag, RooRealVar& mgg, RooWorkspace& w );//all parameters are floated
 TString MakeDoubleExp( TString tag, RooRealVar& mgg, RooWorkspace& w );
