@@ -120,7 +120,7 @@ int main( int argc, char* argv[] )
 	  
 	  std::cout << "\\begin{table}\n\\centering\n\\caption{\\label{tab:Resolution} my resolution table}\n";
 	  std::cout << "\\begin{tabular}{r*{4}{c}}\n\\hline\n";
-	  std::cout << "$\\mathrm{M_{G}}$ (GeV) & $\\sigma_{eff}$ (GeV) & FWHM (GeV) & FWHM/(2.35*M_{G})  \\\\\n\\hline\n";
+	  std::cout << "$\\mathrm{M_{G}}$ (GeV) & $\\sigma_{eff}$ (GeV) & FWHM (GeV) & FWHM/(2.35*$\\mathrm{M_{G}}$)  \\\\\n\\hline\n";
 	  for ( auto tmp : mymap )
 	    {
 	      TString formatTable = Form("%0.f & %.3f & %.3f & %.2e\\\\",  tmp.first, tmp.second.effSigma, tmp.second.FWHM,

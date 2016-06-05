@@ -759,7 +759,7 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
   if ( isEBEB) mggName = "mGammaGamma_EBEB";
   else mggName = "mGammaGamma_EBEE";
 
-  
+  mggName = "mGammaGamma";
   //RooRealVar mgg( mggName, "m_{#gamma#gamma}", 230, 6000, "GeV" );//EBEBE
   RooRealVar mgg( mggName, "m_{#gamma#gamma}", 320, 6000, "GeV" );//EBEE
   
@@ -821,7 +821,7 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
   
   bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("full") );
   //bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE));
-  //bres->SetName("BkgOnlyFitResult");
+  bres->SetName("BkgOnlyFitResult");
   hmd_a = ws->var( tag_bkg+"_a")->getVal();
   hmd_b = ws->var( tag_bkg+"_b")->getVal();
   Nbkg   = ws->var( tag_bkg+"_Nbkg")->getVal();

@@ -185,7 +185,7 @@ int main( int argc, char** argv )
   gTwoS->Draw("AFC");
   gOneS->Draw("FC");
   gExp->Draw("C");
-  gObs->Draw("L");
+  gObs->Draw("C");
 
   TLegend* leg = new TLegend( 0.6, 0.58, 0.89, 0.89, NULL, "brNDC" );
   leg->SetBorderSize(0);
@@ -204,8 +204,8 @@ int main( int argc, char** argv )
   AddCMS(c);
 
   c->SetLogx();
-  c->SaveAs("NarrowResLimit.pdf");
-  c->SaveAs("NarrowResLimit.C");
+  c->SaveAs("NarrowResLimit_NOBIAS.pdf");
+  c->SaveAs("NarrowResLimit_NOBIAS.C");
   
   gObs->GetXaxis()->SetRangeUser(0, 30);
   gObs->Write("gObs");

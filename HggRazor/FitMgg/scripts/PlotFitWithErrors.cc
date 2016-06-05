@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include <TSystem.h>
+#include <TLegend.h>
 #include "TString.h"
 #include "TFile.h"
 #include "TH1F.h"
@@ -23,6 +24,34 @@
 #include "RooCurve.h"
 
 
+const float lumi = 5;
+//Axis
+const float axisTitleSize = 0.06;
+const float axisTitleOffset = .8;
+
+const float axisTitleSizeRatioX   = 0.18;
+const float axisLabelSizeRatioX   = 0.12;
+const float axisTitleOffsetRatioX = 0.94;
+
+const float axisTitleSizeRatioY   = 0.15;
+const float axisLabelSizeRatioY   = 0.108;
+const float axisTitleOffsetRatioY = 0.32;
+
+//Margins
+const float leftMargin   = 0.12;
+const float rightMargin  = 0.05;
+const float topMargin    = 0.07;
+const float bottomMargin = 0.12;
+
+//CMS STANDARD
+TString CMSText = "CMS";
+TString extraText   = "Preliminary";
+//TString lumiText = "2.32 fb^{-1} (13 TeV)";
+TString lumiText = "2.69 fb^{-1} (13 TeV)";
+
+bool AddCMS( TCanvas* C );
+
+
 void PlotFitWithErrors( TString fname, bool blind = true, float min = 230, float max = 1630 )
 {
   
@@ -32,8 +61,17 @@ void PlotFitWithErrors( TString fname, bool blind = true, float min = 230, float
   RooFitResult* res = (RooFitResult*)ws->obj("BkgOnlyFitResult");
 
   
-  TCanvas cv;
-  
+  TCanvas* cv = new TCanvas( "cv", "cv", 2119, 33, 800, 700 );
+  cv->SetHighLightColor(2);
+  cv->SetFillColor(0);
+  cv->SetBorderMode(0);
+  cv->SetBorderSize(2);
+  cv->SetLeftMargin( leftMargin );
+  cv->SetRightMargin( rightMargin );
+  cv->SetTopMargin( topMargin );
+  cv->SetBottomMargin( bottomMargin );
+  cv->SetFrameBorderMode(0);
+  cv->SetFrameBorderMode(0);
   
   RooRealVar * mass = ws->var("mGammaGamma");
   mass->setRange("all", min, max);
@@ -61,9 +99,9 @@ void PlotFitWithErrors( TString fname, bool blind = true, float min = 230, float
   plot->SetName("myCurve");
   plot->Print();
 
-  TH1F* h_tmp = new TH1F("h", "_h", 57, 103, 160);
-  TH1F* h_tmp2 = new TH1F("h2", "_h2", 57, 103, 160);
-  TH1F* h_tmp3 = new TH1F("h3", "_h3", 57, 103, 160);
+  TH1F* h_tmp = new TH1F("h", "_h", 70, min, max);
+  TH1F* h_tmp2 = new TH1F("h2", "_h2", 70, min, max);
+  TH1F* h_tmp3 = new TH1F("h3", "_h3", 70, min, max);
   h_tmp->SetBinErrorOption(TH1::kPoisson);
   h_tmp2->SetBinErrorOption(TH1::kPoisson);
   data->fillHistogram( h_tmp, *mass);
@@ -161,7 +199,9 @@ void PlotFitWithErrors( TString fname, bool blind = true, float min = 230, float
   TGraph* gsigma = new TGraph(2*Nc, xp, sigma);
   TGraph* gsigma2 = new TGraph(2*Nc, xp, sigma2);
   gsigma2->SetFillColor(kAzure-2);
+  gsigma2->SetLineColor(kAzure-2);
   gsigma->SetFillColor(kAzure-4);
+  gsigma->SetLineColor(kAzure-4);
   
   //pdf->plotOn(plot,RooFit::NormRange( "low,high" ),RooFit::FillColor(kGreen),RooFit::Range("Full"), RooFit::VisualizeError(*res,2.0,kFALSE));
   //pdf->plotOn(plot,RooFit::NormRange( "low,high" ),RooFit::FillColor(kYellow),RooFit::Range("Full"), RooFit::VisualizeError(*res,1.0,kFALSE));
@@ -222,7 +262,10 @@ void PlotFitWithErrors( TString fname, bool blind = true, float min = 230, float
   RooPlot *plot2 = mass->frame(min,max, 70);
   plot2->SetTitle("");
   data->plotOn( plot2 );
-  pdf->plotOn( plot2, RooFit::NormRange( "all" ),RooFit::Range("all"), RooFit::LineWidth(1), RooFit::LineColor(kRed) );
+  pdf->plotOn( plot2, RooFit::NormRange( "all" ),RooFit::Range("all"), RooFit::LineWidth(2), RooFit::LineColor(kRed) );
+  TH1F* dummy = new TH1F("dummy", "dummy", 70,230,320);
+  dummy->SetLineColor(kRed);
+  dummy->SetLineWidth(2);
   
   //h_tmp2->Draw("sameE0");
   //h_tmp2->Draw("sameE1");
@@ -232,19 +275,91 @@ void PlotFitWithErrors( TString fname, bool blind = true, float min = 230, float
   //plot2->Draw();
 
   gsigma2->SetTitle("");
-  gsigma2->GetYaxis()->SetRangeUser(0.1,600);
+  //gsigma2->GetYaxis()->SetRangeUser(0.1,600);
+  gsigma2->GetYaxis()->SetRangeUser(0.1,200);
+  gsigma2->GetXaxis()->SetTitleSize(0.05);
+  gsigma2->GetYaxis()->SetTitleSize(0.05);
+  gsigma2->GetYaxis()->SetTitle("Events / ( 20 GeV )");
   gsigma2->GetXaxis()->SetRangeUser(230.,1610);
+  gsigma2->GetXaxis()->SetTitle("m_{#gamma#gamma} (GeV)");
   gsigma2->Draw("AF");
   gsigma->Draw("F");
   plot2->Draw("same");
+  h_tmp2->Draw("sameE0");
+  h_tmp2->Draw("sameE1");
+  h_tmp3->Draw("sameE1");
+
+  TLegend* leg = new TLegend( 0.7, 0.6, 0.93, 0.89, NULL, "brNDC" );
+  leg->SetBorderSize(0);
+  leg->SetLineColor(1);
+  leg->SetLineStyle(1);
+  leg->SetLineWidth(1);
+  leg->SetFillColor(0);
+  leg->SetFillStyle(1001);
+  leg->SetTextSize(0.04);
+  leg->AddEntry( h_tmp2, " Data", "lep" );
+  leg->AddEntry( dummy, " Fit model", "l" );
+  leg->AddEntry( gsigma, " #pm 1 #sigma", "f" );
+  leg->AddEntry( gsigma2, " #pm 2 #sigma", "f" );
+  leg->Draw();
+
+  float lumifont = 42;
+  float cmsSize = 0.06;
+  TLatex latex;
+  latex.SetNDC();
+  latex.SetTextAngle(0);
+  latex.SetTextColor(kBlack);    
+  latex.SetTextFont(lumifont);
+  latex.SetTextAlign(31); 
+  latex.SetTextSize(cmsSize);    
+  latex.DrawLatex(0.6, 0.85, "EBEE");
+  
+  AddCMS(cv);
   
   TString tag = (blind ? "_BLIND" : "");
-  cv.SetLogy();
+  cv->SetLogy();
   //cv.SetLogx();
-  cv.SaveAs("figs/mgg_data_"+tag+TString(Form("_%0.0f_%0.0f",min,max))+".png");
-  cv.SaveAs("figs/mgg_data_"+tag+TString(Form("_%0.0f_%0.0f",min,max))+".pdf");
-  cv.SaveAs("figs/mgg_data_"+tag+TString(Form("_%0.0f_%0.0f",min,max))+".C");
+  cv->SaveAs("figs/mgg_data_"+tag+TString(Form("_%0.0f_%0.0f",min,max))+".png");
+  cv->SaveAs("figs/mgg_data_"+tag+TString(Form("_%0.0f_%0.0f",min,max))+".pdf");
+  cv->SaveAs("figs/mgg_data_"+tag+TString(Form("_%0.0f_%0.0f",min,max))+".C");
   
   return;
+};
+bool AddCMS( TCanvas* C )
+{
+  C->cd();
+  float lumix = 0.955;
+  float lumiy = 0.945;
+  float lumifont = 42;
+  
+  float cmsx = 0.32;
+  float cmsy = 0.875;
+  float cmsTextFont   = 61;  // default is helvetic-bold
+  float extrax = cmsx + 0.078;
+  float extray = cmsy - 0.04;
+  float extraTextFont = 52;  // default is helvetica-italics
+  // ratio of "CMS" and extra text size
+  float extraOverCmsTextSize  = 0.76;
+  float cmsSize = 0.06;
+  TLatex latex;
+  latex.SetNDC();
+  latex.SetTextAngle(0);
+  latex.SetTextColor(kBlack);    
+  float extraTextSize = extraOverCmsTextSize*cmsSize;
+  latex.SetTextFont(lumifont);
+  latex.SetTextAlign(31); 
+  latex.SetTextSize(cmsSize);    
+  latex.DrawLatex(lumix, lumiy,lumiText);
+
+  latex.SetTextFont(cmsTextFont);
+  latex.SetTextAlign(31); 
+  latex.SetTextSize(cmsSize);
+  latex.DrawLatex(cmsx, cmsy, CMSText);
+   
+  latex.SetTextFont(extraTextFont);
+  latex.SetTextAlign(31); 
+  latex.SetTextSize(extraTextSize);
+  latex.DrawLatex(extrax, extray, extraText);
+  return true;
 };
 
