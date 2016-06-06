@@ -277,7 +277,16 @@ int main( int argc, char* argv[])
       _binNumber = binNumber;
     }
   
-  
+
+  //FWHM
+  std::string FWHM = ParseCommandLine( argc, argv, "-FWHM=" );
+  if ( FWHM == "" && fitMode == "datacard" && _highMassMode )
+    {
+      std::cerr << "[ERROR]: please provide a FWHM, --FWHM=<FWHM>\nEXIT" << std::endl;
+      return -1;
+    }
+
+  std::cout << "FWHM: " << FWHM << std::endl;
   
   if (  f1 != "" ) std::cout << "[INFO]: f1    :" << f1 << std::endl;
   if (  f2 != "" ) std::cout << "[INFO]: f2    :" << f2 << std::endl;
@@ -547,7 +556,7 @@ int main( int argc, char* argv[])
       std::cout << "calling MakeDataCard" << std::endl;
       if ( _highMassMode )
 	{
-	  MakeDataCardHMD( tree->CopyTree( cut ), mggName, _Signal_Yield, Signal_CL, Mass, binNumber, categoryMode );
+	  MakeDataCardHMD( tree->CopyTree( cut ), mggName, _Signal_Yield, Signal_CL, FWHM, Mass, binNumber, categoryMode );
 	}
       else
 	{

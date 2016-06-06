@@ -46,6 +46,7 @@
 //LOCAL INCLUDES
 #include "RunTwoFitMgg.hh"
 #include "DefinePdfs.hh"
+#include "CustomPdfs.hh"
 
 RooWorkspace* DoubleGausFit( TTree* tree, float forceSigma, bool sameMu, float forceMu, TString mggName )
 {
@@ -729,7 +730,7 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   return ws;
 }
 
-void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std::string Signal_CF, float mass, TString binNumber, TString category )
+void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std::string Signal_CF, std::string fnFWHM, float mass, TString binNumber, TString category )
 {
   std::cout << "entering datacard: " << Signal_Yield << std::endl;
   std::stringstream ss_signal;
@@ -747,6 +748,27 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
       if ( ss_signal.eof() ) break;
     }
 
+  std::ifstream ifs_fwhm( fnFWHM.c_str(), std::ifstream::in );
+
+  std::map<float,float> map_fwhm;
+  if ( ifs_fwhm.is_open() )
+    {
+      float _mass, _fwhm;
+      while ( ifs_fwhm.good() )
+	{
+	  ifs_fwhm >> _mass >> _fwhm;
+	  if ( ifs_fwhm.eof() ) break;
+	  if ( map_fwhm.find( _mass ) == map_fwhm.end() ) map_fwhm[_mass] = _fwhm;
+	}
+    }
+  else
+    {
+      std::cerr << "[ERROR]: unable to open file " << fnFWHM << "\n EXIT" << std::endl;
+      return;
+    }
+
+  for ( auto tmp : map_fwhm ) std::cout <<  tmp.first << " " << tmp.second << std::endl;
+  
   //------------------------------------------------
   // Define Workspace and create variables
   //------------------------------------------------
@@ -756,10 +778,9 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
 
   bool isEBEB = false;
   
-  if ( isEBEB) mggName = "mGammaGamma_EBEB";
+  if ( isEBEB ) mggName = "mGammaGamma_EBEB";
   else mggName = "mGammaGamma_EBEE";
 
-  mggName = "mGammaGamma";
   //RooRealVar mgg( mggName, "m_{#gamma#gamma}", 230, 6000, "GeV" );//EBEBE
   RooRealVar mgg( mggName, "m_{#gamma#gamma}", 320, 6000, "GeV" );//EBEE
   
@@ -891,7 +912,36 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
 	  std::cerr << "category: " <<  category << " NOT DEFINED for HM Analysis, terminating" << std::endl;
 	  exit (EXIT_FAILURE);
 	}
+
       
+      //--------------------
+      //GetFWHM
+      //--------------------
+      RooRealVar* mymass     = new RooRealVar( "my_f_mass", "#mass_{CB}", _mass, "" );
+      mymass->setConstant( kTRUE );
+      double fwhm;
+      if ( isEBEB )
+	{
+	  RooIntepolateDSCB_W0p014_Spin0_EBEB* myCB = new RooIntepolateDSCB_W0p014_Spin0_EBEB( "dummy" , "", mgg, *mymass );
+	  TF1* myTF1  = myCB->asTF( RooArgList(mgg), RooArgList( *mymass ) );
+	  double maxY = myTF1->GetMaximum();
+	  double maxX = myTF1->GetMaximumX();
+	  double _low = myTF1->GetX( 0.5*maxY , 0, maxX );
+	  double _high = myTF1->GetX( 0.5*maxY , maxX, 6000 );
+	  fwhm = _high - _low;
+	}
+      else
+	{
+	  RooIntepolateDSCB_W0p014_Spin0_EBEE* myCB = new RooIntepolateDSCB_W0p014_Spin0_EBEE( "dummy" , "", mgg, *mymass );
+	  TF1* myTF1  = myCB->asTF( RooArgList(mgg), RooArgList( *mymass ) );
+	  double maxY = myTF1->GetMaximum();
+	  double maxX = myTF1->GetMaximumX();
+	  double _low = myTF1->GetX( 0.5*maxY , 0, maxX );
+	  double _high = myTF1->GetX( 0.5*maxY , maxX, 6000 );
+	  fwhm = _high - _low;
+	}
+
+      //std::cout << "----> " << _mass << " " << fwhm << std::endl;
       //---------
       //Bkg model
       //---------
@@ -981,7 +1031,10 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
 	}
       else
 	{
-	  double biasYield = Signal_Yield*0.06*pow( _mass/600. , -4.0 ) + 1e-6;
+	  double biasYield;
+	  if ( isEBEB ) biasYield = ( 0.06*pow( _mass/600. , -4.0 ) + 1e-6)*fwhm;
+	  else biasYield = 0.1*pow( _mass/600. , -5.0 )*fwhm;
+	  std::cout << "----------" << Signal_Yield << " " << " " << biasYield << " " << fwhm <<  std::endl;
 	  ofs << "imax 1 number of bins\njmax 3 number of processes minus 1\nkmax * number of nuisance parameters\n";
 	  ofs << "----------------------------------------------------------------------------------------\n";
 	  ofs << "shapes Bkg\t\tbin"          << binNumber << "\t" << combineRootFile << " combineWS:" << combineBkg << "\n";
