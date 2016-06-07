@@ -96,17 +96,17 @@ int main( int argc, char** argv )
     }
   
   
-  TCanvas* cv = new TCanvas( "cv", "cv", 2119, 33, 800, 700 );
-  cv->SetHighLightColor(2);
-  cv->SetFillColor(0);
-  cv->SetBorderMode(0);
-  cv->SetBorderSize(2);
-  cv->SetLeftMargin( leftMargin );
-  cv->SetRightMargin( rightMargin );
-  cv->SetTopMargin( topMargin );
-  cv->SetBottomMargin( bottomMargin );
-  cv->SetFrameBorderMode(0);
-  cv->SetFrameBorderMode(0);
+  TCanvas* c = new TCanvas( "c", "c", 2119, 33, 800, 700 );
+  c->SetHighLightColor(2);
+  c->SetFillColor(0);
+  c->SetBorderMode(0);
+  c->SetBorderSize(2);
+  c->SetLeftMargin( leftMargin );
+  c->SetRightMargin( rightMargin );
+  c->SetTopMargin( topMargin );
+  c->SetBottomMargin( bottomMargin );
+  c->SetFrameBorderMode(0);
+  c->SetFrameBorderMode(0);
 
   /*
   TLegend* leg = new TLegend( 0.7, 0.6, 0.93, 0.89, NULL, "brNDC" );
@@ -143,16 +143,56 @@ int main( int argc, char** argv )
   h->SetXTitle("m_{#gamma#gamma} GeV");
   h->GetXaxis()->SetTitleSize(0.06);
   h->GetXaxis()->SetTitleOffset(0.85);
+ 
+
+
+  TPad *pad1 = new TPad("pad1","pad1", .0, 0.31, 1., 1.);
+  pad1->SetBottomMargin(0);
+  pad1->SetRightMargin( rightMargin );
+  pad1->SetLeftMargin( leftMargin );
+  pad1->Draw();
+  pad1->cd();
+  
   h->Draw("E1");
   hc->Draw("same+E1");
-
+  
+  c->cd();
+  TPad *pad2 = new TPad("pad2","pad2", .0, .0, 1., 0.29);
+  pad2->SetTopMargin(0.025);
+  pad2->SetBottomMargin(0.3);
+  pad2->SetRightMargin( rightMargin );
+  pad2->SetLeftMargin( leftMargin );
+  pad2->SetGridy();
+  pad2->Draw();
+  pad2->cd();
+  
   TH1F* ratio = new TH1F( *h );
   ratio->Divide( hc );
+ 
+  ratio->SetMarkerStyle(20);
+  ratio->SetMarkerColor(kBlue);
+  ratio->SetLineColor(kBlue);
+  ratio->SetLineWidth(1);
+  ratio->SetMarkerSize(1);
+  ratio->SetStats(0);
+  ratio->SetTitle("");
 
-  cv->SetLogy();
-  cv->SaveAs("dataReferenceEBEB.pdf");
-  cv->SaveAs("dataReferenceEBEB.png");
-  cv->SaveAs("dataReferenceEBEB.C");
+  ratio->GetYaxis()->SetRangeUser(0.7,1.3);
+  ratio->SetYTitle("ref./cross-check");
+  ratio->GetYaxis()->SetLabelSize(0.08);
+  ratio->GetXaxis()->SetLabelSize(0.12);
+  ratio->GetYaxis()->SetTitleSize(0.09);
+  ratio->GetYaxis()->SetTitleOffset(0.5);
+  ratio->SetXTitle("m_{#gamma#gamma} GeV");
+  ratio->GetXaxis()->SetTitleSize(0.15);
+  ratio->GetXaxis()->SetTitleOffset(0.85);
+  ratio->Draw("E1");
+
+  pad1->SetLogy();
+  pad1->Update();
+  c->SaveAs("dataReferenceEBEB.pdf");
+  c->SaveAs("dataReferenceEBEB.png");
+  c->SaveAs("dataReferenceEBEB.C");
   
   h->Write("mass");
   hc->Write("mass_caltech");
