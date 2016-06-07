@@ -3,6 +3,7 @@
 #include <TSystem.h>
 #include <TLegend.h>
 #include "TString.h"
+#include <TROOT.h>
 #include "TFile.h"
 #include "TH1F.h"
 #include "TCanvas.h"
@@ -54,13 +55,15 @@ bool AddCMS( TCanvas* C );
 
 void PlotFitWithErrors( TString fname, bool blind = true, float min = 230, float max = 1630 )
 {
-  
+
+  gROOT->Reset();
   gSystem->Load("../include/libCustomPdfs.so");
   TFile* fin = new TFile( fname, "READ");
   RooWorkspace *ws  = (RooWorkspace*)fin->Get("w_sb");
   RooFitResult* res = (RooFitResult*)ws->obj("BkgOnlyFitResult");
 
-  
+
+  TFile* fout = new TFile("TGraphFitMggEBEE.root", "RECREATE");
   TCanvas* cv = new TCanvas( "cv", "cv", 2119, 33, 800, 700 );
   cv->SetHighLightColor(2);
   cv->SetFillColor(0);
@@ -72,9 +75,11 @@ void PlotFitWithErrors( TString fname, bool blind = true, float min = 230, float
   cv->SetBottomMargin( bottomMargin );
   cv->SetFrameBorderMode(0);
   cv->SetFrameBorderMode(0);
-  
-  RooRealVar * mass = ws->var("mGammaGamma");
+
+    
+  RooRealVar * mass = ws->var("mGammaGamma_EBEE");
   mass->setRange("all", min, max);
+  mass->setBins(70);
   mass->setRange("blind", 700, 800);
   mass->setRange("low", min, 700);
   mass->setRange("high", 800, max);
@@ -84,13 +89,17 @@ void PlotFitWithErrors( TString fname, bool blind = true, float min = 230, float
   
   RooAbsPdf * pdf = ws->pdf("Bkg_fit_HMDiphoton_HMDiphoton_ext_HMDiphoton");
   //RooPlot *plot = mass->frame(min,max,max-min);
-  RooPlot *plot = mass->frame(min,max, 70);
+  //RooPlot *plot = mass->frame(min,max, 70);
+  RooPlot *plot = mass->frame(70);
   plot->SetTitle("");
   
-  RooAbsData* data = ws->data("data")->reduce(Form("mGammaGamma > %f && mGammaGamma < %f",min,max));
+  RooAbsData* data = ws->data("data")->reduce(Form("mGammaGamma_EBEE > %f && mGammaGamma_EBEE < %f",min,max));
+  //RooAbsData* data = ws->data("data")->reduce(Form("mGammaGamma_EBEE > %f && mGammaGamma_EBEE < %f",320,max));
   double nTot = data->sumEntries();
+  double nTot2 = ws->data("data")->reduce( Form("mGammaGamma_EBEE > %f && mGammaGamma_EBEE < %f", 320., max) )->sumEntries();
+  std::cout << "nTot2: " << nTot2 << std::endl;
   
-  if( blind ) data = data->reduce("mGammaGamma < 700 || mGammaGamma > 800");
+  if( blind ) data = data->reduce("mGammaGamma_EBEE < 700 || mGammaGamma_EBEE > 800");
   double nBlind = data->sumEntries();
   double norm = nTot/nBlind; //normalization for the plot
   
@@ -132,13 +141,19 @@ void PlotFitWithErrors( TString fname, bool blind = true, float min = 230, float
 	}
       
     }
+
+ 
+  //ws->var("mGammaGamma_EBEE")->setRange(min,max);
+ 
   //add the fix error band
-  RooCurve* c = plot->getCurve("Bkg_fit_HMDiphoton_HMDiphoton_ext_HMDiphoton_Norm[mGammaGamma]_Range[all]_NormRange[all]");
+  RooCurve* c = plot->getCurve("Bkg_fit_HMDiphoton_HMDiphoton_ext_HMDiphoton_Norm[mGammaGamma_EBEE]_Range[all]_NormRange[all]");
   const int Nc = c->GetN();
+  std::cout << "===================" << std::endl;
+  std::cout << "-->" << Nc << std::endl;
   //TGraphErrors errfix(Nc);
   //TGraphErrors errfix2(Nc);
-  TGraphAsymmErrors errfix(Nc);
-  TGraphAsymmErrors errfix2(Nc);
+  TGraphAsymmErrors* errfix  = new TGraphAsymmErrors(Nc);
+  TGraphAsymmErrors* errfix2 = new TGraphAsymmErrors(Nc);
 
   double sigma[2*Nc];
   double sigma2[2*Nc];
@@ -147,42 +162,46 @@ void PlotFitWithErrors( TString fname, bool blind = true, float min = 230, float
   Double_t *y = c->GetY();
   double NtotalFit = ws->var("Bkg_fit_HMDiphoton_HMDiphoton_ext_Nbkg")->getVal();
   std::cout << "ndata: " << nTot << ", nFit: " << NtotalFit << std::endl;
+  ws->var("mGammaGamma_EBEE")->setRange(330,max);
+  TH1F* hp = (TH1F*)pdf->createHistogram("mGammaGamma_EBEE", 65);
+  hp->Scale( NtotalFit );
+  
   for( int i = 0; i < Nc; i++ )
     {
-      errfix.SetPoint(i,x[i],y[i]);
-      errfix2.SetPoint(i,x[i],y[i]);
+      errfix->SetPoint(i,x[i],y[i]);
+      errfix2->SetPoint(i,x[i],y[i]);
       xp[i] = x[i];
       xp[2*Nc-(i+1)] = x[i];
       mass->setVal(x[i]);
-      std::cout << x[i] << " " << y[i] << std::endl; 
+      //std::cout << x[i] << " " << y[i] << std::endl; 
       double shapeErr = pdf->getPropagatedError(*res)*NtotalFit;
       double statUn = y[i]/sqrt(NtotalFit);
       double totalErr = TMath::Sqrt( shapeErr*shapeErr + statUn*statUn );
-      std::cout << x[i] << " " << y[i] << " " << NtotalFit << " " << shapeErr << " " << statUn << std::endl;
+      //std::cout << x[i] << " " << y[i] << " " << NtotalFit << " " << shapeErr << " " << statUn << std::endl;
       //total normalization error
       //double totalErr = TMath::Sqrt( shapeErr*shapeErr + y[i]*y[i]/NtotalFit ); 
       if ( y[i] - totalErr > .0 )
 	{
-	  errfix.SetPointError(i, 0, 0, totalErr, totalErr );
+	  errfix->SetPointError(i, 0, 0, totalErr, totalErr );
 	  sigma[i] = y[i]-totalErr;
 	  sigma[2*Nc-(i+1)] = y[i]+totalErr;
 	}
       else
 	{
-	  errfix.SetPointError(i, 0, 0, y[i]-0.01, totalErr );
+	  errfix->SetPointError(i, 0, 0, y[i]-0.01, totalErr );
 	  sigma[i] = 0.01;
 	  sigma[2*Nc-(i+1)] = y[i]+totalErr;
 	}
       //2sigma
       if ( y[i] -  2.*totalErr > .0 )
 	{
-	  errfix2.SetPointError(i, 0, 0, 2.*totalErr,  2.*totalErr );
+	  errfix2->SetPointError(i, 0, 0, 2.*totalErr,  2.*totalErr );
 	  sigma2[i] = y[i]-2.0*totalErr;
 	  sigma2[2*Nc-(i+1)] = y[i]+2.0*totalErr;
 	}
       else
 	{
-	  errfix2.SetPointError(i, 0, 0, y[i]-0.01,  2.*totalErr );
+	  errfix2->SetPointError(i, 0, 0, y[i]-0.01,  2.*totalErr );
 	  sigma2[i] = 0.01;
 	  sigma2[2*Nc-(i+1)] = y[i]+2.0*totalErr;
 	}
@@ -194,8 +213,8 @@ void PlotFitWithErrors( TString fname, bool blind = true, float min = 230, float
       */
     }
   
-  errfix.SetFillColor(kAzure-2);
-  errfix2.SetFillColor(kRed+2);
+  errfix->SetFillColor(kAzure-2);
+  errfix2->SetFillColor(kRed+2);
   TGraph* gsigma = new TGraph(2*Nc, xp, sigma);
   TGraph* gsigma2 = new TGraph(2*Nc, xp, sigma2);
   gsigma2->SetFillColor(kAzure-2);
@@ -270,8 +289,8 @@ void PlotFitWithErrors( TString fname, bool blind = true, float min = 230, float
   //h_tmp2->Draw("sameE0");
   //h_tmp2->Draw("sameE1");
   //h_tmp3->Draw("sameE1");
-  errfix.SetMarkerStyle(20);
-  errfix.SetMarkerSize(1);
+  errfix->SetMarkerStyle(20);
+  errfix->SetMarkerSize(1);
   //plot2->Draw();
 
   gsigma2->SetTitle("");
@@ -322,6 +341,12 @@ void PlotFitWithErrors( TString fname, bool blind = true, float min = 230, float
   cv->SaveAs("figs/mgg_data_"+tag+TString(Form("_%0.0f_%0.0f",min,max))+".png");
   cv->SaveAs("figs/mgg_data_"+tag+TString(Form("_%0.0f_%0.0f",min,max))+".pdf");
   cv->SaveAs("figs/mgg_data_"+tag+TString(Form("_%0.0f_%0.0f",min,max))+".C");
+
+  fout->cd();
+  errfix->Write("fit1");
+  errfix2->Write("fit2");
+  hp->Write("hp");
+  fout->Close();
   
   return;
 };

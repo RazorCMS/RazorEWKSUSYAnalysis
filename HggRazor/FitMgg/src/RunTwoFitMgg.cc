@@ -868,9 +868,9 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
   ws->import( data );
 
   float SignaYieldOriginal = Signal_Yield;
-  for ( int i = 0; i < 301; i++ )
+  for ( int i = 0; i < 1501; i++ )
     {
-      float _mass = 500. + (float)10*i;
+      float _mass = 500. + (float)2*i;
       if ( isEBEB )
 	{
 	  Signal_Yield = SignaYieldOriginal*(1.00/0.402153)*(0.398352+(0.000164685)*_mass-(2.3037e-08)*_mass*_mass)*(0.83769+(1.95668e-05)*_mass - (2.87399e-09)*_mass*_mass);
@@ -1058,7 +1058,7 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
 	  ofs << "mu_Global_" << det << "\t\tparam\t\t 0 " <<  _mass*0.01 <<  "\n";
 	  ofs << "theta_" << det << "\t\tparam\t\t 0 1\n";
 	  ofs << "SignalNbias_" << det <<"\trateParam bin0 biasSignal (@0*" << biasYield <<") theta_" << det << "\n";
-	  ofs << "BkgNbias_"    << det <<"\t\trateParam bin0 biasBkg (@0*" << biasYield <<") theta_" << det << "\n";
+	  ofs << "BkgNbias_"    << det <<"\t\trateParam bin0 biasBkg (@0*-" << biasYield <<") theta_" << det << "\n";
 	}
       ofs.close();
       //ws->Write();
