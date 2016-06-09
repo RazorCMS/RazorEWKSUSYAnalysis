@@ -23,6 +23,7 @@
 #include "RooAbsPdf.h"
 #include "RooAbsData.h"
 #include "RooCurve.h"
+#include "CommandLineInput.hh"
 
 
 const float lumi = 5;
@@ -56,15 +57,38 @@ bool AddCMS( TCanvas* C );
 int main( int argc, char** argv )
 {
 
-  TString fname = "EBEB/HggRazorWorkspace_EBEB_m750.root";
   bool blind = false;
-  bool isEBEB = false;
-  double min = 230.;
-  double max = 1630.;
+  bool isEBEB = true;
+  double min, max;
+  
+  std::string inputFile = ParseCommandLine( argc, argv, "-inputFile=" );
+  if (  inputFile == "" )
+    {
+      std::cerr << "[ERROR]: please provide an input file using --inputFile=<path_to_file>" << std::endl;
+      return -1;
+    }
+  
+  std::string detector = ParseCommandLine( argc, argv, "-det=" );
+  if (  detector == "ebeb" )
+    {
+      std::cout << "detector: ebeb" << std::endl;
+      isEBEB = true;
+    }
+  else if ( detector == "ebee" )
+    {
+      std::cout << "detector: ebee" << std::endl;
+      isEBEB = false;
+    }
+  else
+    {
+      std::cerr << "incorrect detector use <ebeb/ebee>" << std::endl;
+      return -1;
+    }
+  
   
   gROOT->Reset();
   gSystem->Load("include/libCustomPdfs.so");
-  TFile* fin = new TFile( fname, "READ");
+  TFile* fin = new TFile( inputFile.c_str(), "READ");
   RooWorkspace *ws  = (RooWorkspace*)fin->Get("w_sb");
   RooFitResult* res = (RooFitResult*)ws->obj("BkgOnlyFitResult");
 
@@ -82,10 +106,25 @@ int main( int argc, char** argv )
   cv->SetFrameBorderMode(0);
   cv->SetFrameBorderMode(0);
 
-    
-  RooRealVar * mass = ws->var("mGammaGamma_EBEB");
+  std::string varName;
+  if ( isEBEB )
+    {
+      varName = "mGammaGamma_EBEB";
+      min = 230.;
+      max = 1630.;
+    }
+  else
+    {
+      varName = "mGammaGamma_EBEE";
+      min = 330.;
+      max = 1630.;
+    }
+  
+  RooRealVar * mass = ws->var( varName.c_str() );
   mass->setRange("all", min, max);
-  mass->setBins(70);
+  if ( isEBEB ) mass->setBins(70);
+  else mass->setBins(65);
+  
   mass->setRange("blind", 700, 800);
   mass->setRange("low", min, 700);
   mass->setRange("high", 800, max);
@@ -94,41 +133,60 @@ int main( int argc, char** argv )
   mass->SetTitle("m_{#gamma#gamma}");
   
   RooAbsPdf * pdf = ws->pdf("Bkg_fit_HMDiphoton_HMDiphoton_ext_HMDiphoton");
-  //RooPlot *plot = mass->frame(min,max,max-min);
-  //RooPlot *plot = mass->frame(min,max, 70);
-  RooPlot *plot = mass->frame(70);
+  RooPlot* plot;
+  if ( isEBEB ) plot = mass->frame(min,max, 70);
+  else plot = mass->frame(min,max, 65);
+  
   plot->SetTitle("");
   
-  RooAbsData* data = ws->data("data")->reduce(Form("mGammaGamma_EBEB > %f && mGammaGamma_EBEB < %f",min,max));
-  //RooAbsData* data = ws->data("data")->reduce(Form("mGammaGamma_EBEB > %f && mGammaGamma_EBEB < %f",320,max));
+  RooAbsData* data = ws->data("data")->reduce( Form("%s > %f && %s < %f", varName.c_str(), min, varName.c_str(), max) );
   double nTot = data->sumEntries();
-  double nTot2 = ws->data("data")->reduce( Form("mGammaGamma_EBEB > %f && mGammaGamma_EBEB < %f", 330., max) )->sumEntries();
-  std::cout << "nTot2: " << nTot2 << std::endl;
   
-  if( blind ) data = data->reduce("mGammaGamma_EBEB < 700 || mGammaGamma_EBEB > 800");
+  if( blind ) data = data->reduce( Form("%s > %f && %s < %f", varName.c_str(), 800., varName.c_str(), 700.) );
   double nBlind = data->sumEntries();
   double norm = nTot/nBlind; //normalization for the plot
   
   data->plotOn( plot, RooFit::Invisible() );
-  pdf->plotOn( plot, RooFit::NormRange( "all" ), RooFit::Range("all"), RooFit::LineWidth(0.1) );
+  pdf->plotOn( plot, RooFit::NormRange( "all" ), RooFit::Range("all"), RooFit::LineWidth(1) );
   plot->SetName("myCurve");
   plot->Print();
 
-  TH1F* h_tmp = new TH1F("h", "_h", 70, min, max);
-  TH1F* h_tmp2 = new TH1F("h2", "_h2", 70, min, max);
-  TH1F* h_tmp3 = new TH1F("h3", "_h3", 70, min, max);
+  TH1F* h_tmp; 
+  TH1F* h_tmp2;
+  TH1F* h_tmp3;
+
+  if ( isEBEB )
+    {
+      h_tmp  = new TH1F("h",   "_h", 70, min, max);
+      h_tmp2 = new TH1F("h2", "_h2", 70, min, max);
+      h_tmp3 = new TH1F("h3", "_h3", 70, min, max);
+    }
+  else
+    {
+      h_tmp  = new TH1F("h",   "_h", 65, min, max);
+      h_tmp2 = new TH1F("h2", "_h2", 65, min, max);
+      h_tmp3 = new TH1F("h3", "_h3", 65, min, max);
+    }
   h_tmp->SetBinErrorOption(TH1::kPoisson);
   h_tmp2->SetBinErrorOption(TH1::kPoisson);
   data->fillHistogram( h_tmp, *mass);
   h_tmp2->SetLineColor(kBlack);
   h_tmp2->SetMarkerColor(kBlack);
   h_tmp2->SetMarkerStyle(20);
-  //h_tmp->SetLineWidth(2);
+  h_tmp->SetLineWidth(2);
   h_tmp2->SetStats(0);
   h_tmp3->SetLineColor(kBlack);
   h_tmp3->SetMarkerColor(kBlack);
   h_tmp3->SetMarkerStyle(20);
-  //h_tmp->SetLineWidth(2);
+  
+  h_tmp->SetLineWidth(2);
+  h_tmp2->SetLineWidth(2);
+  h_tmp3->SetLineWidth(2);
+
+  h_tmp->SetMarkerSize(1.5);
+  h_tmp2->SetMarkerSize(1.5);
+  h_tmp3->SetMarkerSize(1.5);
+  
   h_tmp3->SetStats(0);
   h_tmp3->SetTitle("");
   for ( int i = 1; i <= h_tmp->GetNbinsX(); i++ )
@@ -149,75 +207,68 @@ int main( int argc, char** argv )
     }
 
  
-  //ws->var("mGammaGamma_EBEB")->setRange(min,max);
- 
-  //add the fix error band
-  RooCurve* c = plot->getCurve("Bkg_fit_HMDiphoton_HMDiphoton_ext_HMDiphoton_Norm[mGammaGamma_EBEB]_Range[all]_NormRange[all]");
-  const int Nc = c->GetN();
-  std::cout << "===================" << std::endl;
-  std::cout << "-->" << Nc << std::endl;
-  //TGraphErrors errfix(Nc);
-  //TGraphErrors errfix2(Nc);
+  ws->var( varName.c_str() )->setRange(min,max);
+  TH1F* hp;
+  if ( isEBEB ) hp = (TH1F*)pdf->createHistogram( varName.c_str() , 70);
+  else hp = (TH1F*)pdf->createHistogram( varName.c_str(), 65);
+  
+  double NtotalFit = ws->var("Bkg_fit_HMDiphoton_HMDiphoton_ext_Nbkg")->getVal();
+  std::cout << "ndata: " << nTot << ", nFit: " << NtotalFit << std::endl;
+  hp->Scale( NtotalFit );
+  const int Nc = hp->GetNbinsX();
+  
   TGraphAsymmErrors* errfix  = new TGraphAsymmErrors(Nc);
   TGraphAsymmErrors* errfix2 = new TGraphAsymmErrors(Nc);
-
   double sigma[2*Nc];
   double sigma2[2*Nc];
   double xp[2*Nc];
-  Double_t *x = c->GetX();
-  Double_t *y = c->GetY();
-  double NtotalFit = ws->var("Bkg_fit_HMDiphoton_HMDiphoton_ext_Nbkg")->getVal();
-  std::cout << "ndata: " << nTot << ", nFit: " << NtotalFit << std::endl;
-  ws->var("mGammaGamma_EBEB")->setRange(230,max);
-  //ws->var("mGammaGamma_EBEE")->setRange(330,max);
-  TH1F* hp = (TH1F*)pdf->createHistogram("mGammaGamma_EBEB", 70);
-  //TH1F* hp = (TH1F*)pdf->createHistogram("mGammaGamma_EBEE", 65);
-  hp->Scale( NtotalFit );
   
   for( int i = 0; i < Nc; i++ )
     {
-      errfix->SetPoint(i,x[i],y[i]);
-      errfix2->SetPoint(i,x[i],y[i]);
-      xp[i] = x[i];
-      xp[2*Nc-(i+1)] = x[i];
-      mass->setVal(x[i]);
-      //std::cout << x[i] << " " << y[i] << std::endl; 
+      double x = hp->GetBinCenter(i+1);
+      double y = hp->GetBinContent(i+1);
+      errfix->SetPoint(i,x,y);
+      errfix2->SetPoint(i,x,y);
+      xp[i] = x;
+      xp[2*Nc-(i+1)] = x;
+      mass->setVal(x);
+      //std::cout << x << " " << y << std::endl; 
       double shapeErr = pdf->getPropagatedError(*res)*NtotalFit;
-      double statUn = y[i]/sqrt(NtotalFit);
+      double statUn = y/sqrt(NtotalFit);
       double totalErr = TMath::Sqrt( shapeErr*shapeErr + statUn*statUn );
-      //std::cout << x[i] << " " << y[i] << " " << NtotalFit << " " << shapeErr << " " << statUn << std::endl;
+      //std::cout << x << " " << y << " " << NtotalFit << " " << shapeErr << " " << statUn << std::endl;
       //total normalization error
-      //double totalErr = TMath::Sqrt( shapeErr*shapeErr + y[i]*y[i]/NtotalFit ); 
-      if ( y[i] - totalErr > .0 )
+      //double totalErr = TMath::Sqrt( shapeErr*shapeErr + y*y/NtotalFit ); 
+      if ( y - totalErr > .0 )
 	{
 	  errfix->SetPointError(i, 0, 0, totalErr, totalErr );
-	  sigma[i] = y[i]-totalErr;
-	  sigma[2*Nc-(i+1)] = y[i]+totalErr;
+	  sigma[i] = y-totalErr;
+	  sigma[2*Nc-(i+1)] = y+totalErr;
 	}
       else
 	{
-	  errfix->SetPointError(i, 0, 0, y[i]-0.01, totalErr );
+	  errfix->SetPointError(i, 0, 0, y-0.01, totalErr );
 	  sigma[i] = 0.01;
-	  sigma[2*Nc-(i+1)] = y[i]+totalErr;
+	  sigma[2*Nc-(i+1)] = y+totalErr;
 	}
       //2sigma
-      if ( y[i] -  2.*totalErr > .0 )
+      if ( y -  2.*totalErr > .0 )
 	{
 	  errfix2->SetPointError(i, 0, 0, 2.*totalErr,  2.*totalErr );
-	  sigma2[i] = y[i]-2.0*totalErr;
-	  sigma2[2*Nc-(i+1)] = y[i]+2.0*totalErr;
+	  sigma2[i] = y-2.0*totalErr;
+	  sigma2[2*Nc-(i+1)] = y+2.0*totalErr;
 	}
       else
 	{
-	  errfix2->SetPointError(i, 0, 0, y[i]-0.01,  2.*totalErr );
+	  errfix2->SetPointError(i, 0, 0, y-0.01,  2.*totalErr );
 	  sigma2[i] = 0.01;
-	  sigma2[2*Nc-(i+1)] = y[i]+2.0*totalErr;
+	  sigma2[2*Nc-(i+1)] = y+2.0*totalErr;
 	}
       /*
-	std::cout << x[i] << " " << y[i] << " "
+	std::cout << x << " " << y << " "
 	<< " ,pdf get Val: " << pdf->getVal()
 	<< " ,pdf get Prop Err: " << pdf->getPropagatedError(*res)*NtotalFit
-	<< " stat uncertainty: " << TMath::Sqrt(y[i]) << " Ntot: " << NtotalFit <<  std::endl;
+	<< " stat uncertainty: " << TMath::Sqrt(y) << " Ntot: " << NtotalFit <<  std::endl;
       */
     }
   
@@ -229,64 +280,16 @@ int main( int argc, char** argv )
   gsigma2->SetLineColor(kAzure-2);
   gsigma->SetFillColor(kAzure-4);
   gsigma->SetLineColor(kAzure-4);
-  
-  //pdf->plotOn(plot,RooFit::NormRange( "low,high" ),RooFit::FillColor(kGreen),RooFit::Range("Full"), RooFit::VisualizeError(*res,2.0,kFALSE));
-  //pdf->plotOn(plot,RooFit::NormRange( "low,high" ),RooFit::FillColor(kYellow),RooFit::Range("Full"), RooFit::VisualizeError(*res,1.0,kFALSE));
-  //pdf->plotOn(plot,RooFit::NormRange( "low,high" ),RooFit::FillColor(kGreen),RooFit::Range("Full"), RooFit::VisualizeError(*res,2.0,kTRUE));
-  //pdf->plotOn(plot,RooFit::NormRange( "low,high" ),RooFit::FillColor(kYellow),RooFit::Range("Full"), RooFit::VisualizeError(*res,1.0,kTRUE));
-
-
-  //plot->addObject(&errfix,"4");
-  //plot->addObject(&errfix2,"4");
-  //plot->addObject(&errfix,"4");
 
   //data->plotOn(plot);
   TBox blindBox(121,plot->GetMinimum()-(plot->GetMaximum()-plot->GetMinimum())*0.015,130,plot->GetMaximum());
   blindBox.SetFillColor(kGray);
 
-  if(blind) {
-    //plot->addObject(&blindBox);
-    //pdf->plotOn(plot,RooFit::NormRange( "low,high" ),RooFit::FillColor(kGreen),RooFit::Range("Full"), RooFit::VisualizeError(*res,2.0,kTRUE));
-    //pdf->plotOn(plot,RooFit::NormRange( "low,high" ),RooFit::FillColor(kYellow),RooFit::Range("Full"), RooFit::VisualizeError(*res,1.0,kTRUE));
-  }
   
-  //plot->addObject(&errfix,"4");
-  //data->plotOn(plot);
+  RooPlot *plot2;
+  if ( isEBEB ) plot2 = mass->frame(min,max, 70);
+  else plot2 = mass->frame(min,max, 65);
   
-  //pdf->plotOn(plot,RooFit::Normalization( norm ) );
-  //pdf->plotOn(plot,RooFit::NormRange( "low,high" ),RooFit::Range("Full"),RooFit::LineWidth(1.5) );
-  pdf->plotOn( plot, RooFit::NormRange( "all" ),RooFit::Range("all"), RooFit::LineWidth(2), RooFit::LineColor(kWhite) );
-  //data->plotOn(plot);
-  /*
-    pdf->plotOn(plot,RooFit::Normalization(norm),RooFit::Range("all"),RooFit::LineWidth(0.8) );
-    //pdf->plotOn(plot,RooFit::Normalization(norm),RooFit::FillColor(kGreen),RooFit::Range("all"), RooFit::VisualizeError(*res,2.0,kFALSE));
-    //pdf->plotOn(plot,RooFit::Normalization(norm),RooFit::FillColor(kYellow),RooFit::Range("all"), RooFit::VisualizeError(*res,1.0,kFALSE));
-    pdf->plotOn(plot,RooFit::Normalization(norm),RooFit::FillColor(kGreen),RooFit::Range("all"), RooFit::VisualizeError(*res,2.0,kTRUE));
-    pdf->plotOn(plot,RooFit::Normalization(norm),RooFit::FillColor(kYellow),RooFit::Range("all"), RooFit::VisualizeError(*res,1.0,kTRUE));
-    data->plotOn(plot);
-    pdf->plotOn(plot,RooFit::Normalization(norm),RooFit::Range("all"),RooFit::LineWidth(0.8) );
-  */
-  TLatex lbl0(0.12,0.96,"CMS Preliminary");
-  lbl0.SetNDC();
-  lbl0.SetTextSize(0.042);
-  plot->addObject(&lbl0);
-  
-  
-  TLatex lbl2(0.6,0.96,"#sqrt{s}=8 TeV  L = 19.78 fb^{-1}");
-  lbl2.SetNDC();
-  lbl2.SetTextSize(0.042);
-  plot->addObject(&lbl2);
-  
-  
-  int iObj=-1;
-  TNamed *obj;
-  while( (obj = (TNamed*)plot->getObject(++iObj)) ) {
-    obj->SetName(Form("Object_%d",iObj));
-  }
-  
-  //plot->Draw();
-
-  RooPlot *plot2 = mass->frame(min,max, 70);
   plot2->SetTitle("");
   data->plotOn( plot2 );
   pdf->plotOn( plot2, RooFit::NormRange( "all" ),RooFit::Range("all"), RooFit::LineWidth(2), RooFit::LineColor(kRed) );
@@ -294,16 +297,13 @@ int main( int argc, char** argv )
   dummy->SetLineColor(kRed);
   dummy->SetLineWidth(2);
   
-  //h_tmp2->Draw("sameE0");
-  //h_tmp2->Draw("sameE1");
-  //h_tmp3->Draw("sameE1");
+  
   errfix->SetMarkerStyle(20);
   errfix->SetMarkerSize(1);
-  //plot2->Draw();
-
+  
   gsigma2->SetTitle("");
-  //gsigma2->GetYaxis()->SetRangeUser(0.1,600);
-  gsigma2->GetYaxis()->SetRangeUser(0.1,200);
+  if ( isEBEB ) gsigma2->GetYaxis()->SetRangeUser(0.1,600);
+  else gsigma2->GetYaxis()->SetRangeUser(0.1, 200);
   gsigma2->GetXaxis()->SetTitleSize(0.05);
   gsigma2->GetYaxis()->SetTitleSize(0.05);
   gsigma2->GetYaxis()->SetTitle("Events / ( 20 GeV )");
@@ -339,7 +339,8 @@ int main( int argc, char** argv )
   latex.SetTextFont(lumifont);
   latex.SetTextAlign(31); 
   latex.SetTextSize(cmsSize);    
-  latex.DrawLatex(0.6, 0.85, "EBEE");
+  if ( isEBEB ) latex.DrawLatex(0.6, 0.85, "EBEB");
+  else latex.DrawLatex(0.6, 0.85, "EBEE");
   
   AddCMS(cv);
   
@@ -368,7 +369,7 @@ bool AddCMS( TCanvas* C )
   float lumiy = 0.945;
   float lumifont = 42;
   
-  float cmsx = 0.32;
+  float cmsx = 0.34;
   float cmsy = 0.875;
   float cmsTextFont   = 61;  // default is helvetic-bold
   float extrax = cmsx + 0.078;

@@ -921,7 +921,7 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
 	  fwhm = _high - _low;
 	}
 
-      //std::cout << "----> " << _mass << " " << fwhm << std::endl;
+      std::cout << "----> " << _mass << " " << fwhm << std::endl;
       //---------
       //Bkg model
       //---------
