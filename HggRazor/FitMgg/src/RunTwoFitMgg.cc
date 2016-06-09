@@ -730,7 +730,7 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   return ws;
 }
 
-void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std::string Signal_CF, std::string fnFWHM, float mass, TString binNumber, TString category )
+void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std::string Signal_CF, float mass, TString binNumber, TString category )
 {
   std::cout << "entering datacard: " << Signal_Yield << std::endl;
   std::stringstream ss_signal;
@@ -748,26 +748,6 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
       if ( ss_signal.eof() ) break;
     }
 
-  std::ifstream ifs_fwhm( fnFWHM.c_str(), std::ifstream::in );
-
-  std::map<float,float> map_fwhm;
-  if ( ifs_fwhm.is_open() )
-    {
-      float _mass, _fwhm;
-      while ( ifs_fwhm.good() )
-	{
-	  ifs_fwhm >> _mass >> _fwhm;
-	  if ( ifs_fwhm.eof() ) break;
-	  if ( map_fwhm.find( _mass ) == map_fwhm.end() ) map_fwhm[_mass] = _fwhm;
-	}
-    }
-  else
-    {
-      std::cerr << "[ERROR]: unable to open file " << fnFWHM << "\n EXIT" << std::endl;
-      return;
-    }
-
-  for ( auto tmp : map_fwhm ) std::cout <<  tmp.first << " " << tmp.second << std::endl;
   
   //------------------------------------------------
   // Define Workspace and create variables
@@ -782,7 +762,7 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
   else mggName = "mGammaGamma_EBEE";
 
   //RooRealVar mgg( mggName, "m_{#gamma#gamma}", 230, 6000, "GeV" );//EBEBE
-  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 320, 6000, "GeV" );//EBEE
+  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 330, 6000, "GeV" );//EBEE
   
   mgg.setUnit( "GeV" );
   mgg.setRange( "signal", 600., 900. );
@@ -798,9 +778,9 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
   else
     {
       mgg.setBins(22720);
-      mgg.setRange( "ebee", 320., 6000. );//EBEB
-      mgg.setRange( "low", 320., 650.);//EBEE
-      mgg.setRange( "full", 320., 6000. );//EBEE
+      mgg.setRange( "ebee", 330., 6000. );//EBEB
+      mgg.setRange( "low", 330., 650.);//EBEE
+      mgg.setRange( "full", 330., 6000. );//EBEE
     }
       
   

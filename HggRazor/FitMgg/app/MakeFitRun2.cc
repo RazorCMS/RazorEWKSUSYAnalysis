@@ -277,16 +277,6 @@ int main( int argc, char* argv[])
       _binNumber = binNumber;
     }
   
-
-  //FWHM
-  std::string FWHM = ParseCommandLine( argc, argv, "-FWHM=" );
-  if ( FWHM == "" && fitMode == "datacard" && _highMassMode )
-    {
-      std::cerr << "[ERROR]: please provide a FWHM, --FWHM=<FWHM>\nEXIT" << std::endl;
-      return -1;
-    }
-
-  std::cout << "FWHM: " << FWHM << std::endl;
   
   if (  f1 != "" ) std::cout << "[INFO]: f1    :" << f1 << std::endl;
   if (  f2 != "" ) std::cout << "[INFO]: f2    :" << f2 << std::endl;
@@ -426,9 +416,9 @@ int main( int argc, char* argv[])
       //EBEE
       else if ( detectorMode == "ebee" )
 	{
-	  cut = "mGammaGamma > 320. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1Pt> 75. && pho2Pt>75. && ( (abs(pho1DefaultSC_Eta) > 1.566 && abs(pho2DefaultSC_Eta) < 1.4442) || (abs(pho1DefaultSC_Eta) < 1.4442 && abs(pho2DefaultSC_Eta) > 1.566) ) && HLTDecision[93] == 1";
+	  cut = "mGammaGamma > 330. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1Pt> 75. && pho2Pt>75. && ( (abs(pho1DefaultSC_Eta) > 1.566 && abs(pho2DefaultSC_Eta) < 1.4442) || (abs(pho1DefaultSC_Eta) < 1.4442 && abs(pho2DefaultSC_Eta) > 1.566) ) && HLTDecision[93] == 1";
 	}
-      cutMETfilters = " && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
+      cutMETfilters = " && 1";
     }
   
   if(fitMode == "AIC2")
@@ -556,7 +546,7 @@ int main( int argc, char* argv[])
       std::cout << "calling MakeDataCard" << std::endl;
       if ( _highMassMode )
 	{
-	  MakeDataCardHMD( tree->CopyTree( cut ), mggName, _Signal_Yield, Signal_CL, FWHM, Mass, binNumber, categoryMode );
+	  MakeDataCardHMD( tree->CopyTree( cut ), mggName, _Signal_Yield, Signal_CL, Mass, binNumber, categoryMode );
 	}
       else
 	{
