@@ -777,7 +777,7 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
     }
   else
     {
-      mgg.setBins(22720);
+      mgg.setBins(22680);
       mgg.setRange( "ebee", 330., 6000. );//EBEB
       mgg.setRange( "low", 330., 650.);//EBEE
       mgg.setRange( "full", 330., 6000. );//EBEE
@@ -847,17 +847,17 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
   ws->import( *fmgg );
   ws->import( data );
 
-  float SignaYieldOriginal = Signal_Yield;
+  float SignaYieldOriginal = Signal_Yield;//2.69(1/fb)*10fb
   for ( int i = 0; i < 1501; i++ )
     {
       float _mass = 500. + (float)2*i;
       if ( isEBEB )
 	{
-	  Signal_Yield = SignaYieldOriginal*(1.00/0.402153)*(0.398352+(0.000164685)*_mass-(2.3037e-08)*_mass*_mass)*(0.83769+(1.95668e-05)*_mass - (2.87399e-09)*_mass*_mass);
+	  Signal_Yield = SignaYieldOriginal*( 2.44392e-01+(3.40500e-04)*_mass-(1.42193e-07)*pow(_mass,2)+(3.08615e-11)*pow(_mass,3)-(2.75671e-15)*pow(_mass,4) );
 	}
       else
 	{
-	  Signal_Yield = SignaYieldOriginal*(1.0/0.184193)*(0.737974+(4.55241e-05)*_mass-(5.50793e-09)*_mass*_mass)*(0.293253-(0.000108474)*_mass+(1.41917e-08)*_mass*_mass);
+	  Signal_Yield = SignaYieldOriginal*( 1.61828e-01+(6.99351e-05)*_mass-(9.55028e-08)*pow(_mass,2)+(2.92184e-11)*pow(_mass,3)-(2.82880e-15)*pow(_mass,4) );
 	}
       
       TString combineRootFile;
@@ -899,6 +899,7 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
       //--------------------
       RooRealVar* mymass     = new RooRealVar( "my_f_mass", "#mass_{CB}", _mass, "" );
       mymass->setConstant( kTRUE );
+      
       double fwhm;
       if ( isEBEB )
 	{
@@ -922,6 +923,8 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
 	}
 
       std::cout << "----> " << _mass << " " << fwhm << std::endl;
+      RooRealVar* _fwhm     = new RooRealVar( "FWHM", "FWHM", fwhm, "" );
+      combine_ws->import( *_fwhm );
       //---------
       //Bkg model
       //---------
@@ -1004,7 +1007,7 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
 	  ofs << "rate\t\t\t\t\t\t1\t\t1\n";
 	  ofs << "----------------------------------------------------------------------------------------\n";
 	  ofs << "CMS_Lumi\t\t\tlnN\t\t1.027\t\t-\n";
-	  ofs << "Photon_Trigger_" << det << "\t\t\tlnN\t\t1.10\t\t-\n";
+	  ofs << "Photon_Trigger_" << det << "\t\t\tlnN\t\t1.08\t\t-\n";
 	  ofs << "PdfNorm_" << det << "\t\t\t\tlnN\t\t1.06\t\t-\n";
 	  int totalSys = signal_sys.size();
 	  ofs << "mu_Global_" << det << "\t\t\tparam\t\t 0 " <<  _mass*0.01 <<  "\n";
@@ -1015,7 +1018,8 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
 	  if ( isEBEB ) biasYield = ( 0.06*pow( _mass/600. , -4.0 ) + 1e-6)*fwhm;
 	  else biasYield = 0.1*pow( _mass/600. , -5.0 )*fwhm;
 	  std::cout << "----------" << Signal_Yield << " " << " " << biasYield << " " << fwhm <<  std::endl;
-	  ofs << "imax 1 number of bins\njmax 3 number of processes minus 1\nkmax * number of nuisance parameters\n";
+
+	  /*ofs << "imax 1 number of bins\njmax 3 number of processes minus 1\nkmax * number of nuisance parameters\n";
 	  ofs << "----------------------------------------------------------------------------------------\n";
 	  ofs << "shapes Bkg\t\tbin"          << binNumber << "\t" << combineRootFile << " combineWS:" << combineBkg << "\n";
 	  ofs << "shapes biasSignal\tbin"   << binNumber << "\t" << combineRootFile << " combineWS:"   << copySignalName << "\n";
@@ -1039,6 +1043,29 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
 	  ofs << "theta_" << det << "\t\tparam\t\t 0 1\n";
 	  ofs << "SignalNbias_" << det <<"\trateParam bin0 biasSignal (@0*" << biasYield <<") theta_" << det << "\n";
 	  ofs << "BkgNbias_"    << det <<"\t\trateParam bin0 biasBkg (@0*-" << biasYield <<") theta_" << det << "\n";
+	  */
+	  ofs << "imax 1 number of bins\njmax 2 number of processes minus 1\nkmax * number of nuisance parameters\n";
+	  ofs << "----------------------------------------------------------------------------------------\n";
+	  ofs << "shapes Bkg\t\tbin"          << binNumber << "\t" << combineRootFile << " combineWS:" << combineBkg << "\n";
+	  ofs << "shapes biasSignal\tbin"   << binNumber << "\t" << combineRootFile << " combineWS:"   << copySignalName << "\n";
+	  ofs << "shapes signal\t\tbin"       << binNumber << "\t" << combineRootFile << " combineWS:" << tagSignalInterpol << "\n";
+	  ofs << "shapes data_obs\t\tbin"     << binNumber << "\t" << combineRootFile << " combineWS:" << dataName << "\n";
+	  ofs << "----------------------------------------------------------------------------------------\n";
+	  ofs << "bin\t\tbin" << binNumber << "\n";
+	  ofs << "observation\t-1.0\n";
+	  ofs << "----------------------------------------------------------------------------------------\n";
+	  ofs << "bin\t\t\t\tbin" << binNumber << "\t\tbin" << binNumber << "\t\tbin" << binNumber << "\n";
+	  ofs << "process\t\t\t\tsignal\t\tBkg\t\tbiasSignal\n";
+	  ofs << "process\t\t\t\t0\t\t1\t\t2\n";
+	  ofs << "rate\t\t\t\t1\t\t1\t\t1\n";
+	  ofs << "----------------------------------------------------------------------------------------\n";
+	  ofs << "CMS_Lumi\t\tlnN\t1.027\t\t-\t\t-\n";
+	  ofs << "Photon_Trigger_Eff" << "\tlnN\t1.08\t\t-\t\t-\n";
+	  ofs << "PdfNorm" << "\t\t\tlnN\t1.06\t\t-\t\t-\n";
+	  int totalSys = signal_sys.size();
+	  ofs << "mu_Global_" << det << "\t\tparam\t\t 0 " <<  _mass*0.01 <<  "\n";
+	  ofs << "theta_" << det << "\t\tparam\t\t 0 1\n";
+	  ofs << "SignalNbias_" << det <<"\trateParam bin0 biasSignal (@0*" << biasYield <<") theta_" << det << "\n";
 	}
       ofs.close();
       //ws->Write();

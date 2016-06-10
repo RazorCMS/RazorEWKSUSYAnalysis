@@ -61,24 +61,26 @@ int main( int argc, char** argv )
 
   gROOT->Reset();
   
-  std::ifstream ifs ( "/Users/cmorgoth/Work/HighMassDiphoton/ReferenceFiles/massList.EBEB.exo.txt", std::ifstream::in );
+  std::ifstream ifs ( "/Users/cmorgoth/Work/HighMassDiphoton/ReferenceFiles/massList.EBEE.exo.txt", std::ifstream::in );
   assert( ifs );
 
   TFile* fin = new TFile("/Users/cmorgoth/Work/HighMassDiphoton/ReferenceFiles/HggRazorExo_DoubleEG_2015D_GoodLumiSilver.root", "READ");
   TTree* tree = (TTree*)fin->Get("HggRazor");
   //EBEB
-  TString cut = "mGammaGamma > 230. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1DefaultSC_Eta) <1.4442 && abs(pho2DefaultSC_Eta) < 1.4442 && pho1Pt> 75. && pho2Pt>75. && HLTDecision[93] == 1";
+  //TString cut = "mGammaGamma > 230. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1DefaultSC_Eta) <1.4442 && abs(pho2DefaultSC_Eta) < 1.4442 && pho1Pt> 75. && pho2Pt>75. && HLTDecision[93] == 1";
   
   //EBEE
-  //TString cut = "mGammaGamma > 320. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1Pt> 75. && pho2Pt>75. && ( (abs(pho1DefaultSC_Eta) > 1.566 && abs(pho2DefaultSC_Eta) < 1.4442) || (abs(pho1DefaultSC_Eta) < 1.4442 && abs(pho2DefaultSC_Eta) > 1.566) ) && HLTDecision[93] == 1";
+  TString cut = "mGammaGamma > 320. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1Pt> 75. && pho2Pt>75. && ( (abs(pho1DefaultSC_Eta) > 1.566 && abs(pho2DefaultSC_Eta) < 1.4442) || (abs(pho1DefaultSC_Eta) < 1.4442 && abs(pho2DefaultSC_Eta) > 1.566) ) && HLTDecision[93] == 1";
 
-  tree->Draw("mGammaGamma>>tmp1(70,230,1630)", cut);//EBEB
-  //tree->Draw("mGammaGamma>>tmp1(70,230,1630)", cut);//EBEE
+  //tree->Draw("mGammaGamma>>tmp1(70,230,1630)", cut);//EBEB
+  tree->Draw("mGammaGamma>>tmp1(65,330,1630)", cut);//EBEE
   TH1F* hc = (TH1F*)gDirectory->Get("tmp1");
   hc->SetBinErrorOption(TH1::kPoisson);
   
-  TFile* fout = new TFile("HistoMassEBEB.root", "RECREATE");
-  TH1F* h = new TH1F("h", "mass", 70, 230, 1630);
+  TFile* fout = new TFile("HistoMassEBEE.root", "RECREATE");
+  //TH1F* h = new TH1F("h", "mass", 70, 230, 1630);
+  TH1F* h = new TH1F("h", "mass", 65, 330, 1630); 
+  
   h->SetBinErrorOption(TH1::kPoisson);
  
   if ( ifs.is_open() )
@@ -166,7 +168,7 @@ int main( int argc, char** argv )
   leg->SetFillColor(0);
   leg->SetFillStyle(1001);
   leg->SetTextSize(0.04);
-  leg->AddEntry( h, " referemce", "lep" );
+  leg->AddEntry( h, " reference", "lep" );
   leg->AddEntry( hc, " cross-check", "lep" );
   leg->Draw();
   
@@ -205,9 +207,9 @@ int main( int argc, char** argv )
 
   pad1->SetLogy();
   pad1->Update();
-  c->SaveAs("dataReferenceEBEB.pdf");
-  c->SaveAs("dataReferenceEBEB.png");
-  c->SaveAs("dataReferenceEBEB.C");
+  c->SaveAs("dataReferenceEBEE.pdf");
+  c->SaveAs("dataReferenceEBEE.png");
+  c->SaveAs("dataReferenceEBEE.C");
   
   h->Write("mass");
   hc->Write("mass_caltech");

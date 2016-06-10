@@ -79,11 +79,11 @@ int main( int argc, char** argv )
       return -1;
     }
   
-  TString cut = "pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1Pt> 75. && pho2Pt>75.";
+  TString cut = "pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1Pt> 75. && pho2Pt>75. && HLTDecision[93] == 1";
   TString categoryCutString;
 
   if (categoryMode == "ebeb") categoryCutString = " && mGammaGamma >= 230 && abs(pho1DefaultSC_Eta) <1.4442 && abs(pho2DefaultSC_Eta) < 1.4442";
-  else if (categoryMode == "ebee") categoryCutString = " && mGammaGamma >= 320 && ( (abs(pho1DefaultSC_Eta) < 1.4442 && abs(pho2DefaultSC_Eta) > 1.566) || (abs(pho1DefaultSC_Eta) > 1.566 && abs(pho2DefaultSC_Eta) < 1.4442) )";
+  else if (categoryMode == "ebee") categoryCutString = " && mGammaGamma >= 330 && ( (abs(pho1DefaultSC_Eta) < 1.4442 && abs(pho2DefaultSC_Eta) > 1.566) || (abs(pho1DefaultSC_Eta) > 1.566 && abs(pho2DefaultSC_Eta) < 1.4442) )";
   
   cut = cut + categoryCutString;
 
@@ -154,7 +154,7 @@ int main( int argc, char** argv )
       ctr++;
     }
 
-  TString mFname = "AccEff_GluGlu_5p6_EBEB";
+  TString mFname = "AccEff_GluGlu_0p014_EBEE_FINAL";
   TFile* out = new TFile(mFname+".root", "recreate");
   TGraph* gAccEff = new TGraph(npoints, x, AccEff);
 
@@ -202,7 +202,7 @@ int main( int argc, char** argv )
   leg->SetFillColor(0);
   leg->SetFillStyle(1001);
   leg->SetTextSize(0.04);
-  leg->AddEntry( gr, " EBEB J=0", "ep" );
+  leg->AddEntry( gr, " EBEE J=0", "ep" );
   leg->Draw();
 
   AddCMS(c);
