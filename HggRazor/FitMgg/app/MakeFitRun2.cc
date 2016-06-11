@@ -62,7 +62,14 @@ int main( int argc, char* argv[])
   std::string categoryMode = ParseCommandLine( argc, argv, "-category=" );
   if (  categoryMode == "" )
     {
-      std::cerr << "[ERROR]: please provide the category. Use --category=<highpt,highres,lowres>" << std::endl;
+      std::cerr << "[ERROR]: please provide the category. Use --category=<highpt,highres,lowres,inclusive>" << std::endl;
+      return -1;
+    }
+
+  std::string detectorMode = ParseCommandLine( argc, argv, "-detector=" );
+  if (  detectorMode == "" )
+    {
+      std::cerr << "[ERROR]: please provide the detector. Use --detector=<ebeb,ebee>" << std::endl;
       return -1;
     }
 
@@ -271,7 +278,6 @@ int main( int argc, char* argv[])
     }
   
   
-  
   if (  f1 != "" ) std::cout << "[INFO]: f1    :" << f1 << std::endl;
   if (  f2 != "" ) std::cout << "[INFO]: f2    :" << f2 << std::endl;
 
@@ -403,11 +409,16 @@ int main( int argc, char* argv[])
   if ( _highMassMode )
     {
       //EBEB
-      cut = "mGammaGamma > 230. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1DefaultSC_Eta) <1.4442 && abs(pho2DefaultSC_Eta) < 1.4442 && pho1Pt> 75. && pho2Pt>75.";
-      //cut = "mGammaGamma > 230. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.4442 && abs(pho2Eta) < 1.4442 && pho1Pt> 75. && pho2Pt>75.";
+      if ( detectorMode == "ebeb")
+	{
+	  cut = "mGammaGamma > 230. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1DefaultSC_Eta) <1.4442 && abs(pho2DefaultSC_Eta) < 1.4442 && pho1Pt> 75. && pho2Pt>75. && HLTDecision[93] == 1";
+	}
       //EBEE
-      //cut = "mGammaGamma > 230. && mGammaGamma < 1230. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1Pt> 75. && pho2Pt>75. && ( (abs(pho1DefaultSC_Eta) > 1.566 && abs(pho2DefaultSC_Eta) < 1.4442) || (abs(pho1DefaultSC_Eta) < 1.4442 && abs(pho2DefaultSC_Eta) > 1.566) ) ";
-      cutMETfilters = " && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
+      else if ( detectorMode == "ebee" )
+	{
+	  cut = "mGammaGamma > 330. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1Pt> 75. && pho2Pt>75. && ( (abs(pho1DefaultSC_Eta) > 1.566 && abs(pho2DefaultSC_Eta) < 1.4442) || (abs(pho1DefaultSC_Eta) < 1.4442 && abs(pho2DefaultSC_Eta) > 1.566) ) && HLTDecision[93] == 1";
+	}
+      cutMETfilters = " && 1";
     }
   
   if(fitMode == "AIC2")

@@ -350,7 +350,8 @@ TString MakeDoubleCBInterpolate( TString tag, RooRealVar& mgg, RooWorkspace& w )
   RooRealVar* Ns     = new RooRealVar( tag + "_DCBI_Ns", "N_{s}", 1e5, "events");
   Ns->setConstant(kFALSE);
   
-  RooDoubleCBInterpolate* dCB = new RooDoubleCBInterpolate( tag + "DCBI_pdf", "", mgg, *mass );
+  //RooDoubleCBInterpolate* dCB = new RooDoubleCBInterpolate( tag + "DCBI_pdf", "", mgg, *mass );
+  RooIntepolateDSCB_W0p014_Spin0_EBEE* dCB = new RooIntepolateDSCB_W0p014_Spin0_EBEE( tag + "DCBI_pdf", "", mgg, *mass );
   
   //------------------------------------
   //C r e a t e   E x t e n d e d  p.d.f
@@ -362,41 +363,34 @@ TString MakeDoubleCBInterpolate( TString tag, RooRealVar& mgg, RooWorkspace& w )
   return ex_pdf_name;
 };
 
-TString MakeDoubleCBInterpolateNE( TString tag, RooRealVar& mgg, RooWorkspace& w, bool _globalScale, bool _categoryScale, TString category )
+TString MakeDoubleCBInterpolateNE( TString tag, RooRealVar& mgg, RooWorkspace& w, TString category )
 {
   RooRealVar* mass     = new RooRealVar( tag + "_DCBI_mass", "#mass_{CB}", 750, "" );
   mass->setConstant(kFALSE);
   
   TString pdf_name = tag + "_DCBI";
-  RooDoubleCBInterpolate* dCB;
-  if ( _globalScale && _categoryScale )
+  
+  if ( category == "EBEB" )
     {
-      RooRealVar* muGlobal = new RooRealVar( "mu_Global", "#mu_{global}", 0, "" );
-      RooRealVar* muCat    = new RooRealVar( category+"_mu_Global", "#mu_{"+category+"}", 0, "" );
-      RooFormulaVar* mggp  = new RooFormulaVar( tag + "_DG_mggp", "m_{gg} - #mu_{g} - #mu_{"+category+"}", "(@0-@1-@2)", RooArgList(mgg, *muGlobal, *muCat) );
-      dCB = new RooDoubleCBInterpolate( pdf_name , "", *mggp, *mass );
-    }
-  else if ( _globalScale && !_categoryScale )
-    {
-      RooRealVar* muGlobal = new RooRealVar( "mu_Global", "#mu_{g}", 0, "" );
+      RooRealVar* muGlobal = new RooRealVar( "mu_Global_EBEB", "#mu_{g}", 0, "" );
       RooFormulaVar* mggp  = new RooFormulaVar( tag + "_DG_muG", "m_{gg} - #mu_{g}", "(@0-@1)", RooArgList(mgg, *muGlobal) );
-      dCB = new RooDoubleCBInterpolate( pdf_name , "", *mggp, *mass );
+      RooIntepolateDSCB_W0p014_Spin0_EBEB* dCB = new RooIntepolateDSCB_W0p014_Spin0_EBEB( pdf_name , "", *mggp, *mass );
+      w.import( *dCB );
+      return pdf_name;
     }
-  else if ( !_globalScale && _categoryScale )
+  else if ( category == "EBEE" )
     {
-      RooRealVar* muCat    = new RooRealVar( category+"_mu_Global", "#mu_{"+category+"}", 0, "" );
-      RooFormulaVar* mggp  = new RooFormulaVar( tag + "_DG_muG", "mgg - #mu_{"+category+"}", "(@0-@1)", RooArgList(mgg, *muCat) );
-      dCB = new RooDoubleCBInterpolate( pdf_name , "", *mggp, *mass );
+      RooRealVar* muGlobal = new RooRealVar( "mu_Global_EBEE", "#mu_{g}", 0, "" );
+      RooFormulaVar* mggp  = new RooFormulaVar( tag + "_DG_muG", "m_{gg} - #mu_{g}", "(@0-@1)", RooArgList(mgg, *muGlobal) );
+      RooIntepolateDSCB_W0p014_Spin0_EBEE* dCB = new RooIntepolateDSCB_W0p014_Spin0_EBEE( pdf_name , "", *mggp, *mass );
+      w.import( *dCB );
+      
+      return pdf_name;
     }
-  else
-    {
-      dCB = new RooDoubleCBInterpolate( pdf_name , "", mgg, *mass );
-    }
-
   
-  w.import( *dCB );
-  
-  return pdf_name;
+  std::cerr << "category: " <<  category << " NOT DEFINED for HM Analysis, terminating" << std::endl;
+  exit (EXIT_FAILURE);
+  return "";
 };
 
 TString MakeDoubleExp(TString tag, RooRealVar& mgg, RooWorkspace& w)
@@ -543,7 +537,7 @@ TString MakeHMDiphoton( TString tag, RooRealVar& mgg, RooWorkspace& w )
   a->setConstant(kFALSE);
   RooRealVar* b = new RooRealVar( pdfName + "_b", "", -0.06, "a.u"); 
   b->setConstant(kFALSE);
-  b->setRange(-5,5);
+  //b->setRange(-5,5);
 
   RooRealVar* Nbkg = new RooRealVar( pdfName + "_Nbkg","",10., "events");
   Nbkg->setConstant(kFALSE);
@@ -563,7 +557,7 @@ TString MakeHMDiphotonNE( TString tag, RooRealVar& mgg, RooWorkspace& w )
   a->setConstant(kFALSE);
   RooRealVar* b = new RooRealVar( pdfName + "_b", "", -0.06, "a.u"); 
   b->setConstant(kFALSE);
-  b->setRange(-5,5);
+  //b->setRange(-5,5);
 
   
   RooHMDiphoton* hmDiphoton = new RooHMDiphoton( pdfName, "", mgg, *a, *b );

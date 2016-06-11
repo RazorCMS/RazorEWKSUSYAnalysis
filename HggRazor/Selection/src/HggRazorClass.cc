@@ -615,7 +615,7 @@ void HggRazorClass::PrintEventInfo( )
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
       //ofs << run << ":" << lumi << ":" << event << " " << mGammaGamma << " " << pTGammaGamma << "\n";
-      ofs << run << ":" << lumi << ":" << event << "\n";
+      ofs << run << ":" << lumi << ":" << event << " " << mGammaGamma << "\n";
 
 		
     }
@@ -655,6 +655,41 @@ void HggRazorClass::PrintEventInfo(  std::vector< std::pair<long int, long int> 
 	}
     }
   
+};
+
+
+void HggRazorClass::PrintEventInfo(  std::map< std::string, double > eventList )
+{
+  if ( _debug ) std::cout << "[DEBUG]: Entering Loop" << std::endl;
+  if (fChain == 0) return;
+  
+  Long64_t nentries = fChain->GetEntriesFast();
+  Long64_t nbytes = 0, nb = 0;
+  double total_in = 0, total_rm = 0;
+  std::cout << "[INFO]: nentries: " << nentries << std::endl;
+  TFile* fout = new TFile("massDiff.root", "RECREATE");
+  TH1F* h_m = new TH1F( "h_m", "h_m", 10000, -1e-5, 1e-5 );
+  for (Long64_t jentry=0; jentry < nentries; jentry++ )
+    {
+      Long64_t ientry = LoadTree(jentry);
+      
+      if (ientry < 0) break;
+      nb = fChain->GetEntry(jentry);   nbytes += nb;
+      std::stringstream ss;
+      ss << run << ":" << lumi << ":"  << event;
+      std::string key = ss.str();
+      for ( auto tmp : eventList )
+	{
+	  if ( tmp.first == key )
+	    {
+	      h_m->Fill( (mGammaGamma - tmp.second)/tmp.second );
+	    }
+	}
+    }
+
+  h_m->Write("massDiff");
+  fout->Close();
+  delete fout;
 };
 
 float HggRazorClass::GetHighPtGB( double mr, double r2 )
