@@ -33,6 +33,8 @@ struct finalBin
   bool _final;
 };
 
+const float NBKG = 40.0;
+
 int main( int argc, char* argv[] )
 {
   gROOT->Reset();
@@ -301,7 +303,7 @@ int main( int argc, char* argv[] )
 		  continue;
 		}
 	      if ( b[k+0] == 0  || b[k+1] == 0 ) continue;//avoid nans
-	      if ( bFull[k+0] < 10. || bFull[k+1] <= 10 ) continue;//avoid bins with small counts
+	      if ( bFull[k+0] < NBKG || bFull[k+1] <= NBKG ) continue;//avoid bins with small counts
 	      
 	      double mu   = GetBestFitSignalStrength( k+2, b, s, obs );
 	      double qnot = GetQnotTestStatistics( k+2, b, s, obs, mu );
@@ -370,7 +372,7 @@ int main( int argc, char* argv[] )
 		}
 	       
 	      if ( b[k+0] == 0 || b[k+1] == 0 ) continue;
-	      if ( bFull[k+0] <= 10. || bFull[k+1] <= 10 ) continue;//avoid bins with small counts
+	      if ( bFull[k+0] <= NBKG || bFull[k+1] <= NBKG ) continue;//avoid bins with small counts
 	      double mu   = GetBestFitSignalStrength( k+2, b, s, obs );
 	      double qnot = GetQnotTestStatistics( k+2, b, s, obs, mu );
 	      
@@ -490,7 +492,7 @@ int main( int argc, char* argv[] )
 	  fb.s      = bestS[0];
 	  fb._final = false;
 	  tmpMap[itmp] = fb;
-	  if ( (fb.b_full - 10.) < 10.0 )
+	  if ( (fb.b_full - NBKG) < NBKG )
 	    {
 	      std::cout << "MR: First partition is at minimum bkg events: " << fb.b_full << std::endl;
 	      tmpMap[itmp]._final = true;
@@ -507,7 +509,7 @@ int main( int argc, char* argv[] )
 	  fb.s      = bestS[1];
 	  fb._final = false;
 	  tmpMap[itmp] = fb;
-	  if ( (fb.b_full - 10.) < 10.0 )
+	  if ( (fb.b_full - NBKG) < NBKG )
 	    {
 	      std::cout << "MR: Second partition is at minimum bkg events: " << fb.b_full << std::endl;
 	      tmpMap[itmp]._final = true;
@@ -546,7 +548,7 @@ int main( int argc, char* argv[] )
 	  fb.s      = bestS[0];
 	  fb._final = false;
 	  tmpMap[itmp] = fb;
-	  if ( (fb.b_full - 10.) < 10.0 )
+	  if ( (fb.b_full - NBKG) < NBKG )
 	    {
 	      std::cout << "Rsq: First partition is at minimum bkg events: " << fb.b_full << std::endl;
 	      tmpMap[itmp]._final = true;
@@ -563,7 +565,7 @@ int main( int argc, char* argv[] )
 	  fb.s      = bestS[1];
 	  fb._final = false;
 	  tmpMap[itmp] = fb;
-	  if ( (fb.b_full - 10.) < 10.0 )
+	  if ( (fb.b_full - NBKG) < NBKG )
 	    {
 	      std::cout << "Rsq: Second partition is at minimum bkg events: " << fb.b_full << std::endl;
 	      tmpMap[itmp]._final = true;
