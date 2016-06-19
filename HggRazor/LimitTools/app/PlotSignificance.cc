@@ -111,7 +111,7 @@ int main( int argc, char** argv )
   int ctr = 0;
   for ( auto tmp : mymap )
     {
-      std::cout << "mass: " << tmp.first << " expL: " << tmp.second.sigma << std::endl;
+      if ( tmp.second.sigma != 0.0 ) std::cout << "mass: " << tmp.first << " expL: " << tmp.second.sigma << std::endl;
       x[ctr]     = tmp.first;
       sigma[ctr] = tmp.second.sigma;
       pval[ctr]  = tmp.second.pvalue;
