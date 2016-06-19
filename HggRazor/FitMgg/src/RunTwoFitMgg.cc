@@ -763,27 +763,31 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
 
   //RooRealVar mgg( mggName, "m_{#gamma#gamma}", 230, 6000, "GeV" );//EBEBE
   RooRealVar mgg( mggName, "m_{#gamma#gamma}", 330, 6000, "GeV" );//EBEE
+
+  //RooRealVar mgg( mggName, "m_{#gamma#gamma}", 230, 10000, "GeV" );//EBEBE
+  //RooRealVar mgg( mggName, "m_{#gamma#gamma}", 330, 10000, "GeV" );//EBEE
+  
   
   mgg.setUnit( "GeV" );
-  mgg.setRange( "signal", 600., 900. );
-  mgg.setRange( "high", 850., 6000.);
-  mgg.setRange( "low", 230., 650.);//EBEB
+  //mgg.setRange( "signal", 600., 900. );
+  //mgg.setRange( "high", 850., 10000.);
+  //mgg.setRange( "low", 230., 650.);//EBEB
 
   if ( isEBEB )
     {
+      //mgg.setBins(39080);//230-6000
+      //mgg.setRange( "full", 230., 10000. );//EBEB
       mgg.setBins(23080);//230-6000
-      mgg.setRange( "full", 230., 6000. );//EBEB
       mgg.setRange( "full", 230., 6000. );//EBEB
     }
   else
     {
+      //mgg.setBins(38680);
+      //mgg.setRange( "full", 330., 10000. );//EBEE
       mgg.setBins(22680);
-      mgg.setRange( "ebee", 330., 6000. );//EBEB
-      mgg.setRange( "low", 330., 650.);//EBEE
       mgg.setRange( "full", 330., 6000. );//EBEE
     }
       
-  
   //----------------
   //Retreive dataset
   //----------------
@@ -814,14 +818,13 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
   RooFitResult* bres;
   tag_bkg = MakeHMDiphoton( "Bkg_fit_HMDiphoton", mgg, *ws );
   ws->var(tag_bkg+"_Nbkg")->setVal( npoints );
-  //ws->var(tag_bkg+"_a")->setVal( 1.54 );
-  //ws->var(tag_bkg+"_b")->setVal( -0.48 );
-  
   ws->var(tag_bkg+"_a")->setVal( 0.03 );
   ws->var(tag_bkg+"_b")->setVal( -0.403 );
-  
+  //ws->var(tag_bkg+"_a")->setVal( 1.490177 );
+  //ws->var(tag_bkg+"_b")->setVal( -0.4817967 );
+ 
   bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("full") );
-  //bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE));
+
   bres->SetName("BkgOnlyFitResult");
   hmd_a = ws->var( tag_bkg+"_a")->getVal();
   hmd_b = ws->var( tag_bkg+"_b")->getVal();
@@ -834,15 +837,11 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
   //--------------------------------
   RooPlot *fmgg;
   if ( isEBEB ) fmgg = mgg.frame(230, 1630, 70);//EBEB
-  //else fmgg = mgg.frame(320, 1620, 65);//EBEE
   else fmgg = mgg.frame(230, 1630, 70);//EBEE
   
   data.plotOn(fmgg);
-  ws->pdf( tag_bkg )->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("ebee"),RooFit::NormRange("ebee"));
+  ws->pdf( tag_bkg )->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("full"),RooFit::NormRange("full"));
   fmgg->SetName( "BkgOnlyFitPlot" );
-
-  
-
   ws->import( *bres );
   ws->import( *fmgg );
   ws->import( data );
@@ -1015,8 +1014,16 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
       else
 	{
 	  double biasYield;
-	  if ( isEBEB ) biasYield = ( 0.06*pow( _mass/600. , -4.0 ) + 1e-6)*fwhm;
-	  else biasYield = 0.1*pow( _mass/600. , -5.0 )*fwhm;
+	  if ( isEBEB )
+	    {
+	      //biasYield = ( 0.06*pow( _mass/600. , -4.0 ) + 1e-6)*fwhm*SignaYieldOriginal/3.0;//2015
+	      biasYield = pow( _mass, 2.2-0.4*TMath::Log(_mass) )*fwhm*SignaYieldOriginal/10.;//2016
+	    }
+	  else
+	    {
+	      //biasYield = 0.1*pow( _mass/600. , -5.0 )*fwhm*SignaYieldOriginal/3.0;//2015
+	      biasYield = ( 0.10*pow(_mass/600.,-5.0 ) + 2e-5 )*fwhm*SignaYieldOriginal/10.;//2016
+	    }
 	  std::cout << "----------" << Signal_Yield << " " << " " << biasYield << " " << fwhm <<  std::endl;
 
 	  /*ofs << "imax 1 number of bins\njmax 3 number of processes minus 1\nkmax * number of nuisance parameters\n";

@@ -469,8 +469,8 @@ void HggRazorClass::Loop()
 	}
       else
 	{ 
-	  w = weight*pileupWeight;
-	  //w = weight;
+	  //w = weight*pileupWeight;
+	  w = weight;
 	}
       total_in += w;
       bool pho1_isFake = false;

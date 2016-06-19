@@ -16,6 +16,7 @@
 #include "TGraphErrors.h"
 #include "TGraphAsymmErrors.h"
 #include "TMath.h"
+#include "RooHist.h"
 
 #include "TBox.h"
 
@@ -64,25 +65,37 @@ int main( int argc, char** argv )
   std::ifstream ifs ( "/Users/cmorgoth/Work/HighMassDiphoton/ReferenceFiles/massList.EBEE.exo.txt", std::ifstream::in );
   assert( ifs );
 
-  TFile* fin = new TFile("/Users/cmorgoth/Work/HighMassDiphoton/ReferenceFiles/HggRazorExo_DoubleEG_2015D_GoodLumiSilver.root", "READ");
+  //TFile* fin = new TFile("/Users/cmorgoth/Work/HighMassDiphoton/ReferenceFiles/HggRazorExo_DoubleEG_2015D_GoodLumiSilver.root", "READ");
+  TFile* fin = new TFile("/Users/cmorgoth/Work/git/RazorEWKSUSYAnalysis/HggRazor/FitMgg/DiphotonEXO_DoubleEG_2016B_PRv2_GoodLumiGoldenJun16_newFile.root", "READ");
   TTree* tree = (TTree*)fin->Get("HggRazor");
   //EBEB
   //TString cut = "mGammaGamma > 230. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1DefaultSC_Eta) <1.4442 && abs(pho2DefaultSC_Eta) < 1.4442 && pho1Pt> 75. && pho2Pt>75. && HLTDecision[93] == 1";
   
   //EBEE
-  TString cut = "mGammaGamma > 320. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1Pt> 75. && pho2Pt>75. && ( (abs(pho1DefaultSC_Eta) > 1.566 && abs(pho2DefaultSC_Eta) < 1.4442) || (abs(pho1DefaultSC_Eta) < 1.4442 && abs(pho2DefaultSC_Eta) > 1.566) ) && HLTDecision[93] == 1";
+  TString cut = "mGammaGamma > 330. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1Pt> 75. && pho2Pt>75. && ( (abs(pho1DefaultSC_Eta) > 1.566 && abs(pho2DefaultSC_Eta) < 1.4442) || (abs(pho1DefaultSC_Eta) < 1.4442 && abs(pho2DefaultSC_Eta) > 1.566) ) && HLTDecision[93] == 1";
 
-  //tree->Draw("mGammaGamma>>tmp1(70,230,1630)", cut);//EBEB
-  tree->Draw("mGammaGamma>>tmp1(65,330,1630)", cut);//EBEE
+  tree->Draw("mGammaGamma>>tmp1(70,230,1630)", cut);//EBEB
+  //tree->Draw("mGammaGamma>>tmp1(65,330,1630)", cut);//EBEE
   TH1F* hc = (TH1F*)gDirectory->Get("tmp1");
   hc->SetBinErrorOption(TH1::kPoisson);
   
-  TFile* fout = new TFile("HistoMassEBEE.root", "RECREATE");
-  //TH1F* h = new TH1F("h", "mass", 70, 230, 1630);
-  TH1F* h = new TH1F("h", "mass", 65, 330, 1630); 
-  
-  h->SetBinErrorOption(TH1::kPoisson);
  
+  //TH1F* h = new TH1F("h", "mass", 70, 230, 1630);
+
+  TFile* fin2 = new TFile("/Users/cmorgoth/Work/git/RazorEWKSUSYAnalysis/HggRazor/FitMgg/2016Ref/bands_EBEE016.root", "READ");
+  RooHist* hh = (RooHist*)fin2->Get("data");
+  
+  //TH1F* h = new TH1F("h", "mass", 65, 330, 1630);//EBEE
+  TH1F* h = new TH1F("h", "mass", 70, 230, 1630);//EBEB
+  h->SetBinErrorOption(TH1::kPoisson);
+
+  double* yy = hh->GetY();
+  for ( int i = 1; i <= 70; i++ ) h->SetBinContent( i, yy[i-1] );
+  
+  TFile* fout = new TFile("HistoMassEBEE.root", "RECREATE");
+  //TH1F* h = new TH1F("h", "mass", 65, 330, 1630); 
+  //
+  /*
   if ( ifs.is_open() )
     {
       std::string dummy;
@@ -99,8 +112,8 @@ int main( int argc, char** argv )
     {
       std::cout << "unable to open file!!!" << std::endl;
     }
-  
-  
+    
+  */
   TCanvas* c = new TCanvas( "c", "c", 2119, 33, 800, 700 );
   c->SetHighLightColor(2);
   c->SetFillColor(0);

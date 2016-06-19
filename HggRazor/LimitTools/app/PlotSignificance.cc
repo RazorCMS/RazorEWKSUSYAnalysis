@@ -12,17 +12,14 @@
 #include <TStyle.h>
 #include <TLatex.h>
 #include <TLegend.h>
+#include <TLine.h>
 //LOCAL INCLUDES
 #include "CommandLineInput.hh"
 
-struct Limit
+struct Sig
 {
-  double obs;
-  double exp0p025;
-  double exp0p16;
-  double exp0p5;
-  double exp0p84;
-  double exp0p975;
+  double sigma;
+  double pvalue;
 };
 
 
@@ -49,7 +46,7 @@ const float bottomMargin = 0.12;
 TString CMSText = "CMS";
 TString extraText   = "Preliminary";
 //TString lumiText = "2.32 fb^{-1} (13 TeV)";
-TString lumiText = "2.55 fb^{-1} (13 TeV)";
+TString lumiText = "2.69 fb^{-1} (13 TeV)";
 
 bool AddCMS( TCanvas* C );
 
@@ -69,7 +66,7 @@ int main( int argc, char** argv )
   std::ifstream ifs ( inputList.c_str(), std::ifstream::in );
 
 
-  std::map<float, Limit> mymap;
+  std::map<float, Sig> mymap;
   
   std::string fname;
   if( ifs.is_open() )
@@ -80,26 +77,18 @@ int main( int argc, char** argv )
 	  if ( ifs.eof() ) break;
 	  //std::cout << "fname: " << fname << std::endl;
 	  TFile* fin = new TFile( fname.c_str(), "READ" );
-	  int low  = fname.find(".mH")+3;
+	  int low  = fname.find("_m")+2;
 	  int high = fname.find(".root") - low;
 	  std::string mass = fname.substr( low, high );
 	  float _mass = atof( mass.c_str() );
 	  TTree* tree = (TTree*)fin->Get("limit");
 	  double limit;
-	  Limit tmpLimit;
+	  Sig tmpLimit;
 	  tree->SetBranchAddress( "limit", &limit );
 	  tree->GetEntry(0);
-	  tmpLimit.exp0p025 = limit*1.;
+	  tmpLimit.sigma = limit;
 	  tree->GetEntry(1);
-	  tmpLimit.exp0p16 = limit*1.;
-	  tree->GetEntry(2);
-	  tmpLimit.exp0p5 = limit*1.;
-	  tree->GetEntry(3);
-	  tmpLimit.exp0p84 = limit*1.;
-	  tree->GetEntry(4);
-	  tmpLimit.exp0p975 = limit*1.;
-	  tree->GetEntry(5);
-	  tmpLimit.obs = limit*1.;
+	  tmpLimit.pvalue = limit;
 	  //std::cout << "mass: " << mass << "-> " << exp0p025 << " " << exp0p16 << " " << exp0p5 << " " << exp0p84
 	  //<< " " << exp0p975 << " " << obs << std::endl;
 	  if ( mymap.find( _mass ) == mymap.end() )
@@ -116,48 +105,30 @@ int main( int argc, char** argv )
 
   int npoints = mymap.size();
   float x[npoints];
-  float expL[npoints];
-  float obsL[npoints];
-  
-  float xp[2*npoints];
-  float OneS[2*npoints];
-  float TwoS[2*npoints];
-   
+  float sigma[npoints];
+  float pval[npoints];
 
   int ctr = 0;
   for ( auto tmp : mymap )
     {
-      if ( tmp.first >= 500 && tmp.first < 3000 ) std::cout << "mass: " << tmp.first << " expL: " << tmp.second.exp0p975 << ", obs: "
-							   << tmp.second.obs << std::endl;
-      x[ctr]    = tmp.first;
-      obsL[ctr] = tmp.second.obs;
-      expL[ctr] = tmp.second.exp0p5;
-      
-      xp[ctr] = tmp.first;
-      xp[2*npoints-(ctr+1)] = tmp.first;     
-
-      OneS[ctr] = tmp.second.exp0p16;
-      OneS[2*npoints-(ctr+1)] = tmp.second.exp0p84;
-
-      TwoS[ctr] = tmp.second.exp0p025;
-      TwoS[2*npoints-(ctr+1)] = tmp.second.exp0p975;
-       
+      std::cout << "mass: " << tmp.first << " expL: " << tmp.second.sigma << std::endl;
+      x[ctr]     = tmp.first;
+      sigma[ctr] = tmp.second.sigma;
+      pval[ctr]  = tmp.second.pvalue;
       ctr++;
     }
 
-  TFile* out = new TFile("out_test.root", "recreate");
-  TGraph* gObs = new TGraph(npoints, x, obsL);
-  TGraph* gExp = new TGraph(npoints, x, expL);
-  TGraph* gOneS = new TGraph(2*npoints, xp, OneS);
-  TGraph* gTwoS = new TGraph(2*npoints, xp, TwoS);
-
+  TFile* out = new TFile("out_test_significance.root", "recreate");
+  TGraph* gsigma = new TGraph(npoints, x, sigma);
+  TGraph* gpval = new TGraph(npoints, x, pval);
+  
   TCanvas* c = new TCanvas( "c", "c", 2119, 33, 800, 700 );
   c->SetHighLightColor(2);
   c->SetFillColor(0);
   c->SetBorderMode(0);
   c->SetBorderSize(2);
   c->SetLeftMargin( leftMargin );
-  c->SetRightMargin( rightMargin );
+  c->SetRightMargin( 1.6*rightMargin );
   c->SetTopMargin( topMargin );
   c->SetBottomMargin( bottomMargin );
   c->SetFrameBorderMode(0);
@@ -165,32 +136,26 @@ int main( int argc, char** argv )
 
   gStyle->SetPaintTextFormat("4.3f");
   
-  gTwoS->SetFillColor(kSpring-3);
-  gTwoS->SetLineColor(kSpring-3);
-  gOneS->SetFillColor(kSpring+10);
-  gOneS->SetLineColor(kSpring+10);
-  gExp->SetLineWidth(3);
-  gExp->SetLineStyle(2);
-  gObs->SetLineWidth(2);
-  gObs->SetMarkerSize(0.5);
-  gObs->SetMarkerStyle(20);
+  gpval->SetLineColor(kAzure-2);
+  gpval->SetMarkerColor(kAzure-2);
+  gpval->SetMarkerSize(1);
+  gpval->SetMarkerStyle(20);
+  gpval->SetLineWidth(3);
 
-  gTwoS->SetTitle("");
-  gTwoS->GetXaxis()->SetTitleSize(0.05);
-  gTwoS->GetXaxis()->SetTitle("M_{G} (GeV)");
-  gTwoS->GetYaxis()->SetTitleSize(0.05);
-  gTwoS->GetYaxis()->CenterTitle(kTRUE);
-  gTwoS->GetYaxis()->SetTitle("95% C.L. limit #sigma(pp#rightarrowG#rightarrow#gamma#gamma) (fb)");
+  gpval->SetTitle("");
+  gpval->GetXaxis()->SetTitleSize(0.05);
+  gpval->GetXaxis()->SetTitle("M_{G} (GeV)");
+  gpval->GetYaxis()->SetTitleSize(0.05);
+  //gsigma->GetYaxis()->CenterTitle(kTRUE);
+  gpval->GetYaxis()->SetTitle("p_{0}");
 
-  gTwoS->GetYaxis()->SetRangeUser(0,20.6);
-  gTwoS->GetXaxis()->SetRangeUser(450,3300);
+  gpval->GetYaxis()->SetRangeUser(0.001, 0.6);
+  gpval->GetXaxis()->SetRangeUser(450,3300);
   
-  gTwoS->Draw("AFL");
-  gOneS->Draw("FL");
-  gExp->Draw("PL");
-  gObs->Draw("PL");
+  //gpval->Draw("APC");
+  gpval->Draw("APL");
 
-  TLegend* leg = new TLegend( 0.6, 0.58, 0.89, 0.89, NULL, "brNDC" );
+  TLegend* leg = new TLegend( 0.6, 0.27, 0.89, 0.35, NULL, "brNDC" );
   leg->SetBorderSize(0);
   leg->SetLineColor(1);
   leg->SetLineStyle(1);
@@ -198,23 +163,42 @@ int main( int argc, char** argv )
   leg->SetFillColor(0);
   leg->SetFillStyle(1001);
   leg->SetTextSize(0.04);
-  leg->AddEntry( gExp, " Expected limit", "l" );
-  leg->AddEntry( gOneS, " #pm1 #sigma", "f" );
-  leg->AddEntry( gTwoS, " #pm2 #sigma", "f" );
-  leg->AddEntry( gObs, " Observed limit", "l" );
+  leg->AddEntry( gpval, " J=0; observed p_{0}", "l" );
   leg->Draw();
 
+  TLine *line = new TLine(450, 0.15865, 3400, 0.15865);
+  line->SetLineStyle(2);
+  line->Draw();
+  TLatex latex;
+  latex.SetNDC();
+  latex.SetTextAngle(0);
+  latex.SetTextColor(kBlack);    
+  latex.SetTextFont(42);
+  latex.SetTextAlign(31); 
+  latex.SetTextSize(0.05);    
+  latex.DrawLatex(0.99, 0.75, "1 #sigma");
+
+  TLine *line2 = new TLine(450, 0.02275, 3400, 0.02275);
+  line2->SetLineStyle(2);
+  line2->Draw();
+  latex.DrawLatex(0.99, 0.5, "2 #sigma");
+
+  TLine *line3 = new TLine(450, 0.00135, 3400, 0.00135);
+  line3->SetLineStyle(2);
+  line3->Draw();
+  latex.DrawLatex(0.99, 0.14, "3 #sigma");
+
+
+  latex.DrawLatex(0.87, 0.42, "#frac{#Gamma}{M_{G}} = 1.4#times10^{-4} ");
   AddCMS(c);
 
   c->SetLogx();
-  c->SaveAs("NarrowResLimit_BIAS_fix.pdf");
-  c->SaveAs("NarrowResLimit_BIAS_fix.C");
+  c->SetLogy();
+  c->SaveAs("NarrowResLimit_pval_BIAS.pdf");
+  c->SaveAs("NarrowResLimit_pval_BIAS.C");
   
-  gObs->GetXaxis()->SetRangeUser(0, 30);
-  gObs->Write("gObs");
-  gExp->Write("gExp");
-  gOneS->Write("gOneS");
-  gTwoS->Write("gTwoS");
+  gsigma->Write("gObs");
+  gpval->Write("gExp");
   
   out->Close();
   return 0;
@@ -228,11 +212,11 @@ bool AddCMS( TCanvas* C )
   float lumiy = 0.945;
   float lumifont = 42;
   
-  float cmsx = 0.28;
-  float cmsy = 0.875;
+  float cmsx = 0.22;
+  float cmsy = 0.940;
   float cmsTextFont   = 61;  // default is helvetic-bold
-  float extrax = cmsx + 0.078;
-  float extray = cmsy - 0.04;
+  float extrax = cmsx + 0.198;
+  float extray = cmsy;
   float extraTextFont = 52;  // default is helvetica-italics
   // ratio of "CMS" and extra text size
   float extraOverCmsTextSize  = 0.76;

@@ -458,7 +458,8 @@ void HggRazorClass::Loop()
 	}
       else
 	{ 
-	  w = weight*pileupWeight;
+	  //w = weight*pileupWeight;
+	  w = weight;
 	}
       total_in += w;
       bool pho1_isFake = false;
@@ -468,7 +469,7 @@ void HggRazorClass::Loop()
       bool prompt_prompt = false;
       bool prompt_fake = false;
       if ( abs(pho1MotherID) > 6 && pho1MotherID != 21 && pho1MotherID != 2212 ) pho1_isFake = true;
-      if ( abs(pho2MotherID) > 6 && pho2MotherID != 21 && pho1MotherID != 2212) pho2_isFake = true;
+      if ( abs(pho2MotherID) > 6 && pho2MotherID != 21 && pho2MotherID != 2212) pho2_isFake = true;
       if ( pho1_isFake && pho2_isFake ) isFakeFake = true;
       if ( pho1_isFake || pho2_isFake ) isFake = true;
       if ( !pho1_isFake && !pho2_isFake ) prompt_prompt = true;

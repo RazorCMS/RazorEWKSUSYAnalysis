@@ -26,9 +26,9 @@
 // float HggRazorClass::mgg_h = 1230.;
 
 //Z
-int HggRazorClass::n_mgg = 28;
-float HggRazorClass::mgg_l = 70.;
-float HggRazorClass::mgg_h = 112.;
+int HggRazorClass::n_mgg = 60;
+float HggRazorClass::mgg_l = 60.;
+float HggRazorClass::mgg_h = 120.;
 
 int HggRazorClass::n_ptgg   = 52;
 float HggRazorClass::ptgg_l = 0.;
@@ -190,11 +190,12 @@ float lres_k[2] = { 1.0, 1.0};
 //Zee
 //--------------
 //EBEB 
-TString cut    = "(abs( pho1DefaultSC_Eta ) <1.4442 && abs( pho2DefaultSC_Eta ) < 1.4442) && pho1Pt > 30. && pho2Pt> 20. && mGammaGamma > 50";
-TString cut_mc = "(abs( pho1DefaultSC_Eta ) <1.4442 && abs( pho2DefaultSC_Eta ) < 1.4442) && pho1Pt > 30. && pho2Pt> 20. && mGammaGamma > 50";
+//TString cut    = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && (abs( pho1DefaultSC_Eta ) <1.4442 && abs( pho2DefaultSC_Eta ) < 1.4442) && pho1Pt > 30. && pho2Pt> 20. && mGammaGamma > 50";
+//TString cut_mc = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && (abs( pho1DefaultSC_Eta ) <1.4442 && abs( pho2DefaultSC_Eta ) < 1.4442) && pho1Pt > 30. && pho2Pt> 20. && mGammaGamma > 50";
 //EBEE
-//TString cut    = "( (abs( pho1SC_Eta ) > 1.566 && abs( pho2SC_Eta ) < 1.4442) || (abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) > 1.566) ) && pho1Pt > 40. && pho2Pt> 30. && mGammaGamma > 50 && pho1passIso == 1 && pho2passIso == 1";
-//TString cut_mc = "( (abs( pho1SC_Eta ) > 1.566 && abs( pho2SC_Eta ) < 1.4442) || (abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) > 1.566) ) && pho1Pt > 40. && pho2Pt> 30. && mGammaGamma > 50 && pho1passIso == 1 && pho2passIso == 1";
+TString cut    = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && ( (abs( pho1SC_Eta ) > 1.566 && abs( pho2SC_Eta ) < 1.4442) || (abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) > 1.566) ) && pho1Pt > 30. && pho2Pt> 20. && mGammaGamma > 50";
+TString cut_mc = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && ( (abs( pho1SC_Eta ) > 1.566 && abs( pho2SC_Eta ) < 1.4442) || (abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) > 1.566) ) && pho1Pt > 30. && pho2Pt> 20. && mGammaGamma > 50";
+
 //---------------------
 //T r i g g e r   C u t 
 //---------------------
@@ -204,8 +205,8 @@ TString cut_mc = "(abs( pho1DefaultSC_Eta ) <1.4442 && abs( pho2DefaultSC_Eta ) 
 //TString triggerCut = "( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
 //TString triggerCut = "( HLTDecision[66] == 1 || HLTDecision[71] == 1 )";
 //TString triggerCut = "( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) ";
-TString triggerCut = "HLTDecision[66]";
-//TString triggerCut = "1";
+//TString triggerCut = "HLTDecision[66]";
+TString triggerCut = "1";
 //--------------------------------
 //D i p h o t o n  M a s s   C u t 
 //--------------------------------
@@ -307,7 +308,7 @@ int main ( int argc, char* argv[] )
   double k_f = 1.0;//Difference in data/mc normalization
   //double k_f = 1.5;
   const double lumi_frac = 1.0; // (5./19.8)
-  const double lumi = 2318.0;
+  const double lumi = 2000.0;
   //const double lumi = 217.7;
   const int mod = 0; 
   if ( treeType == "inclusive" )
@@ -346,11 +347,11 @@ int main ( int argc, char* argv[] )
 	  //------------------------
 	  if ( process == Process::data )
 	    {
-	      cutTree = (TTree*)chain->CopyTree( cut + " && " + triggerCut );
+	      cutTree = (TTree*)chain->CopyTree( cut );
 	    }
 	  else
 	    {
-	      cutTree = (TTree*)chain->CopyTree( cut_mc + " && " + triggerCut );
+	      cutTree = (TTree*)chain->CopyTree( cut_mc );
 	    }
 	  
 	  if ( cutTree == NULL )
