@@ -687,7 +687,10 @@ int main( int argc, char* argv[])
     {
       //RooWorkspace* w_sFit = DoubleGausFit( tree->CopyTree( cut ), forceSigma, sameMu, forceMu, mggName );
       //RooWorkspace* w_sFit = DoubleCBFit( tree->CopyTree( cut ), mggName, 125., 2. );
-      RooWorkspace* w_sFit = DoubleCBFit( tree->CopyTree( cut ), mggName, Mass, Sigma );
+      RooWorkspace* w_sFit;
+       if ( _highMassMode ) w_sFit = DoubleCBFit( tree->CopyTree( cut ), mggName, Mass, Sigma );
+       else w_sFit = DoubleCBFitHggRazor( tree->CopyTree( cut ), mggName, 125., 1.2 );
+       
       w_sFit->Write("w_sFit");
     }
   else if ( fitMode == "chooseBinning")
