@@ -16,7 +16,6 @@
 #include "TGraphErrors.h"
 #include "TGraphAsymmErrors.h"
 #include "TMath.h"
-#include "RooHist.h"
 
 #include "TBox.h"
 
@@ -61,59 +60,27 @@ int main( int argc, char** argv )
 {
 
   gROOT->Reset();
-  
-  std::ifstream ifs ( "/Users/cmorgoth/Work/git/RazorEWKSUSYAnalysis/HggRazor/FitMgg/ReferenceLists/EBEE_4fb.list", std::ifstream::in );
-  assert( ifs );
 
-  //TFile* fin = new TFile("/Users/cmorgoth/Work/HighMassDiphoton/ReferenceFiles/HggRazorExo_DoubleEG_2015D_GoodLumiSilver.root", "READ");
-  TFile* fin = new TFile("DiphotonEXO_DoubleEG_2016B_PRv2_GoodLumiGoldenJun22.root", "READ");
-  TTree* tree = (TTree*)fin->Get("HggRazor");
-  //EBEB
-  //TString cut = "mGammaGamma > 230. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1DefaultSC_Eta) <1.4442 && abs(pho2DefaultSC_Eta) < 1.4442 && pho1Pt> 75. && pho2Pt>75. && ( HLTDecision[93] == 1 || HLTDecision[209] == 1)";
-  
-  //EBEE
-  TString cut = "mGammaGamma > 330. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1Pt> 75. && pho2Pt>75. && ( (abs(pho1DefaultSC_Eta) > 1.566 && abs(pho2DefaultSC_Eta) < 1.4442) || (abs(pho1DefaultSC_Eta) < 1.4442 && abs(pho2DefaultSC_Eta) > 1.566) ) && ( HLTDecision[93] == 1 || HLTDecision[209] == 1)";
-
-  tree->Draw("mGammaGamma>>tmp1(70,230,1630)", cut);//EBEB
-  //tree->Draw("mGammaGamma>>tmp1(65,330,1630)", cut);//EBEE
-  TH1F* hc = (TH1F*)gDirectory->Get("tmp1");
-  hc->SetBinErrorOption(TH1::kPoisson);
-  
+  TFile* fin = new TFile("TGraphFitMggEBEB.root", "READ");
+  TH1F* hc   = (TH1F*)fin->Get("hp");
+  //hc->SetBinErrorOption(TH1::kPoisson);
  
-  //TH1F* h = new TH1F("h", "mass", 70, 230, 1630);
+  fin = new TFile("2016Ref/bands_EBEB016.root", "READ");
+  TGraphAsymmErrors* g = (TGraphAsymmErrors*)fin->Get("onesigma");
 
-  //TFile* fin2 = new TFile("/Users/cmorgoth/Work/git/RazorEWKSUSYAnalysis/HggRazor/FitMgg/2016Ref/bands_EBEE016.root", "READ");
-  //RooHist* hh = (RooHist*)fin2->Get("data");
-  
-  //TH1F* h = new TH1F("h", "mass", 65, 330, 1630);//EBEE
-  TH1F* h = new TH1F("h", "mass", 70, 230, 1630);//EBEB
-  h->SetBinErrorOption(TH1::kPoisson);
+  const int npoints = g->GetN();
+  double* y;
+  y = g->GetY();
 
-  //Get from ROOT FILE
-  //double* yy = hh->GetY();
-  //for ( int i = 1; i <= 70; i++ ) h->SetBinContent( i, yy[i-1] );
+  TH1F* h = new TH1F("h", "h", 70, 230, 1630 );
+  //TH1F* h = new TH1F("h", "h", 65, 330, 1630 );
+  //h->SetBinErrorOption(TH1::kPoisson);
+  for ( int i = 1; i <= h->GetNbinsX(); i++ )
+    {
+      h->SetBinContent( i, y[i-1] );
+    }
   
   TFile* fout = new TFile("HistoMassEBEE.root", "RECREATE");
-  //TH1F* h = new TH1F("h", "mass", 65, 330, 1630); 
-  //
-  
-  if ( ifs.is_open() )
-    {
-      std::string dummy;
-      float mass;
-      while ( ifs.good() )
-	{
-	  ifs >> dummy >> mass;
-	  if ( ifs.eof() ) break;
-	  std::cout << dummy << " " << mass << std::endl;
-	  h->Fill(mass);
-	}
-    }
-  else
-    {
-      std::cout << "unable to open file!!!" << std::endl;
-    }
-    
   
   TCanvas* c = new TCanvas( "c", "c", 2119, 33, 800, 700 );
   c->SetHighLightColor(2);
@@ -182,7 +149,7 @@ int main( int argc, char** argv )
   leg->SetFillColor(0);
   leg->SetFillStyle(1001);
   leg->SetTextSize(0.04);
-  leg->AddEntry( h, " reference", "lep" );
+  leg->AddEntry( h, " referemce", "lep" );
   leg->AddEntry( hc, " cross-check", "lep" );
   leg->Draw();
   
@@ -208,7 +175,7 @@ int main( int argc, char** argv )
   ratio->SetStats(0);
   ratio->SetTitle("");
 
-  ratio->GetYaxis()->SetRangeUser(0.7,1.3);
+  ratio->GetYaxis()->SetRangeUser(0.8,1.2);
   ratio->SetYTitle("ref./cross-check");
   ratio->GetYaxis()->SetLabelSize(0.08);
   ratio->GetXaxis()->SetLabelSize(0.12);
@@ -221,9 +188,9 @@ int main( int argc, char** argv )
 
   pad1->SetLogy();
   pad1->Update();
-  c->SaveAs("dataReferenceEBEE.pdf");
-  c->SaveAs("dataReferenceEBEE.png");
-  c->SaveAs("dataReferenceEBEE.C");
+  c->SaveAs("dataReferenceEBEE_Fit.pdf");
+  c->SaveAs("dataReferenceEBEE_Fit.png");
+  c->SaveAs("dataReferenceEBEE_Fit.C");
   
   h->Write("mass");
   hc->Write("mass_caltech");
