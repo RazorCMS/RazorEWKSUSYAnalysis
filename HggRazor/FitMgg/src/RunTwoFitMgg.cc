@@ -10,13 +10,12 @@
 #include <TFile.h>
 #include <TH1D.h>
 #include <TF1.h>
+#include <TBox.h>
 #include <TCanvas.h>
 #include <TGraph.h>
 #include <TGraphErrors.h>
 #include <TRandom3.h>
 #include <TLegend.h>
-#include <TMath.h>
-#include <TBox.h>
 #include <TMath.h>
 #include <TROOT.h>
 #include <Math/GaussIntegrator.h>
@@ -47,6 +46,24 @@
 #include "RunTwoFitMgg.hh"
 #include "DefinePdfs.hh"
 #include "CustomPdfs.hh"
+
+//Axis
+const float axisTitleSize = 0.06;
+const float axisTitleOffset = .8;
+
+const float axisTitleSizeRatioX   = 0.18;
+const float axisLabelSizeRatioX   = 0.12;
+const float axisTitleOffsetRatioX = 0.84;
+
+const float axisTitleSizeRatioY   = 0.15;
+const float axisLabelSizeRatioY   = 0.108;
+const float axisTitleOffsetRatioY = 0.52;
+
+//Margins
+const float leftMargin   = 0.12;
+const float rightMargin  = 0.05;
+const float topMargin    = 0.07;
+const float bottomMargin = 0.12;
 
 RooWorkspace* DoubleGausFit( TTree* tree, float forceSigma, bool sameMu, float forceMu, TString mggName )
 {
@@ -1311,16 +1328,56 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   //--------------------------------
   // m o d e l   1   p l o t t i n g
   //--------------------------------
+  TCanvas* c = new TCanvas( "c", "c", 2119, 33, 800, 700 );
+  c->SetHighLightColor(2);
+  c->SetFillColor(0);
+  c->SetBorderMode(0);
+  c->SetBorderSize(2);
+  c->SetLeftMargin( leftMargin );
+  c->SetRightMargin( rightMargin );
+  c->SetTopMargin( topMargin );
+  c->SetBottomMargin( bottomMargin );
+  c->SetFrameBorderMode(0);
+  c->SetFrameBorderMode(0);
+  
   RooPlot *fmgg = mgg.frame();
   //data_toys->plotOn(fmgg);
-  data.plotOn(fmgg);
-  ws->pdf( tag_bkg)->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("Full"),RooFit::NormRange("Full"));
-  ws->pdf( tag_bkg)->plotOn(fmgg,RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
+
+  RooDataSet* dataCut = (RooDataSet*) data.reduce(RooFit::Name("dataCut"),RooFit::SelectVars(RooArgSet(mgg)),RooFit::CutRange("low"));
+  RooDataSet* dataHigh = (RooDataSet*) data.reduce(RooFit::Name("dataHigh"),RooFit::SelectVars(RooArgSet(mgg)),RooFit::CutRange("high"));
+  dataCut->append(*dataHigh);
+  //data.plotOn(fmgg,RooFit::Invisible());
+  //
+  //data.plotOn(fmgg);
+  dataCut->plotOn(fmgg);
+  ws->pdf( tag_bkg )->plotOn(fmgg,RooFit::LineColor(kBlue));
+  //ws->pdf( tag_bkg )->plotOn(fmgg,RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed) );
+  //ws->pdf( tag_bkg )->plotOn(fmgg,RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("full"));
+  //ws->pdf( tag_bkg )->plotOn(fmgg,RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("full"));
+  
+  //data.plotOn(fmgg);
+  //ws->pdf( tag_bkg)->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("Full"),RooFit::NormRange("Full"));
+  //ws->pdf( tag_bkg)->plotOn(fmgg,RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
+  float maxC = fmgg->GetMaximum();
+  fmgg->GetXaxis()->SetTitleSize( axisTitleSize );
+  fmgg->GetXaxis()->SetTitleOffset( axisTitleOffset );
+  fmgg->GetYaxis()->SetTitleSize( axisTitleSize );
+  fmgg->GetYaxis()->SetTitleOffset( axisTitleOffset );
+  fmgg->SetAxisRange(0.1, maxC, "Y");
+  fmgg->Draw();
+  
+  c->Update();
+  fmgg->SetTitle("");
+  TBox* box = new TBox(120, 0.105, 135, maxC-0.1);
+  box->SetFillColor(kRed-9);
+  box->SetFillStyle(3344);
+  box->Draw("same");
+  c->SaveAs("BkgOnlyFitPlot.pdf");
   fmgg->SetName( "BkgOnlyFitPlot" );
   //ws->import( *model );
   ws->import( *bres );
   ws->import( *fmgg );
-
+  
   //-----------------------------
   //S i g n a l   p l o t t i n g
   //-----------------------------

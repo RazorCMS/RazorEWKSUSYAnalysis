@@ -10,7 +10,7 @@
 #include "HggRazorSystematics.hh"
 #include "CommandLineInput.hh"
 
-const bool _debug = false;
+const bool _debug = true;
 
 //---------------
 //Binning
@@ -158,6 +158,10 @@ int main( int argc, char* argv[] )
 
   cut = cut + categoryCutString;
 
+  std::cout << "===========================================================================" << std::endl;
+  std::cout << "[INFO]: cut--> " << cut << std::endl;
+  std::cout << "===========================================================================" << std::endl;
+  
   std::ifstream ifs( inputList, std::ifstream::in );
   assert(ifs);
 

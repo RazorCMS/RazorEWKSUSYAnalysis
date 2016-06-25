@@ -394,7 +394,7 @@ int main( int argc, char* argv[])
     if (BinSelection == "13") BinCutString = " && MR > 400 && MR <= 1200 && t1Rsq >= 0.05 ";
     if (BinSelection == "14") BinCutString = " && MR > 1200  ";
   }
- 
+  
   //----------------
   // M a i n   C u t
   //----------------
