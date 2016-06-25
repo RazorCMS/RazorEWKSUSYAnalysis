@@ -33,7 +33,7 @@ struct finalBin
   bool _final;
 };
 
-const float NBKG = 40.0;
+const float NBKG = 10.0;
 
 int main( int argc, char* argv[] )
 {
