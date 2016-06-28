@@ -23,7 +23,7 @@ RooWorkspace* MakeSideBandFit( TTree* tree, float forceSigma, bool constrainMu, 
 RooWorkspace* MakeSignalBkgFit( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName );
 RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeSMH, TString mggName, bool isHighMass = false );
 RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, TString mggName, float SMH_Yield, std::string SMH_CF,
-			    float Signal_Yield, std::string Signal_CF, TString binNumber = "-1", TString category = "category", bool isHighMass = false );
+			    float Signal_Yield, std::string Signal_CF, TString binNumber = "-1", TString category = "category", bool isHighMass = false, TString sModel = "dummy" );
 void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std::string Signal_CF,
 		      float mass = 125., TString binNumber = "-1", TString category = "category" );
 
