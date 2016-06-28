@@ -249,7 +249,8 @@ void HggRazorSystematics::Loop()
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
 
-      float commonW = this->Lumi*weight*pileupWeight*btagCorrFactor;//including btag weight
+      //float commonW = this->Lumi*weight*pileupWeight*btagCorrFactor;//including btag weight
+      float commonW = this->Lumi*weight*btagCorrFactor;
       
       if ( this->processName == "signal" )
 	{

@@ -12,40 +12,10 @@
 
 const bool _debug = true;
 
-//---------------
-//Binning
-//---------------
-const int nMR = 4;
-
-//highpt
-int highpt_nRsq[nMR] = {7,5,3,2};
-float  highptMRedges[] = {150.0, 312.5, 625, 1250, 10000};
-float  highptRSQedges0[7] = {0,0.027,0.052,0.077,0.102,0.127,1.0};
-float  highptRSQedges1[5] = {0,0.022,0.047,0.072,1.0};
-float  highptRSQedges2[3] = {0,0.021,1.0};
-float  highptRSQedges3[2] = {0,1.0};
-
-//highres
-int highres_nRsq[nMR] = {9,5,3,2};
-float  highresMRedges[] = {150,237.5,475,950,10000};
-float  highresRSQedges0[9] = {0,0.028,0.053,0.078,0.103,0.128,0.153,0.178,1.0};
-float  highresRSQedges1[5] = {0,0.035,0.06,0.085,1.0};
-float  highresRSQedges2[3] = {0,0.018,1.0};
-float  highresRSQedges3[2] = {0,1.0};
-
-//lowres
-int lowres_nRsq[nMR] = {7,6,3,2};
-float  lowresMRedges[] = {150,200,400,800,10000};
-float  lowresRSQedges0[7] = {0,0.049,0.074,0.099,0.124,0.149,1.0};
-float  lowresRSQedges1[6] = {0,0.023,0.048,0.073,0.098,1.0};
-float  lowresRSQedges2[3] = {0,0.02,1.0};
-float  lowresRSQedges3[2] = {0,1.0};
-
-
-
-//-----------------------------------------
-//New Binning From Significance Calculation
-//-----------------------------------------
+/*
+//----------------------------------------------
+//New Binning From Significance Calculation 2015 
+//----------------------------------------------
 //HighPt
 float bin_highpt0[4] = {150,0.13,10000,1};
 float bin_highpt1[4] = {750,0,10000,0.01};
@@ -116,6 +86,82 @@ std::vector<float*> SetBinning_lowres()
   myVec.push_back(bin_lowres6);
   return myVec;
 };
+*/
+
+
+//----------------------------------------------
+//New Binning From Significance Calculation 2016 
+//----------------------------------------------
+//HIGHPT
+float bin_highpt0[4] = {600,0.025,10000,1};
+float bin_highpt1[4] = {150,0.13,600,1};
+float bin_highpt2[4] = {1250,0,10000,0.025};
+float bin_highpt3[4] = {150,0,450,0.13};
+float bin_highpt4[4] = {450,0,600,0.035};
+float bin_highpt5[4] = {450,0.035,600,0.13};
+float bin_highpt6[4] = {600,0,1250,0.015};
+float bin_highpt7[4] = {600,0.015,1250,0.025};
+std::vector<float*> SetBinning_highpt()
+{
+  std::vector<float*> myVec;
+  myVec.push_back(bin_highpt0);
+  myVec.push_back(bin_highpt1);
+  myVec.push_back(bin_highpt2);
+  myVec.push_back(bin_highpt3);
+  myVec.push_back(bin_highpt4);
+  myVec.push_back(bin_highpt5);
+  myVec.push_back(bin_highpt6);
+  myVec.push_back(bin_highpt7);
+  return myVec;
+};
+//HZBB
+float bin_hzbb0[4] = {150,0,10000,1};
+std::vector<float*> SetBinning_hzbb()
+{
+  std::vector<float*> myVec;
+  myVec.push_back(bin_hzbb0);
+  return myVec;
+};
+//HIGHRES
+float bin_highres0[4] = {600,0.01,10000,1};
+float bin_highres1[4] = {150,0.175,600,1};
+float bin_highres2[4] = {150,0,400,0.175};
+float bin_highres3[4] = {400,0,600,0.025};
+float bin_highres4[4] = {400,0.025,600,0.175};
+float bin_highres5[4] = {600,0,950,0.01};
+float bin_highres6[4] = {950,0,10000,0.01};
+std::vector<float*> SetBinning_highres()
+{
+  std::vector<float*> myVec;
+  myVec.push_back(bin_highres0);
+  myVec.push_back(bin_highres1);
+  myVec.push_back(bin_highres2);
+  myVec.push_back(bin_highres3);
+  myVec.push_back(bin_highres4);
+  myVec.push_back(bin_highres5);
+  myVec.push_back(bin_highres6);
+  return myVec;
+};
+//LOWRES
+float bin_lowres0[4] = {500,0.01,10000,1};
+float bin_lowres1[4] = {150,0.15,500,1};
+float bin_lowres2[4] = {150,0,400,0.15};
+float bin_lowres3[4] = {400,0,500,0.015};
+float bin_lowres4[4] = {400,0.015,500,0.15};
+float bin_lowres5[4] = {500,0,800,0.01};
+float bin_lowres6[4] = {800,0,10000,0.01};
+std::vector<float*> SetBinning_lowres()
+{
+  std::vector<float*> myVec;
+  myVec.push_back(bin_lowres0);
+  myVec.push_back(bin_lowres1);
+  myVec.push_back(bin_lowres2);
+  myVec.push_back(bin_lowres3);
+  myVec.push_back(bin_lowres4);
+  myVec.push_back(bin_lowres5);
+  myVec.push_back(bin_lowres6);
+  return myVec;
+};
 
 
 //----------------
@@ -125,7 +171,6 @@ float HggRazorSystematics::Lumi  = 2300.0;
 float HggRazorSystematics::NR_kf = 1.0;
 int   HggRazorSystematics::n_PdfSys = 60;
 
-void SetMapBinning( std::map<std::pair<float, float>, std::vector<float>>& myMap, TString category = "highpt" );
 
 int main( int argc, char* argv[] )
 {
@@ -302,11 +347,6 @@ int main( int argc, char* argv[] )
       TTree* cutTree = tree->CopyTree( cut );
       TString currentProcess = process.c_str();
 
-      //-----------------------------
-      //Map container for the binning
-      //-----------------------------
-      //std::map<std::pair<float, float>, std::vector<float>> binningMap;
-      //SetMapBinning( binningMap, categoryMode );
       //---------------------------
       //Create HggSystematic object
       //---------------------------
@@ -498,130 +538,6 @@ int main( int argc, char* argv[] )
   for( int ipdf = 0; ipdf < 60; ipdf++ ) pdf[ipdf]->Write();
   sF->Close();
   
-  
-  /*
-  //-----------------------------
-  //Map container for the binning
-  //-----------------------------
-  std::map<std::pair<float, float>, std::vector<float>> binningMap;
-  SetMapBinning( binningMap, categoryMode );
-  
-  //---------------------------
-  //Create HggSystematic object
-  //---------------------------
-  HggRazorSystematics* hggSys = new HggRazorSystematics();
-  hggSys->PrintBinning();
-  hggSys->SetBinningMap( binningMap );
-  hggSys->PrintBinning();
-  hggSys->Loop();
-  */
   return 0;
-}
-
-
-void SetMapBinning( std::map<std::pair<float, float>, std::vector<float>>& myMap, TString category )
-{
-  if ( category == "highpt" )
-    {
-      for ( int i = 0; i < nMR; i++ )
-	{
-	  std::vector<float> vect;
-	  for ( int j = 0; j < highpt_nRsq[i]; j++ )
-	    {
-	      switch (i)
-		{
-		case 0:
-		  vect.push_back(highptRSQedges0[j]);
-		  break;
-		case 1:
-		  vect.push_back(highptRSQedges1[j]);
-		  break;
-		case 2:
-		  vect.push_back(highptRSQedges2[j]);
-		  break;
-		case 3:
-		  vect.push_back(highptRSQedges3[j]);
-		  break;
-		default:
-		  std::cerr << "MR bins exceeds number of defined Rsq binning!! Do nothing" << std::endl;
-		  break;
-		}
-	    }
-	  std::pair<float, float> mypair = std::make_pair( highptMRedges[i], highptMRedges[i+1] );
-	  std::cout << mypair.first << " " << mypair.second << std::endl;
-	  myMap[mypair] = vect;
-	}
-    }
-  else if ( category == "hzbb" )
-    {
-      std::vector<float> vect;
-      vect.push_back( 0.0 );
-      vect.push_back( 1.0 );
-      std::pair<float, float> mypair = std::make_pair( 150., 10000. );
-      std::cout << mypair.first << " " << mypair.second << std::endl;
-      myMap[mypair] = vect;
-    }
-  else if ( category == "highres" )
-    {
-      for ( int i = 0; i < nMR; i++ )
-	{
-	  std::vector<float> vect;
-	  for ( int j = 0; j < highres_nRsq[i]; j++ )
-	    {
-	      switch (i)
-		{
-		case 0:
-		  vect.push_back(highresRSQedges0[j]);
-		  break;
-		case 1:
-		  vect.push_back(highresRSQedges1[j]);
-		  break;
-		case 2:
-		  vect.push_back(highresRSQedges2[j]);
-		  break;
-		case 3:
-		  vect.push_back(highresRSQedges3[j]);
-		  break;
-		default:
-		  std::cerr << "MR bins exceeds number of defined Rsq binning!! Do nothing" << std::endl;
-		  break;
-		}
-	    }
-	  std::pair<float, float> mypair = std::make_pair( highresMRedges[i], highresMRedges[i+1] );
-	  std::cout << mypair.first << " " << mypair.second << std::endl;
-	  myMap[mypair] = vect;
-	}
-    }
-  else if ( category == "lowres" )
-    {
-      for ( int i = 0; i < nMR; i++ )
-	{
-	  std::vector<float> vect;
-	  for ( int j = 0; j < lowres_nRsq[i]; j++ )
-	    {
-	      switch (i)
-		{
-		case 0:
-		  vect.push_back(lowresRSQedges0[j]);
-		  break;
-		case 1:
-		  vect.push_back(lowresRSQedges1[j]);
-		  break;
-		case 2:
-		  vect.push_back(lowresRSQedges2[j]);
-		  break;
-		case 3:
-		  vect.push_back(lowresRSQedges3[j]);
-		  break;
-		default:
-		  std::cerr << "MR bins exceeds number of defined Rsq binning!! Do nothing" << std::endl;
-		  break;
-		}
-	    }
-	  std::pair<float, float> mypair = std::make_pair( lowresMRedges[i], lowresMRedges[i+1] );
-	  std::cout << mypair.first << " " << mypair.second << std::endl;
-	  myMap[mypair] = vect;
-	}
-    }
-  return;
 };
+

@@ -1136,7 +1136,7 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
 };
 
 RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, TString mggName, float SMH_Yield, std::string SMH_CF,
-			    float Signal_Yield, std::string Signal_CF, TString binNumber, TString category, bool isHighMass )
+			    float Signal_Yield, std::string Signal_CF, TString binNumber, TString category, bool isHighMass, TString sModel )
 {
   std::cout << "entering datacard: " << SMH_Yield << " " << Signal_Yield << std::endl;
   std::stringstream ss_smh, ss_signal;
@@ -1168,16 +1168,18 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   //------------------------------------------------
   // C r e a t e   s i g n a l  s h a p e from TTree
   //------------------------------------------------
-  TString combinedRootFileName = "HggRazorWorkspace_bin" + binNumber + ".root";
+  system ("mkdir -p HggRazorDataCards/" + sModel );
+  TString combinedRootFileName = "HggRazorDataCards/" + sModel + "/HggRazorWorkspace_bin" + binNumber + ".root";
   TFile* ftmp = new TFile( combinedRootFileName, "recreate");
+  
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
-
+  mggName = mggName + "_bin" + binNumber;
   RooRealVar mgg( mggName, "m_{#gamma#gamma}", 103, 160, "GeV" );
-  mgg.SetNameTitle( mggName, "m_{#gamma#gamma}" );
+  //mgg.SetNameTitle( mggName, "m_{#gamma#gamma}" );
   mgg.setMin( 103. );
   mgg.setMax( 160. );
   mgg.setUnit( "GeV" );
-  mgg.setBins(38);
+  mgg.setBins(57);
   mgg.setRange( "signal", 115, 135. );
   mgg.setRange( "high", 135., 160. );
   mgg.setRange( "low", 103., 120. );
@@ -1194,8 +1196,11 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   bool sameMu = false;
   TString tagSignal, tagSignalInterpol, tagSMH;
   TString tag;
+  treeData->GetBranch("mGammaGamma")->SetName( mggName );
   RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import(*treeData) );
+  treeSignal->GetBranch("mGammaGamma")->SetName( mggName );
   RooDataSet dataSignal( "dataSignal", "", RooArgSet(mgg), RooFit::Import(*treeSignal) );
+  treeSMH->GetBranch("mGammaGamma")->SetName( mggName );
   RooDataSet dataSMH( "dataSMH", "", RooArgSet(mgg), RooFit::Import(*treeSMH) );
   //---------------------------------
   //D e f i n e   s i g n a l   P D F
@@ -1217,22 +1222,27 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
       //Setting initial parameters
       //--------------------------
       ws->var(tagSignal+"_muCB")->setVal( 125.0 );
-      ws->var(tagSignal+"_sigmaCB")->setVal( 1.0 );
+      ws->var(tagSignal+"_sigmaCB")->setVal( 1.2 );
+      ws->var(tagSignal+"_alpha1")->setVal( 1.6 );
+      ws->var(tagSignal+"_n1")->setVal( 2.9 );
+      ws->var(tagSignal+"_alpha2")->setVal( 1.9 );
+      ws->var(tagSignal+"_n2")->setVal( 3.2 );
+
+      if ( binNumber.Atof() > 15 )
+	{
+	  ws->var(tagSignal+"_sigmaCB")->setVal( 2 );
+	  ws->var(tagSignal+"_alpha1")->setVal( 0.9 );
+	  ws->var(tagSignal+"_n1")->setVal( 2.2 );
+	  ws->var(tagSignal+"_alpha2")->setVal( 1.95 );
+	  ws->var(tagSignal+"_n2")->setVal( 2.1 );
+	}
       
     }
 
   std::cout << tagSignal << std::endl;
-  RooFitResult* sres = ws->pdf( tagSignal )->fitTo( dataSignal, RooFit::Strategy(2), RooFit::Extended( kTRUE ), RooFit::Save( kTRUE ), RooFit::Range("signal") );
+  RooFitResult* sres = ws->pdf( tagSignal )->fitTo( dataSignal, RooFit::Strategy(2), RooFit::Extended( kTRUE ), RooFit::Save( kTRUE ), RooFit::Range("full") );
   sres->SetName("SignalFitResult");
   ws->import( *sres );
-  /*
-  //double gaussian relic
-    double gausFrac    =  ws->var(tagSignal+"_frac")->getVal();
-    double gausMu1     =  ws->var(tagSignal+"_mu1")->getVal();
-    double gausMu2     =  ws->var(tagSignal+"_mu2")->getVal();
-    double gausSigma1  =  ws->var(tagSignal+"_sigma1")->getVal();
-    double gausSigma2  =  ws->var(tagSignal+"_sigma2")->getVal();
-  */
   
   double DCB_mu_s    = ws->var(tagSignal+"_muCB")->getVal( );
   double DCB_sigma_s = ws->var(tagSignal+"_sigmaCB")->getVal( );
@@ -1259,10 +1269,22 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
       //Setting initial parameters
       //--------------------------
       ws->var(tagSMH+"_muCB")->setVal( 125.0 );
-      ws->var(tagSMH+"_sigmaCB")->setVal( 1.0 );
+      ws->var(tagSMH+"_sigmaCB")->setVal( 1.22 );
+      ws->var(tagSMH+"_alpha1")->setVal( 1.3 );
+      ws->var(tagSMH+"_n1")->setVal( 4.4 );
+      ws->var(tagSMH+"_alpha2")->setVal( 1.9 );
+      ws->var(tagSMH+"_n2")->setVal( 4.8 );
+      if ( binNumber.Atof() > 15 )
+	{
+	  ws->var(tagSMH+"_sigmaCB")->setVal( 2 );
+	  ws->var(tagSMH+"_alpha1")->setVal( 0.9 );
+	  ws->var(tagSMH+"_n1")->setVal( 2.2 );
+	  ws->var(tagSMH+"_alpha2")->setVal( 1.95 );
+	  ws->var(tagSMH+"_n2")->setVal( 2.1 );
+	}
     }
   
-  RooFitResult* smhres  = ws->pdf( tagSMH )->fitTo( dataSMH, RooFit::Strategy(2), RooFit::Extended( kTRUE ), RooFit::Save( kTRUE ), RooFit::Range("signal") );
+  RooFitResult* smhres  = ws->pdf( tagSMH )->fitTo( dataSMH, RooFit::Strategy(2), RooFit::Extended( kTRUE ), RooFit::Save( kTRUE ), RooFit::Range("full") );
   smhres->SetName("SMHFitResult");
   ws->import( *smhres );
   /*
@@ -1372,7 +1394,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   box->SetFillColor(kRed-9);
   box->SetFillStyle(3344);
   box->Draw("same");
-  c->SaveAs("BkgOnlyFitPlot.pdf");
+  c->SaveAs( "HggRazorDataCards/" + sModel + "/bkgFit_bin" + binNumber + ".pdf" );
   fmgg->SetName( "BkgOnlyFitPlot" );
   //ws->import( *model );
   ws->import( *bres );
@@ -1384,7 +1406,9 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   RooPlot *fmgg2 = mgg.frame();
   dataSignal.plotOn(fmgg2);
   ws->pdf( tagSignal )->plotOn(fmgg2, RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("Full"));
-  ws->pdf( tagSignal )->plotOn(fmgg2, RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
+  //ws->pdf( tagSignal )->plotOn(fmgg2, RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
+  fmgg2->Draw();
+  c->SaveAs( "HggRazorDataCards/" + sModel + "/signalFit_bin" + binNumber + ".pdf" );
   fmgg2->SetName( "SignalFitPlot" );
   ws->import( *fmgg2 );
 
@@ -1394,7 +1418,9 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   RooPlot *fmgg3 = mgg.frame();
   dataSMH.plotOn(fmgg3);
   ws->pdf( tagSMH )->plotOn(fmgg3, RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("Full"));
-  ws->pdf( tagSMH )->plotOn(fmgg3, RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
+  //ws->pdf( tagSMH )->plotOn(fmgg3, RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
+  fmgg3->Draw();
+  c->SaveAs( "HggRazorDataCards/" + sModel + "/smhFit_bin" + binNumber + ".pdf" );
   fmgg3->SetName( "SMHFitPlot" );
   ws->import( *fmgg3 );
 
@@ -1408,19 +1434,6 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   //--------------
   RooWorkspace* combine_ws = new RooWorkspace( "combine_ws", "" );
   TString combineSMH;
-  /*if ( category != "highres" ) combineSMH = MakeFullDoubleGaussNE( "SMH_bin"+binNumber, mgg, *combine_ws, true, true, category );//add global and cat scale uncertainty
-  else combineSMH = MakeFullDoubleGaussNE( "SMH_bin"+binNumber, mgg, *combine_ws, true );//adding global scale uncertainty only
-  combine_ws->var( combineSMH+"_frac")->setVal(gausFrac_SMH);
-  combine_ws->var( combineSMH+"_mu1")->setVal(gausMu1_SMH);
-  combine_ws->var( combineSMH+"_mu2")->setVal(gausMu2_SMH);
-  combine_ws->var( combineSMH+"_sigma1")->setVal(gausSigma1_SMH);
-  combine_ws->var( combineSMH+"_sigma2")->setVal(gausSigma2_SMH);
-  combine_ws->var( combineSMH+"_frac")->setConstant(kTRUE);
-  combine_ws->var( combineSMH+"_mu1")->setConstant(kTRUE);
-  combine_ws->var( combineSMH+"_mu2")->setConstant(kTRUE);
-  combine_ws->var( combineSMH+"_sigma1")->setConstant(kTRUE);
-  combine_ws->var( combineSMH+"_sigma2")->setConstant(kTRUE);
-  */
   if ( category == "highres" || category == "inclusive" ) combineSMH = MakeDoubleCBNE( "SMH_bin"+binNumber, mgg, *combine_ws, true );
   else combineSMH = MakeDoubleCBNE( "SMH_bin"+binNumber, mgg, *combine_ws, true, true, category );
   combine_ws->var( combineSMH+"_muCB")->setVal( DCB_mu_smh );
@@ -1437,26 +1450,11 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   combine_ws->var( combineSMH+"_alpha2")->setConstant(kTRUE);
   combine_ws->var( combineSMH+"_n2")->setConstant(kTRUE);
   RooRealVar SMH_norm( combineSMH+"_norm" ,"", SMH_Yield);
-  //SMH_norm.setConstant(kFALSE);
   combine_ws->import( SMH_norm );
   //-----------------
   //Signal line shape
   //-----------------
   TString combineSignal;
-  /*
-  if ( category != "highres" ) combineSignal = MakeFullDoubleGaussNE( "signal_bin"+binNumber, mgg, *combine_ws, true, true, category );//add global and cat scale uncertainty
-  else combineSignal = MakeFullDoubleGaussNE( "signal_bin"+binNumber, mgg, *combine_ws, true );//add global scale uncertainty only
-  combine_ws->var( combineSignal+"_frac")->setVal(gausFrac);
-  combine_ws->var( combineSignal+"_mu1")->setVal(gausMu1);
-  combine_ws->var( combineSignal+"_mu2")->setVal(gausMu2);
-  combine_ws->var( combineSignal+"_sigma1")->setVal(gausSigma1);
-  combine_ws->var( combineSignal+"_sigma2")->setVal(gausSigma2);
-  combine_ws->var( combineSignal+"_frac")->setConstant(kTRUE);
-  combine_ws->var( combineSignal+"_mu1")->setConstant(kTRUE);
-  combine_ws->var( combineSignal+"_mu2")->setConstant(kTRUE);
-  combine_ws->var( combineSignal+"_sigma1")->setConstant(kTRUE);
-  combine_ws->var( combineSignal+"_sigma2")->setConstant(kTRUE);
-  */
   if ( category == "highres" || category == "inclusive" )
     {
       combineSignal = MakeDoubleCBNE( "signal_bin"+binNumber, mgg, *combine_ws, true );
@@ -1491,7 +1489,6 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   combine_ws->var( combineSignal+"_n2")->setConstant(kTRUE);
   
   RooRealVar Signal_norm( combineSignal + "_norm", "", Signal_Yield );
-  //Signal_norm.setConstant(kFALSE);
   combine_ws->import( Signal_norm );
   //---------
   //Bkg model
@@ -1502,15 +1499,16 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   RooRealVar Bkg_norm(  combineBkg + "_norm", "", Nbkg );
   Bkg_norm.setConstant(kFALSE);
   combine_ws->import( Bkg_norm );
-  //combine_ws->import( *data_toys );
-  combine_ws->import( data );
+  combine_ws->import( *data_toys );
+  //combine_ws->import( data );
   
   combine_ws->Write("combineWS");
   ftmp->cd();
   ftmp->Close();
   
   //std::string bNumber( binNumber );//TString to std::string
-  TString dataCardName = "HggRazorCombinedCard_bin" + binNumber + ".txt";
+  combinedRootFileName = "HggRazorWorkspace_bin" + binNumber + ".root";
+  TString dataCardName = "HggRazorDataCards/" + sModel + "/HggRazorCombinedCard_bin" + binNumber + ".txt";
   std::ofstream ofs( dataCardName , std::ofstream::out );
 
   ofs << "imax 1 number of bins\njmax 2 number of processes minus 1\nkmax * number of nuisance parameters\n";
@@ -1564,6 +1562,41 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
     {
       ofs << "SMH_btag\t\t\tlnN\t\t-\t\t" << "0.961/1.04" "\t\t-\n";
       ofs << "SMH_misstag\t\t\tlnN\t\t-\t\t" << "0.992/1.008" << "\t\t-\n";
+    }
+  
+  //----------------------------------
+  //Signal Systematics
+  //----------------------------------
+  ctr = 0;
+  for( int isys = 0; isys < totalSys; isys++ )
+    {
+      if ( isys == 0 )
+	{
+	  ofs << "Signal_JES\t\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	}
+      else if ( isys == 2 )
+	{
+	  ofs << "Signal_facScale\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	}
+      else if ( isys == 4 )
+	{
+	  ofs << "Signal_renScale\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	}
+      else if ( isys == 6 )
+	{
+	  ofs << "Signal_facRenScale\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	}
+      else if ( isys > 7 )
+	{
+	  ofs << "Signal_pdf" << ctr << "\t\t\tlnN\t\t" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	  ctr++;
+	}
+    }
+  
+  if ( category == "hzbb" )
+    {
+      ofs << "Signal_btag\t\t\tlnN\t\t" << "0.961/1.04\t\t-\t\t-\n";
+      ofs << "Signal_misstag\t\t\tlnN\t\t" << "0.992/1.008\t\t-\t\t-\n";
     }
   //ofs << "SMH_renScale\t\t\tlnN\t\t-\t\t" << SMH_renScale << "\t\t-\n";
   //ofs << "SMH_facRenScale\t\t\tlnN\t\t-\t\t" << SMH_facRenScale << "\t\t-\n";
