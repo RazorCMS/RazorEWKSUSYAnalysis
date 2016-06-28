@@ -457,11 +457,14 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   //Saving Signal Fit
   sres->SetName("SignalFitResult");
   ws->import( *sres );
-  
+
+  std::cout << "[DEBUG]: SIGNAL PLOTTING" << std::endl;
   //-----------------------------
   //S i g n a l   p l o t t i n g
   //-----------------------------
-  RooPlot *fmgg2 = mgg.frame( 450, 1050, 120);
+  RooPlot *fmgg2;
+  if ( isHighMass ) fmgg2 = mgg.frame( 450, 1050, 120);
+  else fmgg2 = mgg.frame( 103, 160, 38);
   dataSignal.plotOn( fmgg2, RooFit::Range("signal") );
   ws->pdf( tagSignal2 )->plotOn( fmgg2, RooFit::LineColor(kRed), RooFit::Range("signal"), RooFit::NormRange("signal"));
   //ws->pdf( tagSignal )->plotOn(fmgg2, RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
@@ -536,9 +539,10 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   ws->var("BkgModelExp_sExp_a")->setVal( exp_a );
   //HighMass Function
   TString tag_bkg3 = MakeHMDiphotonNE( "BkgModelHM", mgg, *ws );
-  ws->var("BkgModelHM_a")->setVal( hm_a );
-  ws->var("BkgModelHM_b")->setVal( hm_b );
-  
+  ws->var( tag_bkg3+"_a" )->setVal( hm_a );
+  ws->var( tag_bkg3+"_b" )->setVal( hm_b );
+
+  std::cout << "[DEBUG]: BEFORE HMD BKG" << std::endl;
   //-----------------------------------------
   //Define double gaussian for signal and SMH
   //-----------------------------------------
@@ -554,6 +558,8 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   ws->var("DG_Signal_DG_mu2")->setConstant(kTRUE);
   ws->var("DG_Signal_DG_sigma1")->setConstant(kTRUE);
   ws->var("DG_Signal_DG_sigma2")->setConstant(kTRUE);
+
+  std::cout << "[DEBUG]: PASS HMD BKG" << std::endl;
   
   TString tag_sg      = MakeSingleGaussNE( "Signal", mgg, *ws );
   ws->var("Signal_SG_mu")->setVal( gausMu1 );
@@ -641,7 +647,7 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   //---------------------------
   //RooRealVar HiggsMass("HiggsMass","", ws->var("Signal_SG_mu")->getVal());
   RooRealVar HiggsMass("HiggsMass","", ws->var("Signal_SG_mu")->getVal() );
-  RooRealVar HiggsMassUn("HiggsMassUn","", 0.005*ws->var("Signal_SG_mu")->getVal() );
+  RooRealVar HiggsMassUn("HiggsMassUn","", 0.05*ws->var("Signal_SG_mu")->getVal() );
   std::cout << "[INFO]: MC measured mass is:  " << HiggsMass.getVal() << " +/- " << HiggsMassUn.getVal() << std::endl;
   RooGaussian HiggsMass_Constraint("SMH_Constraint", "SMH_Constraint",  *ws->var("Signal_SG_mu"), HiggsMass, HiggsMassUn );
   std::cout << "pass constraints" << std::endl;
@@ -655,8 +661,8 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   TH1F* h_1 = new TH1F("h_1", "h_1", 100, 0, 10);
   RooFitResult* sbres;
   //sbres = model->fitTo( *data_toys, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("full") );
-  sbres = model->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("full") );
-  //sbres = model->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::ExternalConstraints(HiggsMass_Constraint) ,RooFit::Range("full") );
+  //sbres = model->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("full") );
+  sbres = model->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::ExternalConstraints(HiggsMass_Constraint) ,RooFit::Range("full") );
   
   
   for (int i = 0; i < 100; i++ )
@@ -726,7 +732,9 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   //-----------------------------
   //S + B   p l o t t i n g
   //-----------------------------
-  RooPlot *fmgg = mgg.frame( 230, 1230, 50);
+  RooPlot *fmgg;
+  if ( isHighMass ) fmgg = mgg.frame( 230, 1230, 50);
+  else fmgg = mgg.frame( 103, 160, 38);
   data.plotOn(fmgg);
   //data_toys->plotOn(fmgg);
   model->plotOn(fmgg, RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("Full"));
