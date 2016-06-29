@@ -563,7 +563,7 @@ int main( int argc, char* argv[])
       else
 	{
 	  w_sb = MakeDataCard( tree->CopyTree( cut ), treeSignal->CopyTree( cut ), treeSMH->CopyTree( cut ), mggName, _SMH_Yield, SMH_CL,
-			       _Signal_Yield, Signal_CL, binNumber, categoryMode, _highMassMode, _sModel );
+			       _Signal_Yield, Signal_CL, binNumber, categoryMode, _highMassMode, _sModel, f1 );
 	}
       std::cout << "finish MakeDataCard" << std::endl;
       //w_sb->Write("w_sb");

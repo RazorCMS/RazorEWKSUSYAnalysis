@@ -1144,7 +1144,8 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
 };
 
 RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, TString mggName, float SMH_Yield, std::string SMH_CF,
-			    float Signal_Yield, std::string Signal_CF, TString binNumber, TString category, bool isHighMass, TString sModel )
+			    float Signal_Yield, std::string Signal_CF, TString binNumber, TString category, bool isHighMass,
+			    TString sModel, TString f1 )
 {
   std::cout << "entering datacard: " << SMH_Yield << " " << Signal_Yield << std::endl;
   std::stringstream ss_smh, ss_signal;
@@ -1192,6 +1193,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   mgg.setRange( "high", 135., 160. );
   mgg.setRange( "low", 103., 120. );
   mgg.setRange( "full", 103., 160. );
+  mgg.setRange( "Full", 103., 160. );
   
   //--------------------------------
   //I m p or t i n g   D a t a
@@ -1236,7 +1238,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
       ws->var(tagSignal+"_alpha2")->setVal( 1.9 );
       ws->var(tagSignal+"_n2")->setVal( 3.2 );
 
-      if ( binNumber.Atof() > 15 )
+      if ( binNumber.Atof() >= 14 )
 	{
 	  ws->var(tagSignal+"_sigmaCB")->setVal( 2 );
 	  ws->var(tagSignal+"_alpha1")->setVal( 0.9 );
@@ -1282,7 +1284,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
       ws->var(tagSMH+"_n1")->setVal( 4.4 );
       ws->var(tagSMH+"_alpha2")->setVal( 1.9 );
       ws->var(tagSMH+"_n2")->setVal( 4.8 );
-      if ( binNumber.Atof() > 15 )
+      if ( binNumber.Atof() >= 14 )
 	{
 	  ws->var(tagSMH+"_sigmaCB")->setVal( 2 );
 	  ws->var(tagSMH+"_alpha1")->setVal( 0.9 );
@@ -1309,12 +1311,8 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   double DCB_n1_smh    = ws->var(tagSMH+"_n1")->getVal( );
   double DCB_a2_smh    = ws->var(tagSMH+"_alpha2")->getVal( );
   double DCB_n2_smh    = ws->var(tagSMH+"_n2")->getVal( );
-  //------------------------------------
-  // C r e a t e   b k g  s h a p e
-  //------------------------------------
-  TString tag_bkg;
+
   
-  //Initializing Nbkg
   npoints = data.numEntries();
   //set Nbkg Initial Value
   std::cout << "entering constraints" << std::endl;
@@ -1340,17 +1338,142 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   float hmd_a;
   float hmd_b;
   RooFitResult* bres;
+
   
-  tag_bkg = MakeSingleExp( "fullsb_fit_singleExp", mgg, *ws );
-  ws->var("fullsb_fit_singleExp_Nbkg")->setVal( npoints );
+  //------------------------------------
+  // C r e a t e   b k g  s h a p e
+  //------------------------------------
+  TString tag_bkg;
+  if ( f1 == "doubleExp" )
+    {
+      tag_bkg = MakeDoubleExp( f1 + "_fullsb_fit", mgg, *ws );
+    }
+  else if ( f1 == "singleExp" )
+    {
+      tag_bkg = MakeSingleExp( f1 + "_fullsb_fit", mgg, *ws );
+    }
+  else if ( f1 == "modExp" )
+    {
+      tag_bkg = MakeModExp( f1 + "_fullsb_fit", mgg, *ws );
+    }
+  else if ( f1 == "singlePow" )
+    {
+      tag_bkg = MakeSinglePow( f1 + "_fullsb_fit", mgg, *ws );
+    }
+  else if ( f1 == "doublePow" )
+    {
+      tag_bkg = MakeDoublePow( f1 + "_fullsb_fit", mgg, *ws );
+    }
+  else if ( f1 == "poly2" )
+    {
+      tag_bkg = MakePoly2( f1 + "_fullsb_fit", mgg, *ws );
+    }
+  else if ( f1 == "poly3" )
+    {
+      tag_bkg = MakePoly3( f1 + "_fullsb_fit", mgg, *ws );
+    }
+  else if ( f1 == "poly4" )
+    {
+      tag_bkg = MakePoly4( f1 + "_fullsb_fit", mgg, *ws );
+    }
+  else
+    {
+      std::cout << "[ERROR]: fit option not recognized. QUITTING PROGRAM" << std::endl;
+      exit (EXIT_FAILURE);
+    }
+  std::cout << "[INFO]: f1 is a " << f1 << std::endl;
+
+  //Original SingleExp
+  //tag_bkg = MakeSingleExp( "fullsb_fit_singleExp", mgg, *ws );
+  //ws->var("fullsb_fit_singleExp_Nbkg")->setVal( npoints );
+
+
+  ws->var( f1 + "_fullsb_fit_Nbkg")->setVal( npoints );
   bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
   bres->SetName("BkgOnlyFitResult");
   ws->import( *bres );
+  
+
+  /*
   sExp_a = ws->var("fullsb_fit_singleExp_a")->getVal();
   Nbkg   = ws->var("fullsb_fit_singleExp_Nbkg")->getVal();
   NbkgUn = ws->var("fullsb_fit_singleExp_Nbkg")->getError();
   BkgNormUn = 1.0 + NbkgUn/Nbkg;//input a lnN to combine
+  */
+
   
+  //------------------------------------------------------------------------------
+  //Define and obtain initial pdf parameters for f1, using sideband fit parameters
+  //------------------------------------------------------------------------------
+  double dE_N1, dE_N2, dE_a1, dE_a2;//doubleExp
+  double sE_N, sE_a;//singleExp
+  double mE_N, mE_a, mE_m;//modExp
+  double sP_N, sP_a;//singlePow
+  double dP_N, dP_f, dP_a1, dP_a2;//doubleExp
+  double pC, p0, p1, p2, p3, pN;//poly2,pol3;
+  if ( f1 == "doubleExp" )
+    {
+      dE_N1  = ws->var( f1 + "_fullsb_fit_Nbkg" )->getVal();
+      dE_a1  = ws->var( f1 + "_fullsb_fit_a1" )->getVal();
+      dE_a2  = ws->var( f1 + "_fullsb_fit_a2" )->getVal();
+    }
+  else if ( f1 == "singleExp" )
+    {
+      sE_N  = ws->var( f1 + "_fullsb_fit_Nbkg" )->getVal();
+      sE_a  = ws->var( f1 + "_fullsb_fit_a" )->getVal();
+    }
+  else if ( f1 == "modExp" )
+    {
+      mE_N  = ws->var( f1 + "_fullsb_fit_Nbkg" )->getVal();
+      mE_a  = ws->var( f1 + "_fullsb_fit_a" )->getVal();
+      mE_m  = ws->var( f1 + "_fullsb_fit_m" )->getVal();
+    }
+  else if ( f1 == "singlePow" )
+    {
+      sP_N  = ws->var( f1 + "_fullsb_fit_Nbkg" )->getVal();
+      sP_a  = ws->var( f1 + "_fullsb_fit_a" )->getVal();
+    }
+  else if ( f1 == "doublePow" )
+    {
+      dP_N   = ws->var( f1 + "_fullsb_fit_Nbkg" )->getVal();
+      dP_f   = ws->var( f1 + "_fullsb_fit_f" )->getVal();
+      dP_a1  = ws->var( f1 + "_fullsb_fit_a1" )->getVal();
+      dP_a2  = ws->var( f1 + "_fullsb_fit_a2" )->getVal();
+    }
+  else if ( f1 == "poly2" )
+    {
+      pN = ws->var( f1 + "_fullsb_fit_Nbkg" )->getVal();
+      pC = ws->var( f1 + "_fullsb_fit_pC" )->getVal();
+      p0 = ws->var( f1 + "_fullsb_fit_p0" )->getVal();
+      p1 = ws->var( f1 + "_fullsb_fit_p1" )->getVal();
+    }
+  else if ( f1 == "poly3" )
+    {
+      pN = ws->var( f1 + "_fullsb_fit_Nbkg" )->getVal();
+      pC = ws->var( f1 + "_fullsb_fit_pC" )->getVal();
+      p0 = ws->var( f1 + "_fullsb_fit_p0" )->getVal();
+      p1 = ws->var( f1 + "_fullsb_fit_p1" )->getVal();
+      p2 = ws->var( f1 + "_fullsb_fit_p2" )->getVal();
+    }
+  else if ( f1 == "poly4" )
+    {
+      pN = ws->var( f1 + "_fullsb_fit_Nbkg" )->getVal();
+      pC = ws->var( f1 + "_fullsb_fit_pC" )->getVal();
+      p0 = ws->var( f1 + "_fullsb_fit_p0" )->getVal();
+      p1 = ws->var( f1 + "_fullsb_fit_p1" )->getVal();
+      p2 = ws->var( f1 + "_fullsb_fit_p2" )->getVal();
+      p3 = ws->var( f1 + "_fullsb_fit_p3" )->getVal();
+    }
+  else
+    {
+      std::cout << "[ERROR]: fit option not recognized. QUITTING PROGRAM" << std::endl;
+      exit (EXIT_FAILURE);
+    }
+
+  Nbkg   = ws->var( f1 + "_fullsb_fit_Nbkg")->getVal();
+  NbkgUn = ws->var( f1 + "_fullsb_fit_Nbkg")->getError();
+  BkgNormUn = 1.0 + NbkgUn/Nbkg;//input a lnN to combine
+    
   //RooDataSet* data_toys = GenerateToys( ws->pdf( tag_bkg ), mgg, npoints);
   RooAbsData* data_toys = ws->pdf( tag_bkg )->generateBinned( mgg, npoints, RooFit::ExpectedData() );
   data_toys->SetName("data_bin"+binNumber);
@@ -1488,6 +1611,17 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   combine_ws->var( combineSignal+"_n1")->setVal( DCB_n1_s );
   combine_ws->var( combineSignal+"_alpha2")->setVal( DCB_a2_s );
   combine_ws->var( combineSignal+"_n2")->setVal( DCB_n1_s );
+  if ( binNumber.Atof() == 17 || binNumber.Atof() == 19 || binNumber.Atof() == 20 )
+    {
+      //USE SMH SHAPE!!
+      combine_ws->var( combineSignal+"_muCB")->setVal( DCB_mu_smh );
+      combine_ws->var( combineSignal+"_sigmaCB")->setVal( DCB_sigma_smh );
+      combine_ws->var( combineSignal+"_alpha1")->setVal( DCB_a1_smh );
+      combine_ws->var( combineSignal+"_n1")->setVal( DCB_n1_smh );
+      combine_ws->var( combineSignal+"_alpha2")->setVal( DCB_a2_smh );
+      combine_ws->var( combineSignal+"_n2")->setVal( DCB_n1_smh );
+    }
+ 
   
   combine_ws->var( combineSignal+"_muCB")->setConstant(kTRUE);
   combine_ws->var( combineSignal+"_sigmaCB")->setConstant(kTRUE);
@@ -1498,22 +1632,89 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   
   RooRealVar Signal_norm( combineSignal + "_norm", "", Signal_Yield );
   combine_ws->import( Signal_norm );
+
+  
   //---------
   //Bkg model
   //---------
   TString combineBkg;
-  combineBkg = MakeSingleExpNE( "Bkg_bin"+binNumber, mgg, *combine_ws );
-  combine_ws->var( combineBkg + "_a" )->setVal( sExp_a );
+  if ( f1 == "doubleExp" )
+    {
+      combineBkg = MakeDoubleExpNE( f1 + "_Bkg_bin" + binNumber, mgg, *combine_ws );
+      combine_ws->var( combineBkg + "_a1" )->setVal( dE_a1 );
+      combine_ws->var( combineBkg + "_a2" )->setVal( dE_a2 );
+    }
+  else if ( f1 == "singleExp" )
+    {
+      combineBkg = MakeSingleExpNE( f1 + "_Bkg_bin" + binNumber, mgg, *combine_ws );
+      combine_ws->var( combineBkg + "_a" )->setVal( sE_a );
+    }
+  else if ( f1 == "modExp" )
+    {
+      combineBkg = MakeModExpNE( f1 + "_Bkg_bin" + binNumber, mgg, *combine_ws );
+      combine_ws->var( combineBkg + "_a" )->setVal( mE_a );
+      combine_ws->var( combineBkg + "_m" )->setVal( mE_m );
+    }
+  else if ( f1 == "singlePow" )
+    {
+      combineBkg = MakeSinglePowNE( f1 + "_Bkg_bin" + binNumber, mgg, *combine_ws );
+      combine_ws->var( combineBkg + "_a" )->setVal( sP_a );
+    }
+  else if ( f1 == "doublePow" )
+    {
+      combineBkg = MakeDoublePowNE( f1 + "_Bkg_bin" + binNumber, mgg, *combine_ws );
+      combine_ws->var( combineBkg + "_a1" )->setVal( dP_a1 );
+      combine_ws->var( combineBkg + "_a2" )->setVal( dP_a2 );
+      combine_ws->var( combineBkg + "_f" )->setVal( dP_f );
+    }
+  else if ( f1 == "poly2" )
+    {
+      combineBkg = MakePoly2NE( f1 + "_Bkg_bin" + binNumber, mgg, *combine_ws );
+      combine_ws->var( combineBkg + "_pC" )->setVal( pC );
+      combine_ws->var( combineBkg + "_p0" )->setVal( p0 );
+      combine_ws->var( combineBkg + "_p1" )->setVal( p1 );
+    }
+  else if ( f1 == "poly3" )
+    {
+      combineBkg = MakePoly3NE( f1 + "_Bkg_bin" + binNumber, mgg, *combine_ws );
+      combine_ws->var( combineBkg + "_pC" )->setVal( pC );
+      combine_ws->var( combineBkg + "_p0" )->setVal( p0 );
+      combine_ws->var( combineBkg + "_p1" )->setVal( p1 );
+      combine_ws->var( combineBkg + "_p2" )->setVal( p2 );
+    }
+  else if ( f1 == "poly4" )
+    {
+      combineBkg = MakePoly4NE( f1 + "_Bkg_bin" + binNumber, mgg, *combine_ws );
+      combine_ws->var( combineBkg + "_pC" )->setVal( pC );
+      combine_ws->var( combineBkg + "_p0" )->setVal( p0 );
+      combine_ws->var( combineBkg + "_p1" )->setVal( p1 );
+      combine_ws->var( combineBkg + "_p2" )->setVal( p2 );
+      combine_ws->var( combineBkg + "_p3" )->setVal( p3 );
+    }
+  else
+    {
+      std::cout << "[ERROR]: fit option not recognized. QUITTING PROGRAM" << std::endl;
+      exit (EXIT_FAILURE);
+    }
+  
+  //combineBkg = MakeSingleExpNE( "Bkg_bin"+binNumber, mgg, *combine_ws );
+  //combine_ws->var( combineBkg + "_a" )->setVal( sExp_a );
   RooRealVar Bkg_norm(  combineBkg + "_norm", "", Nbkg );
   Bkg_norm.setConstant(kFALSE);
   combine_ws->import( Bkg_norm );
-  combine_ws->import( *data_toys );
-  //combine_ws->import( data );
+
+
+  //-----------------------
+  //Importing dataset
+  //-----------------------
+  //combine_ws->import( *data_toys );
+  combine_ws->import( data );
   
   combine_ws->Write("combineWS");
   ftmp->cd();
   ftmp->Close();
-  
+
+  std::cout << "[INFO]: Creating combine datacard" << std::endl;
   //std::string bNumber( binNumber );//TString to std::string
   combinedRootFileName = "HggRazorWorkspace_bin" + binNumber + ".root";
   TString dataCardName = "HggRazorDataCards/" + sModel + "/HggRazorCombinedCard_bin" + binNumber + ".txt";

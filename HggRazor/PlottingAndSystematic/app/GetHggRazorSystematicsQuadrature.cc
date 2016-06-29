@@ -123,13 +123,11 @@ std::vector<float*> SetBinning_hzbb()
   return myVec;
 };
 //HIGHRES
-float bin_highres0[4] = {600,0.01,10000,1};
-float bin_highres1[4] = {150,0.175,600,1};
-float bin_highres2[4] = {150,0,400,0.175};
-float bin_highres3[4] = {400,0,600,0.025};
-float bin_highres4[4] = {400,0.025,600,0.175};
-float bin_highres5[4] = {600,0,950,0.01};
-float bin_highres6[4] = {950,0,10000,0.01};
+float bin_highres0[4] = {150,0.0,250,0.175};
+float bin_highres1[4] = {150,0.175,250,1};
+float bin_highres2[4] = {250,0.05,10000,1};
+float bin_highres3[4] = {250,0.0,600,0.05};
+float bin_highres4[4] = {600,0.0,10000,0.05};
 std::vector<float*> SetBinning_highres()
 {
   std::vector<float*> myVec;
@@ -138,8 +136,8 @@ std::vector<float*> SetBinning_highres()
   myVec.push_back(bin_highres2);
   myVec.push_back(bin_highres3);
   myVec.push_back(bin_highres4);
-  myVec.push_back(bin_highres5);
-  myVec.push_back(bin_highres6);
+  //myVec.push_back(bin_highres5);
+  //myVec.push_back(bin_highres6);
   return myVec;
 };
 //LOWRES
@@ -167,7 +165,7 @@ std::vector<float*> SetBinning_lowres()
 //----------------
 //Static Variables
 //----------------
-float HggRazorSystematics::Lumi  = 2600.0;
+float HggRazorSystematics::Lumi  = 6300.0;
 float HggRazorSystematics::NR_kf = 1.0;
 int   HggRazorSystematics::n_PdfSys = 60;
 

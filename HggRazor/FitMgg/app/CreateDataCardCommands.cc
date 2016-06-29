@@ -85,6 +85,10 @@ int main( int argc, char* argv[] )
 	  
 	 
 	  if ( ifs.eof() ) break;
+	  Bkg_f1 = "singleExp";
+	  if ( binNumber == 3 || binNumber == 5 ) Bkg_f1 = "poly2";
+	  if ( binNumber == 9 || binNumber == 16 ) Bkg_f1 = "poly3";
+	  if ( binNumber == 15 ) Bkg_f1 = "modExp";
 	  /*std::cout << category << "\t" << MR_l << "\t" << MR_h << "\t" << Rsq_l << "\t" << Rsq_h << "\t" << SMH << "\t" << SMH_sys.str()
 	    << "\t" << Signal << "\t"  << Signal_sys.str() << std::endl; 
 	  */
