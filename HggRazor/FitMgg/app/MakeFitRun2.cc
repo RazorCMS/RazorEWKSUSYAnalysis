@@ -413,6 +413,9 @@ int main( int argc, char* argv[])
   TString cut = "mGammaGamma >103. && mGammaGamma < 160. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.";
   TString cutMETfilters = "";
   TString cutTrigger = "";
+  TString cutMETfiltersData = " && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1)";
+  TString cutTriggerData = " && ( HLTDecision[82] == 1 || HLTDecision[83] || HLTDecision[93])";
+  
   //assymetric cut on photon PT
   //TString cut = "mGammaGamma >103. && mGammaGamma < 160. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 40. && pho2Pt>40.";
   //TString cutMETfilters = "&& (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
@@ -562,7 +565,7 @@ int main( int argc, char* argv[])
 	}
       else
 	{
-	  w_sb = MakeDataCard( tree->CopyTree( cut ), treeSignal->CopyTree( cut ), treeSMH->CopyTree( cut ), mggName, _SMH_Yield, SMH_CL,
+	  w_sb = MakeDataCard( tree->CopyTree( cut+cutMETfiltersData+cutTriggerData ), treeSignal->CopyTree( cut ), treeSMH->CopyTree( cut ), mggName, _SMH_Yield, SMH_CL,
 			       _Signal_Yield, Signal_CL, binNumber, categoryMode, _highMassMode, _sModel, f1 );
 	}
       std::cout << "finish MakeDataCard" << std::endl;
