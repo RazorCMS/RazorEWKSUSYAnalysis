@@ -34,6 +34,8 @@ public:
   int GetSizeVector(){return this->binningVect.size(); };
   TH2Poly* GetNominalTH2Poly( ){ return this->h2p; };
   float GetNominalYield( float mr, float rsq );
+  float GetNominalError( float mr, float rsq );
+  
   std::pair<float, float> GetFacScaleSystematic( float mr, float rsq );
   std::pair<float, float> GetRenScaleSystematic( float mr, float rsq );
   std::pair<float, float> GetFacRenScaleSystematic( float mr, float rsq );
@@ -68,6 +70,7 @@ private:
   
   //TH2Poly Histos
   TH2Poly* h2p;
+  TH2Poly* h2p_Err;
   TH2Poly* h2p_facScaleUp;
   TH2Poly* h2p_facScaleDown;
   TH2Poly* h2p_renScaleUp;

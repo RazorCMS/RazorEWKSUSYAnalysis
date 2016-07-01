@@ -1,92 +1,49 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <sstream>
 #include <algorithm>
 #include <assert.h>
 //ROOT INCLUDES
 #include <TFile.h>
 #include <TROOT.h>
+#include <RooArgSet.h>
+#include <RooAbsArg.h>
+#include <RooAbsCollection.h>
+#include <RooAbsReal.h>
+#include <RooRealVar.h>
+#include <RooFitResult.h>
 //LOCAL INCLUDES
 #include "HggRazorSystematics.hh"
 #include "CommandLineInput.hh"
 
 const bool _debug = false;
 
-/*
-//----------------------------------------------
-//New Binning From Significance Calculation 2015 
-//----------------------------------------------
-//HighPt
-float bin_highpt0[4] = {150,0.13,10000,1};
-float bin_highpt1[4] = {750,0,10000,0.01};
-float bin_highpt2[4] = {750,0.01,10000,0.13};
-float bin_highpt3[4] = {500,0,750,0.03};
-float bin_highpt4[4] = {500,0.03,750,0.13};
-float bin_highpt5[4] = {150,0,400,0.13};
-float bin_highpt6[4] = {400,0,500,0.045};
-float bin_highpt7[4] = {400,0.045,500,0.13};
-std::vector<float*> SetBinning_highpt()
+float GetNs( std::string fname, int bin );
+float GetNsErr( std::string fname, int bin );
+float GetNbkg( std::string fname, std::string f1, int bin );
+
+struct Bin
 {
-  std::vector<float*> myVec;
-  myVec.push_back(bin_highpt0);
-  myVec.push_back(bin_highpt1);
-  myVec.push_back(bin_highpt2);
-  myVec.push_back(bin_highpt3);
-  myVec.push_back(bin_highpt4);
-  myVec.push_back(bin_highpt5);
-  myVec.push_back(bin_highpt6);
-  myVec.push_back(bin_highpt7);
-  return myVec;
+  std::string box;
+  std::string f1;
+  int bin;
+  float x1;
+  float x2;
+  float y1;
+  float y2;
+
+  
+  bool const operator== (const Bin &b) const
+  {
+    return bin == b.bin;
+  }
+  
+  bool const operator< (const Bin &b) const
+  {
+    return bin < b.bin;
+  }
 };
-//HZbb
-float bin_hzbb0[4] = {150,0,10000,1};
-std::vector<float*> SetBinning_hzbb()
-{
-  std::vector<float*> myVec;
-  myVec.push_back(bin_hzbb0);
-  return myVec;
-};
-//HighRes
-float bin_highres0[4] = {600,0.01,10000,1};
-float bin_highres1[4] = {150,0.175,600,1};
-float bin_highres2[4] = {150,0,400,0.175};
-float bin_highres3[4] = {400,0,600,0.025};
-float bin_highres4[4] = {400,0.025,600,0.175};
-float bin_highres5[4] = {600,0,950,0.01};
-float bin_highres6[4] = {950,0,10000,0.01};
-std::vector<float*> SetBinning_highres()
-{
-  std::vector<float*> myVec;
-  myVec.push_back(bin_highres0);
-  myVec.push_back(bin_highres1);
-  myVec.push_back(bin_highres2);
-  myVec.push_back(bin_highres3);
-  myVec.push_back(bin_highres4);
-  myVec.push_back(bin_highres5);
-  myVec.push_back(bin_highres6);
-  return myVec;
-};
-//LowRes
-float bin_lowres0[4] = {500,0.01,10000,1};
-float bin_lowres1[4] = {150,0.15,500,1};
-float bin_lowres2[4] = {150,0,400,0.15};
-float bin_lowres3[4] = {400,0,500,0.015};
-float bin_lowres4[4] = {400,0.015,500,0.15};
-float bin_lowres5[4] = {500,0,800,0.01};
-float bin_lowres6[4] = {800,0,10000,0.01};
-std::vector<float*> SetBinning_lowres()
-{
-  std::vector<float*> myVec;
-  myVec.push_back(bin_lowres0);
-  myVec.push_back(bin_lowres1);
-  myVec.push_back(bin_lowres2);
-  myVec.push_back(bin_lowres3);
-  myVec.push_back(bin_lowres4);
-  myVec.push_back(bin_lowres5);
-  myVec.push_back(bin_lowres6);
-  return myVec;
-};
-*/
 
 
 //----------------------------------------------
@@ -123,13 +80,11 @@ std::vector<float*> SetBinning_hzbb()
   return myVec;
 };
 //HIGHRES
-float bin_highres0[4] = {600,0.01,10000,1};
-float bin_highres1[4] = {150,0.175,600,1};
-float bin_highres2[4] = {150,0,400,0.175};
-float bin_highres3[4] = {400,0,600,0.025};
-float bin_highres4[4] = {400,0.025,600,0.175};
-float bin_highres5[4] = {600,0,950,0.01};
-float bin_highres6[4] = {950,0,10000,0.01};
+float bin_highres0[4] = {150,0.0,250,0.175};
+float bin_highres1[4] = {150,0.175,250,1};
+float bin_highres2[4] = {250,0.05,10000,1};
+float bin_highres3[4] = {250,0.0,600,0.05};
+float bin_highres4[4] = {600,0.0,10000,0.05};
 std::vector<float*> SetBinning_highres()
 {
   std::vector<float*> myVec;
@@ -138,8 +93,8 @@ std::vector<float*> SetBinning_highres()
   myVec.push_back(bin_highres2);
   myVec.push_back(bin_highres3);
   myVec.push_back(bin_highres4);
-  myVec.push_back(bin_highres5);
-  myVec.push_back(bin_highres6);
+  //myVec.push_back(bin_highres5);
+  //myVec.push_back(bin_highres6);
   return myVec;
 };
 //LOWRES
@@ -167,7 +122,7 @@ std::vector<float*> SetBinning_lowres()
 //----------------
 //Static Variables
 //----------------
-float HggRazorSystematics::Lumi  = 2600.0;
+float HggRazorSystematics::Lumi  = 6300.0;
 float HggRazorSystematics::NR_kf = 1.0;
 int   HggRazorSystematics::n_PdfSys = 60;
 
@@ -176,6 +131,46 @@ int main( int argc, char* argv[] )
 {
 
   gROOT->Reset();
+
+  std::map<Bin, std::string> myMap;
+  std::map<std::string, Bin> myMap2;
+  
+  std::ifstream input( "data/HggRazor2016Binning.txt", std::fstream::in );
+  if ( input.is_open() )
+    {
+      float x1, x2, y1, y2;
+      int binN;
+      std::string box, f1;
+      while ( input.good() )
+	{
+	  input >> binN >> x1 >> x2 >> y1 >> y2 >> box >> f1;
+	  if ( input.eof() ) break;
+	  Bin mybin;
+	  mybin.bin = binN;
+	  mybin.f1 = f1;
+	  mybin.box = box;
+	  mybin.x1 = x1;
+	  mybin.x2 = x2;
+	  mybin.y1 = y1;
+	  mybin.y2 = y2;
+	  std::stringstream ss;
+	  ss << box << "_" << x1 << "-" << x2 << "_" << y1 << "-" << y2;
+	  //myMap.find( mybin );
+	  if ( myMap.find( mybin ) == myMap.end() ) myMap[mybin] = f1;
+	  if ( myMap2.find( ss.str() ) == myMap2.end() ) myMap2[ss.str()] = mybin;
+	  //std::cout << binN << " " <<  x1  << " " << x2 << " " << y1 << " " << y2 << " " <<  box << " " << f1 << std::endl;
+	}
+    }
+  else
+    {
+      std::cout << "Unable to open binning lookup table" << std::endl;
+    }
+
+  for ( auto tmp : myMap2 )
+    {
+      std::cout << tmp.first << " " << tmp.second.f1 << std::endl;
+    }
+  
   std::string inputList = ParseCommandLine( argc, argv, "-inputList=" );
   if (  inputList == "" )
     {
@@ -242,6 +237,12 @@ int main( int argc, char* argv[] )
   nominal[1] = new TH2Poly("nominal_SMH_1", "", 150, 10000, 0, 1 );
   nominal[2] = new TH2Poly("nominal_SMH_2", "", 150, 10000, 0, 1 );
   nominal[3] = new TH2Poly("nominal_SMH_3", "", 150, 10000, 0, 1 );
+
+  TH2Poly* nominalErr[4];
+  nominalErr[0] = new TH2Poly("nominalErr_SMH_0", "", 150, 10000, 0, 1 );
+  nominalErr[1] = new TH2Poly("nominalErr_SMH_1", "", 150, 10000, 0, 1 );
+  nominalErr[2] = new TH2Poly("nominalErr_SMH_2", "", 150, 10000, 0, 1 );
+  nominalErr[3] = new TH2Poly("nominalErr_SMH_3", "", 150, 10000, 0, 1 );
   
   TH2Poly* nominalS = new TH2Poly("nominal_Signal", "", 150, 10000, 0, 1 );
 
@@ -291,6 +292,13 @@ int main( int argc, char* argv[] )
       nominal[1]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       nominal[2]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       nominal[3]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+
+      nominalErr[0]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+      nominalErr[1]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+      nominalErr[2]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+      nominalErr[3]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+      
+      
       nominalS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       facScaleUp->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       facScaleUpS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
@@ -328,6 +336,7 @@ int main( int argc, char* argv[] )
     }
 
   std::map< std::string, TH2Poly* > smhMapNominal;
+  std::map< std::string, TH2Poly* > smhMapNominalErr;
   std::string process, rootFileName;
   int ctr = 0;
   while ( ifs.good() )
@@ -410,6 +419,7 @@ int main( int argc, char* argv[] )
 	  else
 	    {
 	      nominal[ctr]->SetBinContent( bin, hggSys->GetNominalYield( tmp[0], tmp[1] ) );
+	      nominalErr[ctr]->SetBinContent( bin, hggSys->GetNominalError( tmp[0], tmp[1] ) );
 	      //facScale
 	      std::pair<float, float> facSys = hggSys->GetFacScaleSystematic( tmp[0], tmp[1] );
 	      float maxSys = std::max( fabs(facSys.first) , fabs(facSys.second) );
@@ -449,8 +459,8 @@ int main( int argc, char* argv[] )
       
       if ( process != "signal" && process != "" )
 	{
-	  std::cout << process << std::endl;
 	  smhMapNominal[process] = nominal[ctr];
+	  smhMapNominalErr[process] = nominalErr[ctr];
 	  if(ctr < 3 )ctr++;
 	}
       
@@ -476,8 +486,31 @@ int main( int argc, char* argv[] )
       float nom_vbfH = smhMapNominal["VBFH"]->GetBinContent( bin );
       float nom_vH = smhMapNominal["VH"]->GetBinContent( bin );
       float nom_s  = nominalS->GetBinContent( bin );
-      std::cout << tmp[0] << "-" << tmp[2] << " $\\otimes$ " << tmp[1] << "-" << tmp[3]
-		<< " & " << nom_ggH << " & " << nom_ttH << " & " << nom_vbfH << " & " << nom_vH << " & " << nom_s << "\\\\" << std::endl;
+
+      float nom_ggH_U = sqrt(smhMapNominalErr["GluGluH"]->GetBinContent( bin ));
+      float nom_ttH_U = sqrt(smhMapNominalErr["ttH"]->GetBinContent( bin ));
+      float nom_vbfH_U = sqrt(smhMapNominalErr["VBFH"]->GetBinContent( bin ));
+      float nom_vH_U = sqrt(smhMapNominalErr["VH"]->GetBinContent( bin ));
+      float nom_s_U  = nominalS->GetBinError( bin );
+      
+      std::stringstream ss;
+      ss << categoryMode << "_" << tmp[0] << "-" << tmp[2] << "_" << tmp[1] << "-" << tmp[3]; 
+      std::cout << myMap2[ss.str()].f1 << std::endl;
+      //std::cout << mybin.bin << " " << mybin.box << " " << mybin.x1 << " " << mybin.x2 << " " << mybin.y1 << " " << mybin.y2 << " " << myMap[mybin] << std::endl;
+      std::stringstream ss_fn;
+      ss_fn << "/Users/cmorgoth/Work/git/RazorEWKSUSYAnalysis/HggRazor/FitMgg/MaxLikelihoodFits/sb300_lsp1_unblinded_6p3ifb_Fixed/mlfit_bin"
+	    << myMap2[ss.str()].bin << ".root";
+      float Ns = GetNs( ss_fn.str(),  myMap2[ss.str()].bin );
+      float NsErr = GetNsErr( ss_fn.str(),  myMap2[ss.str()].bin );
+      float Nbkg = GetNbkg( ss_fn.str(),  myMap2[ss.str()].f1, myMap2[ss.str()].bin );
+      
+      TString line = Form("%0.f-%0.f $\\otimes$ %.3f-%.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f \\\\",
+			  tmp[0], tmp[2], tmp[1], tmp[3], nom_ggH, nom_ggH_U, nom_ttH, nom_ttH_U, nom_vbfH, nom_vbfH_U, nom_vH, nom_vH_U, Ns, NsErr);
+
+      
+      std::cout << line << std::endl;
+      //std::cout << tmp[0] << "-" << tmp[2] << " $\\otimes$ " << tmp[1] << "-" << tmp[3]
+      //<< " & " << nom_ggH << " \\pm " << nom_ggH_U << " & " << nom_ttH << " \\pm " << nom_ttH_U << " & " << nom_vbfH << " & " << nom_vH << " & " << nom_s << "\\\\" << std::endl;
     }
   
   std::cout << "\\hline\n\\end{tabular}\n\\end{center}\n\\end{table*}" << std::endl;
@@ -587,3 +620,39 @@ int main( int argc, char* argv[] )
   return 0;
 };
 
+float GetNs( std::string fname, int bin )
+{
+  TFile* fin = TFile::Open( fname.c_str(), "READ");
+  RooArgSet* norm_fit_s = (RooArgSet*) fin->Get("norm_fit_s");
+  //return norm_fit_s->getRealValue("bin11/signal");
+  std::stringstream ss;
+  ss << "bin" << bin << "/signal";
+  RooRealVar* ss2 = (RooRealVar*)norm_fit_s->find( ss.str().c_str() );
+  return ss2->getVal();
+};
+
+float GetNsErr( std::string fname, int bin )
+{
+  TFile* fin = TFile::Open( fname.c_str(), "READ");
+  RooArgSet* norm_fit_s = (RooArgSet*) fin->Get("norm_fit_s");
+  //return norm_fit_s->getRealValue("bin11/signal");
+  std::stringstream ss;
+  ss << "bin" << bin << "/signal";
+  RooRealVar* ss2 = (RooRealVar*)norm_fit_s->find( ss.str().c_str() );
+  return ss2->getError();
+};
+
+float GetNbkg( std::string fname, std::string f1, int bin )
+{
+  TFile* fin = TFile::Open( fname.c_str(), "READ");
+  RooFitResult* fit_r = (RooFitResult*)fin->Get("fit_s");
+  if ( f1 == "singleExp" )
+    {
+      std::stringstream ss;
+      ss << "singleExp_Bkg_bin" << bin << "_sExp_a";
+      RooRealVar *alpha = (RooRealVar*)fit_r->floatParsFinal().find( ss.str().c_str() );
+      return alpha->getVal();
+    }
+
+  return 0;
+};

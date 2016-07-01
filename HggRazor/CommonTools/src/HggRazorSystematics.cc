@@ -90,6 +90,8 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
 	  return false;
 	}
       h2p = new TH2Poly(this->processName+"+nominal", "", 150, 10000, 0, 1);
+      h2p_Err = new TH2Poly(this->processName+"+nominal", "", 150, 10000, 0, 1);
+      
       h2p_facScaleUp      = new TH2Poly(this->processName+"_facScaleUp", "", 150, 10000, 0, 1);
       h2p_facScaleDown    = new TH2Poly(this->processName+"_facScaleDown", "", 150, 10000, 0, 1);
       h2p_renScaleUp      = new TH2Poly(this->processName+"_renScaleUp", "", 150, 10000, 0, 1);
@@ -116,6 +118,7 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
 	  for ( int i = 0; i < RsqSize-1; i++ )
 	    {
 	      h2p->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
+	      h2p_Err->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
 	      h2p_facScaleUp->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
 	      h2p_facScaleDown->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
 	      h2p_renScaleUp->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
@@ -145,7 +148,8 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
 
       
       h2p = new TH2Poly(this->processName+"+nominal", "", 150, 10000, 0, 1);
-
+      h2p_Err = new TH2Poly(this->processName+"+nominal", "", 150, 10000, 0, 1);
+      
       h2p_facScaleUp      = new TH2Poly(this->processName+"_facScaleUp", "", 150, 10000, 0, 1);
       h2p_facScaleDown    = new TH2Poly(this->processName+"_facScaleDown", "", 150, 10000, 0, 1);
 
@@ -174,7 +178,8 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
 	{
 	  if ( _debug ) std::cout << "adding bin: " << tmp[0] << "," <<  tmp[1] << "," << tmp[2] << "," << tmp[3] << std::endl;
 	  h2p->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
-
+	  h2p_Err->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
+	  
 	  h2p_facScaleUp->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
 	  h2p_facScaleDown->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
 	  
@@ -264,6 +269,7 @@ void HggRazorSystematics::Loop()
 	      //std::cout << "PDF: " << weight << " " << weight*sf_pdf->at(0)*N_events/N_Pdf[0] << std::endl;
 	      //std::cout << "facScale: "<<  weight << " " << weight*sf_facScaleUp*N_events/N_facScale[0] << std::endl;
 	      h2p->Fill( MR, t1Rsq, commonW );
+	      h2p_Err->Fill( MR, t1Rsq, commonW*commonW );
 	      
 	      h2p_facScaleUp->Fill( MR, t1Rsq, commonW*sf_facScaleUp*N_events/N_facScale[0] );
 	      h2p_facScaleDown->Fill( MR, t1Rsq, commonW*sf_facScaleDown*N_events/N_facScale[1] );
@@ -290,6 +296,7 @@ void HggRazorSystematics::Loop()
 	  else
 	    {
 	      h2p->Fill( MR, 0.999, commonW );
+	      h2p_Err->Fill( MR, 0.999, commonW*commonW );
 	      
 	      h2p_facScaleUp->Fill( MR, 0.999, commonW*sf_facScaleUp*N_events/N_facScale[0] );
 	      h2p_facScaleDown->Fill( MR, 0.999, commonW*sf_facScaleDown*N_events/N_facScale[1] );
@@ -523,6 +530,12 @@ float HggRazorSystematics::GetNominalYield( float mr, float rsq )
 {
   int bin = h2p->FindBin( mr+10, rsq+0.0001 );
   return h2p->GetBinContent( bin );
+};
+
+float HggRazorSystematics::GetNominalError( float mr, float rsq )
+{
+  int bin = h2p_Err->FindBin( mr+10, rsq+0.0001 );
+  return h2p_Err->GetBinContent( bin );
 };
 
 std::pair<float, float> HggRazorSystematics::GetFacScaleSystematic( float mr, float rsq )
