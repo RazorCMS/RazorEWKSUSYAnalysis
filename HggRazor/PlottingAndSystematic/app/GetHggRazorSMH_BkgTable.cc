@@ -7,21 +7,25 @@
 //ROOT INCLUDES
 #include <TFile.h>
 #include <TROOT.h>
+#include <TF1.h>
 #include <RooArgSet.h>
 #include <RooAbsArg.h>
 #include <RooAbsCollection.h>
 #include <RooAbsReal.h>
+#include <RooAbsPdf.h>
 #include <RooRealVar.h>
 #include <RooFitResult.h>
+#include <RooWorkspace.h>
 //LOCAL INCLUDES
 #include "HggRazorSystematics.hh"
 #include "CommandLineInput.hh"
+#include "DefinePdfs.hh"
 
 const bool _debug = false;
 
 float GetNs( std::string fname, int bin );
 float GetNsErr( std::string fname, int bin );
-float GetNbkg( std::string fname, std::string f1, int bin );
+float GetNbkg( std::string fname, std::string f1, int bin, bool _err = false );
 
 struct Bin
 {
@@ -473,10 +477,10 @@ int main( int argc, char* argv[] )
 
 
 
-  std::cout << "\\begin{table*}[htb]\n\\begin{center}\n\\caption{";
+  std::cout << "\\begin{table*}[htb]\n\\footnotesize\n\\begin{center}\n\\caption{";
   std::cout << categoryMode << " category binning. SM Higgs, and signal expected yields for an integrated luminosity correspondint to 6.3~$\\mathrm{fb}^{-1}$";
-  std::cout << "\\label{tab:binning-highpt}}\n\\def\\arraystretch{1.5}\n\\begin{tabular}{|c|c|c|c|c|c|}\n\\hline\n$\\mathrm{M_{R}} (GeV)\\otimes\\mathrm{R^{2}}$";
-  std::cout << " & ggH & ttH & vbfH & vH & Signal\\\\" << std::endl;
+  std::cout << "\\label{tab:binning-highpt}}\n\\def\\arraystretch{1.5}\n\\begin{tabular}{|c|c|c|c|c|c|c|}\n\\hline\n$\\mathrm{M_{R}} (GeV)\\otimes\\mathrm{R^{2}}$";
+  std::cout << " & ggH & ttH & vbfH & vH & non-resonant & Signal\\\\" << std::endl;
   std::cout << "\\hline" << std::endl;
   for ( auto tmp: myVectBinning )
     {
@@ -495,7 +499,6 @@ int main( int argc, char* argv[] )
       
       std::stringstream ss;
       ss << categoryMode << "_" << tmp[0] << "-" << tmp[2] << "_" << tmp[1] << "-" << tmp[3]; 
-      std::cout << myMap2[ss.str()].f1 << std::endl;
       //std::cout << mybin.bin << " " << mybin.box << " " << mybin.x1 << " " << mybin.x2 << " " << mybin.y1 << " " << mybin.y2 << " " << myMap[mybin] << std::endl;
       std::stringstream ss_fn;
       ss_fn << "/Users/cmorgoth/Work/git/RazorEWKSUSYAnalysis/HggRazor/FitMgg/MaxLikelihoodFits/sb300_lsp1_unblinded_6p3ifb_Fixed/mlfit_bin"
@@ -503,9 +506,10 @@ int main( int argc, char* argv[] )
       float Ns = GetNs( ss_fn.str(),  myMap2[ss.str()].bin );
       float NsErr = GetNsErr( ss_fn.str(),  myMap2[ss.str()].bin );
       float Nbkg = GetNbkg( ss_fn.str(),  myMap2[ss.str()].f1, myMap2[ss.str()].bin );
+      float NbkgErr = GetNbkg( ss_fn.str(),  myMap2[ss.str()].f1, myMap2[ss.str()].bin, true );
       
-      TString line = Form("%0.f-%0.f $\\otimes$ %.3f-%.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f \\\\",
-			  tmp[0], tmp[2], tmp[1], tmp[3], nom_ggH, nom_ggH_U, nom_ttH, nom_ttH_U, nom_vbfH, nom_vbfH_U, nom_vH, nom_vH_U, Ns, NsErr);
+      TString line = Form("%0.f-%0.f $\\otimes$ %.3f-%.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f \\\\",
+			  tmp[0], tmp[2], tmp[1], tmp[3], nom_ggH, nom_ggH_U, nom_ttH, nom_ttH_U, nom_vbfH, nom_vbfH_U, nom_vH, nom_vH_U, Nbkg, NbkgErr, Ns, NsErr);
 
       
       std::cout << line << std::endl;
@@ -642,16 +646,163 @@ float GetNsErr( std::string fname, int bin )
   return ss2->getError();
 };
 
-float GetNbkg( std::string fname, std::string f1, int bin )
+float GetNbkg( std::string fname, std::string f1, int bin, bool _err )
 {
+  RooFit::PrintLevel(5);
+  RooMsgService::instance().setGlobalKillBelow(RooFit::FATAL);
   TFile* fin = TFile::Open( fname.c_str(), "READ");
   RooFitResult* fit_r = (RooFitResult*)fin->Get("fit_s");
+  /*fin = TFile::Open( "/Users/cmorgoth/Work/git/RazorEWKSUSYAnalysis/HggRazor/FitMgg/MaxLikelihoodFits/sb300_lsp1_unblinded_6p3ifb_Fixed/HggRazorWorkspace_bin8.root", "READ");
+  RooWorkspace* myws = (RooWorkspace*)fin->Get("combineWS");
+  RooRealVar* mymgg = (RooRealVar*)myws->var("mGammaGamma_bin8");
+  RooAbsPdf* mypdf = (RooAbsPdf*)myws->pdf("singleExp_Bkg_bin8_sExp");
+  myws->var("singleExp_Bkg_bin8_sExp_a")->setVal(-2.0071e-02);
+  mymgg->setRange( "signal", 120, 130. );
+  RooAbsReal* myigx = mypdf->createIntegral(*mymgg, RooFit::NormSet(*mymgg), RooFit::Range("signal"));;
+  std::cout << "test--> " << myigx->getVal() << std::endl;
+  myws = (RooWorkspace*)fin->Get("w_sb");
+  RooFitResult* FR = (RooFitResult*)myws->obj("BkgOnlyFitResult");
+  */
+  TFile* ftmp = new TFile( "ws_tmp.root", "recreate");
+  
+ 
+  RooWorkspace* ws = new RooWorkspace( "ws", "" );
+  TString mggName = "mGammaGamma";
+  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 103, 160, "GeV" );
+  //mgg.SetNameTitle( mggName, "m_{#gamma#gamma}" );
+  mgg.setMin( 103. );
+  mgg.setMax( 160. );
+  mgg.setUnit( "GeV" );
+  mgg.setBins(57);
+  mgg.setRange( "signal", 122, 129. );
+  mgg.setRange( "high", 135., 160. );
+  mgg.setRange( "low", 103., 120. );
+  mgg.setRange( "full", 103., 160. );
+  mgg.setRange( "Full", 103., 160. );
   if ( f1 == "singleExp" )
     {
       std::stringstream ss;
       ss << "singleExp_Bkg_bin" << bin << "_sExp_a";
       RooRealVar *alpha = (RooRealVar*)fit_r->floatParsFinal().find( ss.str().c_str() );
-      return alpha->getVal();
+      std::stringstream ss_2;
+      ss_2 << "shapeBkg_Bkg_bin" << bin << "__norm";
+      RooRealVar *Nbkg = (RooRealVar*)fit_r->floatParsFinal().find( ss_2.str().c_str() );
+      
+      
+      TString pdf = MakeSingleExpNE( f1, mgg, *ws );
+      ws->var( pdf + "_a" )->setVal( alpha->getVal() );
+      RooAbsReal* igx = ws->pdf( pdf )->createIntegral(mgg);
+      //std::cout << Nbkg->getVal() << " +/- " << Nbkg->getError() << std::endl;
+      RooAbsReal* igx_sig = ws->pdf( pdf )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("signal"));
+      //std::cout << Nbkg->getVal()*igx_sig->getVal() << " +/- " << Nbkg->getError()*igx_sig->getVal() << std::endl;
+      if ( _err ) return Nbkg->getError()*igx_sig->getVal();
+      return Nbkg->getVal()*igx_sig->getVal();
+      //double shapeErr = ws->pdf( pdf )->getPropagatedError(*fit_r)*Nbkg->getVal();
+      /*
+      RooArgSet* paramSet = mypdf->getParameters( RooArgSet(*mymgg) );
+      paramSet->Print();
+      TF1* myPdf = mypdf->asTF( RooArgList(*mymgg), RooArgList(*paramSet) );
+      TMatrixDSym covMatrix = FR->covarianceMatrix();
+      double params[1];
+      params[0] = myPdf->GetParameter(0);
+      double corrP[1];
+      corrP[0] = 8.15e-03;
+      
+      double integ2_full = myPdf->Integral(103, 160);
+      double integ2_signal = myPdf->Integral(120, 130);
+      //double shapeErr = mypdf->getPropagatedError(*fit_r)*Nbkg->getVal();
+      //double intErr = myPdf->IntegralError( 120., 130., params, covMatrix.GetMatrixArray(), 1e-14 );
+      std::cout << params[0] << std::endl;
+      double intErr = myPdf->IntegralError( 120., 130., params, corrP );
+      std::cout << integ2_signal << " " << integ2_full << " " << intErr << std::endl;
+      //return alpha->getVal();
+      myPdf->Write();
+      ftmp->Close();
+      */
+    }
+  else if ( f1 == "poly2" )
+    {
+      std::stringstream ss0;
+      ss0 << "poly2_Bkg_bin" << bin << "_pol2_p0";
+      RooRealVar *p0 = (RooRealVar*)fit_r->floatParsFinal().find( ss0.str().c_str() );
+      std::stringstream ss1;
+      ss1 << "poly2_Bkg_bin" << bin << "_pol2_p1";
+      RooRealVar *p1 = (RooRealVar*)fit_r->floatParsFinal().find( ss1.str().c_str() );
+      std::stringstream ssC;
+      ssC << "poly2_Bkg_bin" << bin << "_pol2_pC";
+      RooRealVar *pC = (RooRealVar*)fit_r->floatParsFinal().find( ssC.str().c_str() );
+      
+      std::stringstream ss_2;
+      ss_2 << "shapeBkg_Bkg_bin" << bin << "__norm";
+      RooRealVar *Nbkg = (RooRealVar*)fit_r->floatParsFinal().find( ss_2.str().c_str() );
+      
+      
+      TString pdf = MakePoly2NE( f1, mgg, *ws );
+      ws->var( pdf + "_p0" )->setVal( p0->getVal() );
+      ws->var( pdf + "_p1" )->setVal( p1->getVal() );
+      ws->var( pdf + "_pC" )->setVal( pC->getVal() );
+      RooAbsReal* igx = ws->pdf( pdf )->createIntegral(mgg);
+      //std::cout << Nbkg->getVal() << " +/- " << Nbkg->getError() << std::endl;
+      RooAbsReal* igx_sig = ws->pdf( pdf )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("signal"));
+      //std::cout << Nbkg->getVal()*igx_sig->getVal() << " +/- " << Nbkg->getError()*igx_sig->getVal() << std::endl;
+      if ( _err ) return Nbkg->getError()*igx_sig->getVal();
+      return Nbkg->getVal()*igx_sig->getVal();
+    }
+  else if ( f1 == "poly3" )
+    {
+      std::stringstream ss0;
+      ss0 << "poly3_Bkg_bin" << bin << "_pol3_p0";
+      RooRealVar *p0 = (RooRealVar*)fit_r->floatParsFinal().find( ss0.str().c_str() );
+      std::stringstream ss1;
+      ss1 << "poly3_Bkg_bin" << bin << "_pol3_p1";
+      RooRealVar *p1 = (RooRealVar*)fit_r->floatParsFinal().find( ss1.str().c_str() );
+      std::stringstream ss2;
+      ss2 << "poly3_Bkg_bin" << bin << "_pol3_p2";
+      RooRealVar *p2 = (RooRealVar*)fit_r->floatParsFinal().find( ss2.str().c_str() );
+      std::stringstream ssC;
+      ssC << "poly3_Bkg_bin" << bin << "_pol3_pC";
+      RooRealVar *pC = (RooRealVar*)fit_r->floatParsFinal().find( ssC.str().c_str() );
+      
+      std::stringstream ss_2;
+      ss_2 << "shapeBkg_Bkg_bin" << bin << "__norm";
+      RooRealVar *Nbkg = (RooRealVar*)fit_r->floatParsFinal().find( ss_2.str().c_str() );
+
+      
+      TString pdf = MakePoly3NE( f1, mgg, *ws );
+      ws->var( pdf + "_p0" )->setVal( p0->getVal() );
+      ws->var( pdf + "_p1" )->setVal( p1->getVal() );
+      ws->var( pdf + "_p2" )->setVal( p1->getVal() );
+      ws->var( pdf + "_pC" )->setVal( pC->getVal() );
+      RooAbsReal* igx = ws->pdf( pdf )->createIntegral(mgg);
+      //std::cout << Nbkg->getVal() << " +/- " << Nbkg->getError() << std::endl;
+      RooAbsReal* igx_sig = ws->pdf( pdf )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("signal"));
+      //std::cout << Nbkg->getVal()*igx_sig->getVal() << " +/- " << Nbkg->getError()*igx_sig->getVal() << std::endl;
+      if ( _err ) return Nbkg->getError()*igx_sig->getVal();
+      return Nbkg->getVal()*igx_sig->getVal();
+    }
+  else if ( f1 == "modExp" )
+    {
+      std::stringstream ss;
+      ss << "modExp_Bkg_bin" << bin << "_mexp_a";
+      RooRealVar *alpha = (RooRealVar*)fit_r->floatParsFinal().find( ss.str().c_str() );
+      std::stringstream ssm;
+      ssm << "modExp_Bkg_bin" << bin << "_mexp_m";
+      RooRealVar *m = (RooRealVar*)fit_r->floatParsFinal().find( ssm.str().c_str() );
+      
+      std::stringstream ss_2;
+      ss_2 << "shapeBkg_Bkg_bin" << bin << "__norm";
+      RooRealVar *Nbkg = (RooRealVar*)fit_r->floatParsFinal().find( ss_2.str().c_str() );
+      
+      
+      TString pdf = MakeModExpNE( f1, mgg, *ws );
+      ws->var( pdf + "_a" )->setVal( alpha->getVal() );
+      ws->var( pdf + "_m" )->setVal( m->getVal() );
+      RooAbsReal* igx = ws->pdf( pdf )->createIntegral(mgg);
+      //std::cout << Nbkg->getVal() << " +/- " << Nbkg->getError() << std::endl;
+      RooAbsReal* igx_sig = ws->pdf( pdf )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("signal"));
+      //std::cout << Nbkg->getVal()*igx_sig->getVal() << " +/- " << Nbkg->getError()*igx_sig->getVal() << std::endl;
+      if ( _err ) return Nbkg->getError()*igx_sig->getVal();
+      return Nbkg->getVal()*igx_sig->getVal();
     }
 
   return 0;

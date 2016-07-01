@@ -7,9 +7,10 @@ Aux = $(Repo)/Aux
 HggRazor = $(Repo)/HggRazor
 Selection = $(HggRazor)/Selection
 CommonTools = $(HggRazor)/CommonTools
+FitTools = $(HggRazor)/FitMgg
 
-CPPFLAGS := $(shell root-config --cflags) -I$(INC)/include -I$(CommonTools)/include -I$(Aux)/include -I$(Selection)/include
-LDFLAGS := $(shell root-config --glibs) $(STDLIBDIR) -lRooFit -lRooFitCore
+CPPFLAGS := $(shell root-config --cflags) -I$(INC)/include -I$(CommonTools)/include -I$(Aux)/include -I$(Selection)/include -I$(FitTools)/include
+LDFLAGS := $(shell root-config --glibs) $(STDLIBDIR) -lRooFit -lRooFitCore -L$(FitTools)/include -lCustomPdfs
 
 CPPFLAGS += -g -std=c++11
 
@@ -28,7 +29,7 @@ SRC3 = app/PlotFromInclusiveTree.cc $(CommonTools)/src/HggTree.cc $(Selection)/s
 
 SRC4 = app/GetHggRazorSystematics.cc $(CommonTools)/src/HggRazorSystematics.cc $(CommonTools)/src/HggTree.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc
 SRC5 = app/GetHggRazorSystematicsQuadrature.cc $(CommonTools)/src/HggRazorSystematics.cc $(CommonTools)/src/HggTree.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc
-SRC6 = app/GetHggRazorSMH_BkgTable.cc $(CommonTools)/src/HggRazorSystematics.cc $(CommonTools)/src/HggTree.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc
+SRC6 = app/GetHggRazorSMH_BkgTable.cc $(CommonTools)/src/HggRazorSystematics.cc $(CommonTools)/src/HggTree.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc $(FitTools)/src/DefinePdfs.cc
 
 
 OBJ  = $(SRC:.cc=.o)
