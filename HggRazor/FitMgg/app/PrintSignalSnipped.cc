@@ -4,6 +4,8 @@
 #include <map>
 #include <vector>
 #include <stdlib.h>
+#include <algorithm>
+
 //ROOT
 #include <TFile.h>
 #include <TTree.h>
