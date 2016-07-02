@@ -6,6 +6,7 @@
 //ROOT INCLUDES
 #include <TFile.h>
 #include <TROOT.h>
+//#include <RooArgSet.h>
 //LOCAL INCLUDES
 #include "HggRazorSystematics.hh"
 #include "CommandLineInput.hh"
@@ -165,7 +166,7 @@ std::vector<float*> SetBinning_lowres()
 //----------------
 //Static Variables
 //----------------
-float HggRazorSystematics::Lumi  = 6300.0;
+float HggRazorSystematics::Lumi  = 8000.0;
 float HggRazorSystematics::NR_kf = 1.0;
 int   HggRazorSystematics::n_PdfSys = 60;
 
@@ -173,6 +174,8 @@ int   HggRazorSystematics::n_PdfSys = 60;
 int main( int argc, char* argv[] )
 {
 
+  //RooFit::PrintLevel(5);
+  //RooMsgService::instance().setGlobalKillBelow(RooFit::FATAL);
   gROOT->Reset();
   std::string inputList = ParseCommandLine( argc, argv, "-inputList=" );
   if (  inputList == "" )
