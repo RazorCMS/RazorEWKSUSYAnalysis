@@ -1,0 +1,6 @@
+*.o
+*.root
+*.so
+*.pcm
+*.d
+HggRazor/FitMgg/include/rootdict.cc

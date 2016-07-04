@@ -1,0 +1,7 @@
+data /afs/cern.ch/user/d/duanders/work/hggrazor/CMSSW_7_4_2/src/RazorEWKSUSYAnalysis/HggRazor/PlottingAndSystematic/lists/dustin/Data.list
+gammaJet /afs/cern.ch/user/d/duanders/work/hggrazor/CMSSW_7_4_2/src/RazorEWKSUSYAnalysis/HggRazor/PlottingAndSystematic/lists/dustin/GJets.list
+ggH	 /afs/cern.ch/user/d/duanders/work/hggrazor/CMSSW_7_4_2/src/RazorEWKSUSYAnalysis/HggRazor/PlottingAndSystematic/lists/dustin/GGH.list
+vbfH	 /afs/cern.ch/user/d/duanders/work/hggrazor/CMSSW_7_4_2/src/RazorEWKSUSYAnalysis/HggRazor/PlottingAndSystematic/lists/dustin/VBFH.list
+vH	 /afs/cern.ch/user/d/duanders/work/hggrazor/CMSSW_7_4_2/src/RazorEWKSUSYAnalysis/HggRazor/PlottingAndSystematic/lists/dustin/VH.list
+ttH	 /afs/cern.ch/user/d/duanders/work/hggrazor/CMSSW_7_4_2/src/RazorEWKSUSYAnalysis/HggRazor/PlottingAndSystematic/lists/dustin/TTH.list
+diphoton /afs/cern.ch/user/d/duanders/work/hggrazor/CMSSW_7_4_2/src/RazorEWKSUSYAnalysis/HggRazor/PlottingAndSystematic/lists/dustin/Diphoton.list
