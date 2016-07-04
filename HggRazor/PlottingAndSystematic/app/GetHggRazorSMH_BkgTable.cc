@@ -357,6 +357,7 @@ int main( int argc, char* argv[] )
       //------------------------
       //Getting TTree and Histos
       //------------------------
+      TFile* tmp = new TFile("tmp.root", "RECREATE");
       TTree* tree = (TTree*)fin->Get("HggRazor");
       assert( tree );
       TH1F* NEvents = (TH1F*)fin->Get("NEvents");
@@ -366,7 +367,6 @@ int main( int argc, char* argv[] )
       TH1F* SumPdfWeights   = (TH1F*)fin->Get("SumPdfWeights");
       if ( process != "signal" ) assert( SumPdfWeights );
       
-      TFile* tmp = new TFile("tmp.root", "RECREATE");
       TTree* cutTree = tree->CopyTree( cut );
       TString currentProcess = process.c_str();
 
