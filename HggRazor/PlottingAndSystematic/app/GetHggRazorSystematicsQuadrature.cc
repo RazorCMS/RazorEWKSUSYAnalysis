@@ -166,7 +166,7 @@ std::vector<float*> SetBinning_lowres()
 //----------------
 //Static Variables
 //----------------
-float HggRazorSystematics::Lumi  = 8000.0;
+float HggRazorSystematics::Lumi  = 6300.0;
 float HggRazorSystematics::NR_kf = 1.0;
 int   HggRazorSystematics::n_PdfSys = 60;
 
@@ -351,7 +351,9 @@ int main( int argc, char* argv[] )
       //---------------------------
       //Create HggSystematic object
       //---------------------------
-      HggRazorSystematics* hggSys = new HggRazorSystematics( cutTree, currentProcess, categoryMode, false, false );
+      if ( _debug ) std::cout << "[DEBUG]: creating HggRazorSystematics object" << std::endl;
+      HggRazorSystematics* hggSys = new HggRazorSystematics( cutTree, currentProcess, categoryMode, false, _debug );
+      if ( _debug ) std::cout << "[DEBUG]: created HggRazorSystematics object" << std::endl;
       //hggSys->PrintBinning();
       //hggSys->SetBinningMap( binningMap );
       //hggSys->PrintBinning();
@@ -360,10 +362,13 @@ int main( int argc, char* argv[] )
       hggSys->SetNeventsHisto( NEvents );
       hggSys->SetFacScaleWeightsHisto( SumScaleWeights );
       hggSys->SetPdfWeightsHisto( SumPdfWeights );
+      if ( _debug ) std::cout << "[DEBUG]: doing HggRazorSystematics loop" << std::endl;
       hggSys->Loop();
+      if ( _debug ) std::cout << "[DEBUG]: finished HggRazorSystematics loop" << std::endl;
       for ( auto tmp: myVectBinning )
 	{
 	  int bin = nominal->FindBin( tmp[0]+10, tmp[1]+0.0001 );
+          if ( _debug ) std::cout << "[DEBUG]: processing bin " << bin << std::endl;
 	  if ( currentProcess == "signal" )
 	    {
 	      nominalS->SetBinContent( bin, hggSys->GetNominalYield( tmp[0], tmp[1] ) );

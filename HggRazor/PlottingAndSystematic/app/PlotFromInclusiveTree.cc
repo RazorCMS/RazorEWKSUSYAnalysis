@@ -170,60 +170,6 @@ float hpt_k[2]  = { 1.0, 1.0};
 float hres_k[2] = { 1.0, 1.0};
 float lres_k[2] = { 1.0, 1.0};
 
-//-----------------------------------
-//A p p l y   B a s e l i n e   C u t
-//-----------------------------------
-
-//DATA
-//GammaGamma
-TString cut = "MR > 0 && t1Rsq > 0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1";
-//MGammaGamma HighMass
-//TString cut = "abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>0 && mGammaGamma>230 && mGammaGamma<1230 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1";
-
-
-//----------------
-//Zee
-//----------------
-//EBEB
-//TString cut = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) < 1.479 && abs( pho2Eta ) < 1.479 && mGammaGamma>60. && mGammaGamma<120. && pho1Pt>30 && pho2Pt>20";
-
-//EBEE
-//TString cut = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && ( ( abs( pho1Eta ) < 1.479 && abs( pho2Eta ) > 1.479 ) || (abs( pho1Eta ) > 1.479 && abs( pho2Eta ) < 1.479 ) ) && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && mGammaGamma>60. && mGammaGamma<120.";
-
-//EEEE
-//TString cut = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) > 1.479 && abs( pho2Eta ) > 1.479 && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && mGammaGamma>60. && mGammaGamma<120.";
-
-
-//MC
-//GammaGamma
-TString cut_mc = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1";
-//GammaGamma HighMass
-//TString cut_mc = "abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>0 && mGammaGamma>230 && mGammaGamma<1230 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1";
-
-//Zee
-//EBEB
-//TString cut_mc = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) < 1.479 && abs( pho2Eta ) < 1.479 && mGammaGamma>60. && mGammaGamma<120. && pho1Pt>30 && pho2Pt>20";
-
-//EBEE
-//TString cut_mc = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && ( ( abs( pho1Eta ) < 1.479 && abs( pho2Eta ) > 1.479 ) || (abs( pho1Eta ) > 1.479 && abs( pho2Eta ) < 1.479 ) )  && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && mGammaGamma>60. && mGammaGamma<120.";
-
-//EEEE
-//TString cut_mc = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) > 1.479 && abs( pho2Eta ) > 1.479  && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && mGammaGamma>60. && mGammaGamma<120.";
-
-
-//---------------------
-//T r i g g e r   C u t 
-//---------------------
-//photons
-//TString triggerCut = "(HLTDecision[63] || HLTDecision[64] || HLTDecision[65] || HLTDecision[66] || HLTDecision[67] || HLTDecision[68] || HLTDecision[69] || HLTDecision[74]) && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
-TString triggerCut = "(HLTDecision[82] || HLTDecision[83] || HLTDecision[93] ) && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)"; //for 2016 MC
-//Electrons
-//TString triggerCut = "( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
-//TString triggerCut = "1";
-//--------------------------------
-//D i p h o t o n  M a s s   C u t 
-//--------------------------------
-TString mggCut = "1";
 
 #define _debug 1
 
@@ -246,6 +192,12 @@ int main ( int argc, char* argv[] )
     {
       std::cout << "[WARNING]: please provide a valid run, use --run=<run1/run2>" << std::endl;
       run = "run1";
+    }
+
+  std::string year = ParseCommandLine( argc, argv, "-year=" );
+  if (  year == "" )
+    {
+        year = "2016";
     }
 
   std::string treeType = ParseCommandLine( argc, argv, "-treeType=" );
@@ -295,6 +247,76 @@ int main ( int argc, char* argv[] )
       if ( _debug ) std::cout << "[DEBUG]: first: " << myMap.first << " second: " << myMap.second << std::endl;
     }
   
+  //-----------------------------------
+  //A p p l y   B a s e l i n e   C u t
+  //-----------------------------------
+  //DATA
+  //GammaGamma
+  TString cut = "MR > 0 && t1Rsq > 0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1 && pho1SigmaIetaIeta < 0.0102 && pho1HoverE < 0.05 && pho2SigmaIetaIeta < 0.0102 && pho2HoverE < 0.05";
+
+  if ( year == "2015" ) {
+      cut = cut + " && pTGammaGamma>20";
+  }
+
+  //MGammaGamma HighMass
+  //TString cut = "abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>0 && mGammaGamma>230 && mGammaGamma<1230 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1";
+
+
+  //----------------
+  //Zee
+  //----------------
+  //EBEB
+  //TString cut = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) < 1.479 && abs( pho2Eta ) < 1.479 && mGammaGamma>60. && mGammaGamma<120. && pho1Pt>30 && pho2Pt>20";
+
+  //EBEE
+  //TString cut = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && ( ( abs( pho1Eta ) < 1.479 && abs( pho2Eta ) > 1.479 ) || (abs( pho1Eta ) > 1.479 && abs( pho2Eta ) < 1.479 ) ) && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && mGammaGamma>60. && mGammaGamma<120.";
+
+  //EEEE
+  //TString cut = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) > 1.479 && abs( pho2Eta ) > 1.479 && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && mGammaGamma>60. && mGammaGamma<120.";
+
+
+  //MC
+  //GammaGamma
+  TString cut_mc(cut);
+
+  //GammaGamma HighMass
+  //TString cut_mc = "abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>0 && mGammaGamma>230 && mGammaGamma<1230 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1";
+
+  //Zee
+  //EBEB
+  //TString cut_mc = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) < 1.479 && abs( pho2Eta ) < 1.479 && mGammaGamma>60. && mGammaGamma<120. && pho1Pt>30 && pho2Pt>20";
+
+  //EBEE
+  //TString cut_mc = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && ( ( abs( pho1Eta ) < 1.479 && abs( pho2Eta ) > 1.479 ) || (abs( pho1Eta ) > 1.479 && abs( pho2Eta ) < 1.479 ) )  && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && mGammaGamma>60. && mGammaGamma<120.";
+
+  //EEEE
+  //TString cut_mc = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) > 1.479 && abs( pho2Eta ) > 1.479  && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && mGammaGamma>60. && mGammaGamma<120.";
+
+
+  //---------------------
+  //T r i g g e r   C u t 
+  //---------------------
+  //photons
+  //TString triggerCut = "(HLTDecision[63] || HLTDecision[64] || HLTDecision[65] || HLTDecision[66] || HLTDecision[67] || HLTDecision[68] || HLTDecision[69] || HLTDecision[74]) && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
+  TString triggerCutData = "";
+  TString triggerCutMC = "";
+  if ( year == "2015" ) {
+      triggerCutData = "(HLTDecision[82] || HLTDecision[83] || HLTDecision[93] ) && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)"; 
+      triggerCutMC = "HLTDecision[65]";
+  }
+  else {
+      triggerCutData = "(HLTDecision[82] || HLTDecision[83] || HLTDecision[93] ) && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)"; 
+      triggerCutMC = "1";
+  }
+
+  //Electrons
+  //TString triggerCut = "( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
+  //TString triggerCut = "1";
+  //--------------------------------
+  //D i p h o t o n  M a s s   C u t 
+  //--------------------------------
+  TString mggCut = "1";
+
   TFile* f;
   TTree* tree;
   TChain* chain;
@@ -319,7 +341,7 @@ int main ( int argc, char* argv[] )
   const int nplots = 4;
   double k_f = 1.37;//Difference in data/mc normalization
   const double lumi_frac = 1.0; // (5./19.8)
-  const double lumi = 6300.0;
+  const double lumi = 4000.0;
   const int mod = 0; 
   if ( treeType == "inclusive" )
     {
@@ -329,6 +351,7 @@ int main ( int argc, char* argv[] )
       for( const auto& process : Process() )
 	{
 	  std::string processName = GetProcessString( process );
+          if ( _debug ) std::cout << "[DEBUG]: process " << processName << std::endl;
 	  //DY control region
 	  //if ( !(process == Process::data || process == Process::dy) ) continue;
 	  //HggRazor
@@ -343,10 +366,10 @@ int main ( int argc, char* argv[] )
 	  //-----------------------------
 	  // R e t r i e v i n g  T r e e
 	  //-----------------------------
-	  //need to create temporary root file to store cutTree
-	  TFile* tmp = new TFile("tmp.root","recreate");
 	  chain   = new TChain( "HggRazor" );
 	  AddTChain( chain, mapList[processName] );
+	  //need to create temporary root file to store cutTree
+	  TFile* tmp = new TFile("tmp.root","recreate");
 
 	  
 	  if ( chain == NULL )
@@ -359,13 +382,15 @@ int main ( int argc, char* argv[] )
 	  //------------------------
 	  if ( process == Process::data )
 	    {
-	      std::cout << "CUT--> " << cut << std::endl; 
-	      cutTree = (TTree*)chain->CopyTree( cut + " && " + triggerCut );
+              TString cutToUse = cut + " && " + triggerCutData;
+	      std::cout << "CUT--> " << cutToUse << std::endl; 
+	      cutTree = (TTree*)chain->CopyTree( cutToUse );
 	    }
 	  else
 	    {
-	      std::cout << "CUT--> " << cut << std::endl;
-	      cutTree = (TTree*)chain->CopyTree( cut );
+              TString cutToUse = cut + " && " + triggerCutMC;
+	      std::cout << "CUT--> " << cutToUse << std::endl;
+	      cutTree = (TTree*)chain->CopyTree( cutToUse );
 	    }
 	  
 	  if ( cutTree == NULL )
@@ -406,6 +431,7 @@ int main ( int argc, char* argv[] )
       for ( const auto& htmp : HistoTypes() )
 	{
 	  std::string histoName = GetHistoTypesString( htmp );
+          if ( _debug ) std::cout << "[DEBUG]: Histogram " << histoName << std::endl;
 	  //std::cout << "histoName: " << histoName << std::endl;
 	  stack = new THStack( "hs" , "Hgg Stack " );
 	  leg = new TLegend( 0.7, 0.58, 0.93, 0.89, NULL, "brNDC" );
@@ -460,12 +486,14 @@ int main ( int argc, char* argv[] )
 	      TH1F* tmp_h = new TH1F( histos[i].GetHisto( htmp ) );
 	      TH1D* h_s = GetStyledHisto( (TH1D*)tmp_h, histos[i].process );
 	      h_s->Scale( lumi );
+              if ( _debug ) std::cout << "[DEBUG]: Adding histogram " << h_s->GetName() << std::endl;
 	      if ( _useKF && (histos[i].process == Process::diphoton || histos[i].process == Process::gammaJet) ) h_s->Scale( k_f );
 	      if ( _shapeOnly ) h_s->Scale(1.0/NormFactor);
 	      if ( histos[i].process != Process::data && histos[i].process != Process::signal ) stack->Add( h_s, "histo" );
 	    }
 	  if ( run == "run2" )
 	    {
+              if ( _debug ) std::cout << "[DEBUG]: Making stacked plot (run2)" << std::endl;
 	      if ( _signalPlot ) MakeStackPlotSignal( stack, signal, histoName, "plots/" + histoName + "_" + "Signal", leg2 );
 	      MakeStackPlot( stack, data, mc, histoName, "plots/" + histoName + "_" + "INCLUSIVE", leg );
 	    }
@@ -507,14 +535,14 @@ int main ( int argc, char* argv[] )
 	      
 	      // R e t r i e v i n g  T r e e
 	      //-----------------------------
-	      //need to create temporary root file to store cutTree
-	      TFile* tmp = new TFile("tmp","recreate");
 	      chain   = new TChain( boxName.c_str() );
 	      AddTChain( chain, mapList[processName] );
 	      
+	      //need to create temporary root file to store cutTree
+	      TFile* tmp = new TFile("tmp","recreate");
 	      //A p p l y i n g  C u t s
 	      //------------------------
-	      cutTree = (TTree*)chain->CopyTree( cut + " && " + mggCut + " && " + triggerCut );
+	      cutTree = (TTree*)chain->CopyTree( cut + " && " + mggCut + " && " + triggerCutData );
 	      if ( cutTree == NULL )
 		{
 		  std::cout << "[WARNING]: Empty selected tree: " << boxName << std::endl;

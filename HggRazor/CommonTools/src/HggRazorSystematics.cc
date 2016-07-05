@@ -266,24 +266,31 @@ void HggRazorSystematics::Loop()
 	{
 	  if ( t1Rsq < 1.0 )
 	    {
-	      //std::cout << "PDF: " << weight << " " << weight*sf_pdf->at(0)*N_events/N_Pdf[0] << std::endl;
-	      //std::cout << "facScale: "<<  weight << " " << weight*sf_facScaleUp*N_events/N_facScale[0] << std::endl;
 	      h2p->Fill( MR, t1Rsq, commonW );
 	      h2p_Err->Fill( MR, t1Rsq, commonW*commonW );
 	      
-	      h2p_facScaleUp->Fill( MR, t1Rsq, commonW*sf_facScaleUp*N_events/N_facScale[0] );
-	      h2p_facScaleDown->Fill( MR, t1Rsq, commonW*sf_facScaleDown*N_events/N_facScale[1] );
+	      //h2p_facScaleUp->Fill( MR, t1Rsq, commonW*sf_facScaleUp*N_events/N_facScale[0] );
+	      //h2p_facScaleDown->Fill( MR, t1Rsq, commonW*sf_facScaleDown*N_events/N_facScale[1] );
 	    
-	      h2p_renScaleUp->Fill( MR, t1Rsq, commonW*sf_renScaleUp*N_events/N_facScale[2] );
-	      h2p_renScaleDown->Fill( MR, t1Rsq, commonW*sf_renScaleDown*N_events/N_facScale[3] );
+	      //h2p_renScaleUp->Fill( MR, t1Rsq, commonW*sf_renScaleUp*N_events/N_facScale[2] );
+	      //h2p_renScaleDown->Fill( MR, t1Rsq, commonW*sf_renScaleDown*N_events/N_facScale[3] );
+	      //
+	      //h2p_facRenScaleUp->Fill( MR, t1Rsq, commonW*sf_facRenScaleUp*N_events/N_facScale[4] );
+	      //h2p_facRenScaleDown->Fill( MR, t1Rsq, commonW*sf_facRenScaleDown*N_events/N_facScale[5] );
+	      h2p_facScaleUp->Fill( MR, t1Rsq, commonW );
+	      h2p_facScaleDown->Fill( MR, t1Rsq, commonW );
+	    
+	      h2p_renScaleUp->Fill( MR, t1Rsq, commonW );
+	      h2p_renScaleDown->Fill( MR, t1Rsq, commonW );
 	      
-	      h2p_facRenScaleUp->Fill( MR, t1Rsq, commonW*sf_facRenScaleUp*N_events/N_facScale[4] );
-	      h2p_facRenScaleDown->Fill( MR, t1Rsq, commonW*sf_facRenScaleDown*N_events/N_facScale[5] );
+	      h2p_facRenScaleUp->Fill( MR, t1Rsq, commonW );
+	      h2p_facRenScaleDown->Fill( MR, t1Rsq, commonW );
 	      
 	      //PDF
 	      for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
 		{
-		  h2p_Pdf[ipdf]->Fill( MR, t1Rsq, commonW*sf_pdf->at(ipdf)*N_events/N_Pdf[ipdf] );
+		  h2p_Pdf[ipdf]->Fill( MR, t1Rsq, commonW );
+		  //h2p_Pdf[ipdf]->Fill( MR, t1Rsq, commonW*sf_pdf->at(ipdf)*N_events/N_Pdf[ipdf] );
 		}
 	      
 	      h2p_btagUp->Fill( MR, t1Rsq, commonW*sf_btagUp );
@@ -298,19 +305,28 @@ void HggRazorSystematics::Loop()
 	      h2p->Fill( MR, 0.999, commonW );
 	      h2p_Err->Fill( MR, 0.999, commonW*commonW );
 	      
-	      h2p_facScaleUp->Fill( MR, 0.999, commonW*sf_facScaleUp*N_events/N_facScale[0] );
-	      h2p_facScaleDown->Fill( MR, 0.999, commonW*sf_facScaleDown*N_events/N_facScale[1] );
+	      //h2p_facScaleUp->Fill( MR, 0.999, commonW*sf_facScaleUp*N_events/N_facScale[0] );
+	      //h2p_facScaleDown->Fill( MR, 0.999, commonW*sf_facScaleDown*N_events/N_facScale[1] );
+	      //
+	      //h2p_renScaleUp->Fill( MR, 0.999, commonW*sf_renScaleUp*N_events/N_facScale[2] );
+	      //h2p_renScaleDown->Fill( MR, 0.999, commonW*sf_renScaleDown*N_events/N_facScale[3] );
+	      //
+	      //h2p_facRenScaleUp->Fill( MR, 0.999, commonW*sf_facRenScaleUp*N_events/N_facScale[4] );
+	      //h2p_facRenScaleDown->Fill( MR, 0.999, commonW*sf_facRenScaleDown*N_events/N_facScale[5] );
+	      h2p_facScaleUp->Fill( MR, 0.999, commonW );
+	      h2p_facScaleDown->Fill( MR, 0.999, commonW );
 	      
-	      h2p_renScaleUp->Fill( MR, 0.999, commonW*sf_renScaleUp*N_events/N_facScale[2] );
-	      h2p_renScaleDown->Fill( MR, 0.999, commonW*sf_renScaleDown*N_events/N_facScale[3] );
+	      h2p_renScaleUp->Fill( MR, 0.999, commonW );
+	      h2p_renScaleDown->Fill( MR, 0.999, commonW );
 	      
-	      h2p_facRenScaleUp->Fill( MR, 0.999, commonW*sf_facRenScaleUp*N_events/N_facScale[4] );
-	      h2p_facRenScaleDown->Fill( MR, 0.999, commonW*sf_facRenScaleDown*N_events/N_facScale[5] );
+	      h2p_facRenScaleUp->Fill( MR, 0.999, commonW );
+	      h2p_facRenScaleDown->Fill( MR, 0.999, commonW );
 	      
 	      //PDF
 	      for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
 		{
-		  h2p_Pdf[ipdf]->Fill( MR, 0.999, commonW*sf_pdf->at(ipdf)*N_events/N_Pdf[ipdf] );
+		  h2p_Pdf[ipdf]->Fill( MR, 0.999, commonW );
+		  //h2p_Pdf[ipdf]->Fill( MR, 0.999, commonW*sf_pdf->at(ipdf)*N_events/N_Pdf[ipdf] );
 		}
 	      
 	      h2p_btagUp->Fill( MR, 0.999, commonW*sf_btagUp );
