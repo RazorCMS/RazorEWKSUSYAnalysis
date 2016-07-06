@@ -303,8 +303,9 @@ void HggRazorSystematics::Loop()
       //**********************************************************
 
 
-      float commonW = this->Lumi*weight*pileupWeight*btagCorrFactor;
+      float commonW = 0;
       if (_analysisTag == "Razor2015_76X") {
+	commonW = this->Lumi*weight*pileupWeight*btagCorrFactor;
       } else if (_analysisTag == "Razor2016_80X") {
 	commonW = this->Lumi*weight*pileupWeight*btagCorrFactor*triggerEffWeight;
       } else {
