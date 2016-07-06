@@ -17,7 +17,7 @@ class HggRazorSystematics : public HggTree
 public:
   HggRazorSystematics( );
   HggRazorSystematics( TTree* tree );
-  HggRazorSystematics( TTree* tree, TString processName, TString boxName, bool info = false, bool debug = false );
+  HggRazorSystematics( TTree* tree, TString processName, TString boxName, std::string analysisTag, bool info = false, bool debug = false );
   ~HggRazorSystematics( );
 
   bool InitMrRsqTH2Poly( int mode = 0 );
@@ -57,6 +57,7 @@ private:
   static float NR_kf;//lumi in pb-1
   static int n_PdfSys;
   
+  std::string _analysisTag;
   bool _debug;
   bool _info;
   TString processName;
