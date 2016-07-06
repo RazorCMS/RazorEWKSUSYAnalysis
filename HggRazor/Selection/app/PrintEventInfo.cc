@@ -157,9 +157,11 @@ float Rsq_Hbb[N_Hbb+1] = {0.01,0.05,1.00};
 
 //TString cut = "";
 //EBEB
-//TString cut = "mGammaGamma > 230. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1DefaultSC_Eta) <1.4442 && abs(pho2DefaultSC_Eta) < 1.4442 && pho1Pt> 75. && pho2Pt>75.";
+//TString cut = "mGammaGamma > 230. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1DefaultSC_Eta) <1.4442 && abs(pho2DefaultSC_Eta) < 1.4442 && pho1Pt> 75. && pho2Pt>75. && HLTDecision[93] == 1";
+//TString cut = "mGammaGamma > 230. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1DefaultSC_Eta) <1.4442 && abs(pho2DefaultSC_Eta) < 1.4442 && pho1Pt> 75. && pho2Pt>75. && HLTDecision[93] == 1 && MR > -99999999 && t1Rsq > -999999999 && 1";
+
 //EBEE
-TString cut = "mGammaGamma > 320. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1Pt> 75. && pho2Pt>75. && ( (abs(pho1DefaultSC_Eta) > 1.566 && abs(pho2DefaultSC_Eta) < 1.4442) || (abs(pho1DefaultSC_Eta) < 1.4442 && abs(pho2DefaultSC_Eta) > 1.566) ) ";
+TString cut = "mGammaGamma > 330. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1Pt> 75. && pho2Pt>75. && ( (abs(pho1DefaultSC_Eta) > 1.566 && abs(pho2DefaultSC_Eta) < 1.4442) || (abs(pho1DefaultSC_Eta) < 1.4442 && abs(pho2DefaultSC_Eta) > 1.566) ) && HLTDecision[93] == 1 && MR > -99999999 && t1Rsq > -999999999 && 1 ";
 
 int main ( int argc, char* argv[] )
 {
@@ -173,6 +175,7 @@ int main ( int argc, char* argv[] )
       return -1;
     }
 
+  
   std::string eventList = ParseCommandLine( argc, argv, "-eventList=" );
   if (  eventList == "" )
     {
@@ -184,15 +187,22 @@ int main ( int argc, char* argv[] )
   assert(ifs);
   std::cout << "[DEBUG]: input eventList file asserted" << std::endl;
   std::vector< std::pair<long int, long int> > myVect;
+  std::map< std::string, double > massMap;
+  
   long int run, lumi, event;
+  std::string key;
+  double mass;
   if ( ifs.is_open() )
     {
       while ( ifs.good() )
 	{
-	  ifs >> run >> lumi >> event;
+	  //ifs >> run >> lumi >> event;
+	  ifs >> key >> mass;
 	  if ( ifs.eof() ) break;
-	  std::cout << run << " " << lumi << " "  << event << std::endl;
-	  myVect.push_back( std::make_pair( run, event ) );
+	  //std::cout << run << " " << lumi << " "  << event << std::endl;
+	  //myVect.push_back( std::make_pair( run, event ) );
+	  if ( massMap.find( key ) == massMap.end() ) massMap[key] = mass;
+	  
 	}
       
     }
@@ -200,7 +210,13 @@ int main ( int argc, char* argv[] )
     {
       std::cout << "Unable to open: " << eventList << std::endl;
     }
- 
+
+  for ( auto tmp : massMap )
+    {
+      std::cout << tmp.first << " " << tmp.second << std::endl;
+    }
+
+    
   TFile* f = new TFile( inputFile.c_str(), "READ");
   std::cout << "[DEBUG]: asserting TFile" << std::endl;
   assert( f );
@@ -217,7 +233,7 @@ int main ( int argc, char* argv[] )
   //------------------------------------------------
   HggRazorClass* hggclass = new HggRazorClass( tree->CopyTree( cut ), "signalHM", "inclusive", false, false );
   hggclass->PrintEventInfo( );
-  //hggclass->PrintEventInfo( myVect );
+  hggclass->PrintEventInfo( massMap );
   
   return 0;
 }

@@ -62,7 +62,14 @@ int main( int argc, char* argv[])
   std::string categoryMode = ParseCommandLine( argc, argv, "-category=" );
   if (  categoryMode == "" )
     {
-      std::cerr << "[ERROR]: please provide the category. Use --category=<highpt,highres,lowres>" << std::endl;
+      std::cerr << "[ERROR]: please provide the category. Use --category=<highpt,highres,lowres,inclusive>" << std::endl;
+      return -1;
+    }
+
+  std::string detectorMode = ParseCommandLine( argc, argv, "-detector=" );
+  if (  detectorMode == "" )
+    {
+      std::cerr << "[ERROR]: please provide the detector. Use --detector=<ebeb,ebee>" << std::endl;
       return -1;
     }
 
@@ -198,16 +205,20 @@ int main( int argc, char* argv[])
   //combine datacard related
   //------------------------
   std::string inputFileSignal = ParseCommandLine( argc, argv, "-inputFileSignal=" );
-  if (  inputFileSignal == "" && fitMode == "datacard" && !_highMassMode )
+  if (  inputFileSignal == "" && (fitMode == "datacard"  || fitMode == "sb") && !_highMassMode )
     {
-      std::cerr << "[WARNING]: please provide an input file using --inputFileSignal=<path_to_file>" << std::endl;
+      std::cerr << "[ERROR]: please provide an input file using --inputFileSignal=<path_to_file>" << std::endl;
+      exit (EXIT_FAILURE);
+    }
+  
+  std::string inputFileSMH = ParseCommandLine( argc, argv, "-inputFileSMH=" );
+  if (  inputFileSMH == "" && (fitMode == "datacard" || fitMode == "sb") && !_highMassMode )
+    {
+      std::cerr << "[ERROR]: please provide an input file using --inputFileSMH=<path_to_file>" << std::endl;
+      exit (EXIT_FAILURE);
     }
 
-  std::string inputFileSMH = ParseCommandLine( argc, argv, "-inputFileSMH=" );
-  if (  inputFileSMH == "" && fitMode == "datacard" && !_highMassMode )
-    {
-      std::cerr << "[WARNING]: please provide an input file using --inputFileSMH=<path_to_file>" << std::endl;
-    }
+  
 
   //SMH nominal yield
   std::string SMH_Yield = ParseCommandLine( argc, argv, "-SMH_Yield=" );
@@ -269,8 +280,28 @@ int main( int argc, char* argv[])
     {
       _binNumber = binNumber;
     }
-  
-  
+
+  std::string sModel = ParseCommandLine( argc, argv, "-sModel=" );
+  TString _sModel = "myModel";
+  if (  sModel == "" && fitMode == "datacard" )
+    {
+      std::cerr << "[WARNING]: please provide a Signal Model name, --sModel=<signal model name>" << std::endl;
+    }
+  else
+    {
+      _sModel = sModel;
+    }
+
+  bool _signalOnly = false;
+  std::string sOnly = ParseCommandLine( argc, argv, "-sOnly=" );
+  if (  sOnly == "yes" && fitMode == "datacard" )
+    {
+      _signalOnly = true;
+    }
+  else
+    {
+      std::cerr << "[WARNING]: please provide a valid option for signal Only datacard, --sOnly=<yes>" << std::endl;
+    }
   
   if (  f1 != "" ) std::cout << "[INFO]: f1    :" << f1 << std::endl;
   if (  f2 != "" ) std::cout << "[INFO]: f2    :" << f2 << std::endl;
@@ -298,11 +329,17 @@ int main( int argc, char* argv[])
   else if ( dataMode == "data+signal" )
     {
       f = new TFile( inputFile.c_str() , "READ");
+      assert ( f );
       tree = (TTree*)f->Get( treeName.c_str() );
+      assert ( tree );
       fs = new TFile( inputFileSignal.c_str() , "READ");
+      assert ( fs );
       treeSignal = (TTree*)fs->Get( treeName.c_str() );
+      assert ( treeSignal );
       fsmh = new TFile( inputFileSMH.c_str() , "READ");
+      assert ( fsmh );
       treeSMH = (TTree*)fsmh->Get( treeName.c_str() );
+      assert ( treeSMH );
       _getSignal = true;
     }
  
@@ -388,7 +425,7 @@ int main( int argc, char* argv[])
     if (BinSelection == "13") BinCutString = " && MR > 400 && MR <= 1200 && t1Rsq >= 0.05 ";
     if (BinSelection == "14") BinCutString = " && MR > 1200  ";
   }
- 
+  
   //----------------
   // M a i n   C u t
   //----------------
@@ -397,17 +434,31 @@ int main( int argc, char* argv[])
   TString cut = "mGammaGamma >103. && mGammaGamma < 160. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.";
   TString cutMETfilters = "";
   TString cutTrigger = "";
+
+  TString cutMETfiltersData = " && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1)";
+  TString cutTriggerData = " && ( HLTDecision[82] == 1 || HLTDecision[83] || HLTDecision[93] )";
+  
+  //TString cutTriggerData = " && ( HLTDecision[82] == 1 || HLTDecision[83] || HLTDecision[93] || HLTDecision[87] )";
+  //TString cutMETfiltersData = " && 1";
+  //TString cutTriggerData = " && 1";
+  
+  
   //assymetric cut on photon PT
   //TString cut = "mGammaGamma >103. && mGammaGamma < 160. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 40. && pho2Pt>40.";
   //TString cutMETfilters = "&& (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
   if ( _highMassMode )
     {
       //EBEB
-      //cut = "mGammaGamma > 230. && mGammaGamma < 1230. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1DefaultSC_Eta) <1.4442 && abs(pho2DefaultSC_Eta) < 1.4442 && pho1Pt> 75. && pho2Pt>75.";
-      cut = "mGammaGamma > 230. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.4442 && abs(pho2Eta) < 1.4442 && pho1Pt> 75. && pho2Pt>75.";
+      if ( detectorMode == "ebeb")
+	{
+	  cut = "mGammaGamma > 230. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1DefaultSC_Eta) <1.4442 && abs(pho2DefaultSC_Eta) < 1.4442 && pho1Pt> 75. && pho2Pt>75. && HLTDecision[93] == 1";
+	}
       //EBEE
-      //cut = "mGammaGamma > 230. && mGammaGamma < 1230. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1Pt> 75. && pho2Pt>75. && ( (abs(pho1DefaultSC_Eta) > 1.566 && abs(pho2DefaultSC_Eta) < 1.4442) || (abs(pho1DefaultSC_Eta) < 1.4442 && abs(pho2DefaultSC_Eta) > 1.566) ) ";
-      cutMETfilters = " && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
+      else if ( detectorMode == "ebee" )
+	{
+	  cut = "mGammaGamma > 330. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1Pt> 75. && pho2Pt>75. && ( (abs(pho1DefaultSC_Eta) > 1.566 && abs(pho2DefaultSC_Eta) < 1.4442) || (abs(pho1DefaultSC_Eta) < 1.4442 && abs(pho2DefaultSC_Eta) > 1.566) ) && HLTDecision[93] == 1";
+	}
+      cutMETfilters = " && 1";
     }
   
   if(fitMode == "AIC2")
@@ -445,6 +496,7 @@ int main( int argc, char* argv[])
       else if (categoryMode == "hzbb") categoryCutString = " && pTGammaGamma < 110 && ( abs(mbbH_L-125.) < 15 || ( abs(mbbZ_L-91.) < 15 && abs(mbbH_L-125.) >= 15 ) )";
       else if (categoryMode == "highres") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH_L-125.)>=15 && abs(mbbZ_L-91.)>=15 && sigmaMoverM < 0.0085";
       else if (categoryMode == "lowres") categoryCutString = " && pTGammaGamma < 110  && abs(mbbH_L-125.)>=15 && abs(mbbZ_L-91.)>=15 && sigmaMoverM >= 0.0085";
+      else if (categoryMode == "highresInclusive") categoryCutString = " && sigmaMoverM < 0.0085";
       else if (categoryMode == "inclusive") categoryCutString = "";
     }
   //---------------------------------------------
@@ -521,10 +573,12 @@ int main( int argc, char* argv[])
       RooWorkspace* w_sb;
       if ( !_getSignal ) 
 	{
+	  std::cout << "[INFO]: S+B Fit without SMH and Signal Tree" << std::endl;
 	  w_sb = MakeSignalBkgFit( tree->CopyTree( cut ), forceSigma, constrainMu, forceMu, mggName );
 	}
       else
 	{
+	  std::cout << "[INFO]: S+B Fit with SMH and Signal Tree" << std::endl;
 	  w_sb = MakeSignalBkgFit( tree->CopyTree( cut ), treeSignal->CopyTree( cut ), treeSMH->CopyTree( cut ), mggName, _highMassMode );
 	}
       w_sb->Write("w_sb");
@@ -535,12 +589,12 @@ int main( int argc, char* argv[])
       std::cout << "calling MakeDataCard" << std::endl;
       if ( _highMassMode )
 	{
-	  w_sb = MakeDataCardHMD( tree->CopyTree( cut ), mggName, _Signal_Yield, Signal_CL, Mass, binNumber, categoryMode );
+	  MakeDataCardHMD( tree->CopyTree( cut ), mggName, _Signal_Yield, Signal_CL, Mass, binNumber, categoryMode );
 	}
       else
 	{
-	  w_sb = MakeDataCard( tree->CopyTree( cut ), treeSignal->CopyTree( cut ), treeSMH->CopyTree( cut ), mggName, _SMH_Yield, SMH_CL,
-			       _Signal_Yield, Signal_CL, binNumber, categoryMode, _highMassMode );
+	  w_sb = MakeDataCard( tree->CopyTree( cut+cutMETfiltersData+cutTriggerData ), treeSignal->CopyTree( cut ), treeSMH->CopyTree( cut ), mggName, _SMH_Yield, SMH_CL,
+			       _Signal_Yield, Signal_CL, binNumber, categoryMode, _highMassMode, _sModel, f1, _signalOnly );
 	}
       std::cout << "finish MakeDataCard" << std::endl;
       //w_sb->Write("w_sb");
@@ -676,7 +730,10 @@ int main( int argc, char* argv[])
     {
       //RooWorkspace* w_sFit = DoubleGausFit( tree->CopyTree( cut ), forceSigma, sameMu, forceMu, mggName );
       //RooWorkspace* w_sFit = DoubleCBFit( tree->CopyTree( cut ), mggName, 125., 2. );
-      RooWorkspace* w_sFit = DoubleCBFit( tree->CopyTree( cut ), mggName, Mass, Sigma );
+      RooWorkspace* w_sFit;
+       if ( _highMassMode ) w_sFit = DoubleCBFit( tree->CopyTree( cut ), mggName, Mass, Sigma );
+       else w_sFit = DoubleCBFitHggRazor( tree->CopyTree( cut ), mggName, 125., 1.2 );
+       
       w_sFit->Write("w_sFit");
     }
   else if ( fitMode == "chooseBinning")

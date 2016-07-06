@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Tue Apr 19 00:15:26 2016 by ROOT version 6.06/00
-// from TTree HggTree/Info on selected razor inclusive events
-// found on file: ttHToGG_M125_13TeV_powheg_pythia8_SystematicFixed_1pb_weighted.root
+// Wed Jul  6 22:29:46 2016 by ROOT version 6.06/02
+// from TTree HggRazor/Info on selected razor inclusive events
+// found on file: HggRazor_GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8_1pb_weighted.root
 //////////////////////////////////////////////////////////
 
 #ifndef HggTree_h
@@ -13,7 +13,7 @@
 #include <TFile.h>
 
 // Header file for the classes stored in the TTree if any.
-#include <vector>
+#include "vector"
 
 class HggTree {
 public :
@@ -27,6 +27,7 @@ public :
    Float_t         pileupWeight;
    Float_t         pileupWeightUp;
    Float_t         pileupWeightDown;
+   Float_t         triggerEffWeight;
    Float_t         ISRSystWeightUp;
    Float_t         ISRSystWeightDown;
    Float_t         btagCorrFactor;
@@ -40,10 +41,12 @@ public :
    Float_t         sf_renScaleDown;
    Float_t         sf_facRenScaleUp;
    Float_t         sf_facRenScaleDown;
-   std::vector<float>   *pdfWeights;
-   std::vector<float>   *sf_pdf;
+  std::vector<float>   *pdfWeights;
+  std::vector<float>   *sf_pdf;
    Bool_t          Flag_HBHENoiseFilter;
    Bool_t          Flag_HBHEIsoNoiseFilter;
+   Bool_t          Flag_badChargedCandidateFilter;
+   Bool_t          Flag_badMuonFilter;
    Bool_t          Flag_CSCTightHaloFilter;
    Bool_t          Flag_hcalLaserEventFilter;
    Bool_t          Flag_EcalDeadCellTriggerPrimitiveFilter;
@@ -83,6 +86,7 @@ public :
    Float_t         t1MET;
    Float_t         t1MET_JESUp;
    Float_t         t1MET_JESDown;
+   Float_t         HT;
    Int_t           nSelectedPhotons;
    Float_t         mGammaGamma;
    Float_t         pTGammaGamma;
@@ -131,28 +135,32 @@ public :
    Float_t         mbbZ_L;
    Float_t         mbbH_L;
    Int_t           n_Jets;
-   Float_t         jet_E[100];   //[n_Jets]
-   Float_t         jet_Pt[100];   //[n_Jets]
-   Float_t         jet_Eta[100];   //[n_Jets]
-   Float_t         jet_Phi[100];   //[n_Jets]
+   Float_t         jet_E[10];   //[n_Jets]
+   Float_t         jet_Pt[10];   //[n_Jets]
+   Float_t         jet_Eta[10];   //[n_Jets]
+   Float_t         jet_Phi[10];   //[n_Jets]
+   Bool_t          jetIsCSVL[10];   //[n_Jets]
+   Bool_t          jetIsCSVM[10];   //[n_Jets]
+   Bool_t          jetIsCSVT[10];   //[n_Jets]
    Int_t           n_Jets_JESUp;
    Int_t           n_Jets_JESDown;
    Bool_t          HLTDecision[300];
    Int_t           nGenParticle;
-   Int_t           gParticleMotherId[200];   //[nGenParticle]
-   Int_t           gParticleMotherIndex[200];   //[nGenParticle]
-   Int_t           gParticleId[200];   //[nGenParticle]
-   Int_t           gParticleStatus[200];   //[nGenParticle]
-   Float_t         gParticleE[200];   //[nGenParticle]
-   Float_t         gParticlePt[200];   //[nGenParticle]
-   Float_t         gParticlePhi[200];   //[nGenParticle]
-   Float_t         gParticleEta[200];   //[nGenParticle]
+   Int_t           gParticleMotherId[38];   //[nGenParticle]
+   Int_t           gParticleMotherIndex[38];   //[nGenParticle]
+   Int_t           gParticleId[38];   //[nGenParticle]
+   Int_t           gParticleStatus[38];   //[nGenParticle]
+   Float_t         gParticleE[38];   //[nGenParticle]
+   Float_t         gParticlePt[38];   //[nGenParticle]
+   Float_t         gParticlePhi[38];   //[nGenParticle]
+   Float_t         gParticleEta[38];   //[nGenParticle]
 
    // List of branches
    TBranch        *b_weight;   //!
    TBranch        *b_pileupWeight;   //!
    TBranch        *b_pileupWeightUp;   //!
    TBranch        *b_pileupWeightDown;   //!
+   TBranch        *b_triggerEffWeight;   //!
    TBranch        *b_ISRSystWeightUp;   //!
    TBranch        *b_ISRSystWeightDown;   //!
    TBranch        *b_btagCorrFactor;   //!
@@ -170,6 +178,8 @@ public :
    TBranch        *b_sf_pdf;   //!
    TBranch        *b_Flag_HBHENoiseFilter;   //!
    TBranch        *b_Flag_HBHEIsoNoiseFilter;   //!
+   TBranch        *b_Flag_badChargedCandidateFilter;   //!
+   TBranch        *b_Flag_badMuonFilter;   //!
    TBranch        *b_Flag_CSCTightHaloFilter;   //!
    TBranch        *b_Flag_hcalLaserEventFilter;   //!
    TBranch        *b_Flag_EcalDeadCellTriggerPrimitiveFilter;   //!
@@ -209,6 +219,7 @@ public :
    TBranch        *b_t1MET;   //!
    TBranch        *b_t1MET_JESUp;   //!
    TBranch        *b_t1MET_JESDown;   //!
+   TBranch        *b_HT;   //!
    TBranch        *b_nSelectedPhotons;   //!
    TBranch        *b_mGammaGamma;   //!
    TBranch        *b_pTGammaGamma;   //!
@@ -261,6 +272,9 @@ public :
    TBranch        *b_jet_Pt;   //!
    TBranch        *b_jet_Eta;   //!
    TBranch        *b_jet_Phi;   //!
+   TBranch        *b_jetIsCSVL;   //!
+   TBranch        *b_jetIsCSVM;   //!
+   TBranch        *b_jetIsCSVT;   //!
    TBranch        *b_n_Jets_JESUp;   //!
    TBranch        *b_n_Jets_JESDown;   //!
    TBranch        *b_HLTDecision;   //!
@@ -293,9 +307,9 @@ HggTree::HggTree(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("ttHToGG_M125_13TeV_powheg_pythia8_SystematicFixed_1pb_weighted.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("HggTree_GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8_1pb_weighted.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("ttHToGG_M125_13TeV_powheg_pythia8_SystematicFixed_1pb_weighted.root");
+         f = new TFile("HggTree_GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8_1pb_weighted.root");
       }
       f->GetObject("HggTree",tree);
 
@@ -351,6 +365,7 @@ void HggTree::Init(TTree *tree)
    fChain->SetBranchAddress("pileupWeight", &pileupWeight, &b_pileupWeight);
    fChain->SetBranchAddress("pileupWeightUp", &pileupWeightUp, &b_pileupWeightUp);
    fChain->SetBranchAddress("pileupWeightDown", &pileupWeightDown, &b_pileupWeightDown);
+   fChain->SetBranchAddress("triggerEffWeight", &triggerEffWeight, &b_triggerEffWeight);
    fChain->SetBranchAddress("ISRSystWeightUp", &ISRSystWeightUp, &b_ISRSystWeightUp);
    fChain->SetBranchAddress("ISRSystWeightDown", &ISRSystWeightDown, &b_ISRSystWeightDown);
    fChain->SetBranchAddress("btagCorrFactor", &btagCorrFactor, &b_btagCorrFactor);
@@ -368,6 +383,8 @@ void HggTree::Init(TTree *tree)
    fChain->SetBranchAddress("sf_pdf", &sf_pdf, &b_sf_pdf);
    fChain->SetBranchAddress("Flag_HBHENoiseFilter", &Flag_HBHENoiseFilter, &b_Flag_HBHENoiseFilter);
    fChain->SetBranchAddress("Flag_HBHEIsoNoiseFilter", &Flag_HBHEIsoNoiseFilter, &b_Flag_HBHEIsoNoiseFilter);
+   fChain->SetBranchAddress("Flag_badChargedCandidateFilter", &Flag_badChargedCandidateFilter, &b_Flag_badChargedCandidateFilter);
+   fChain->SetBranchAddress("Flag_badMuonFilter", &Flag_badMuonFilter, &b_Flag_badMuonFilter);
    fChain->SetBranchAddress("Flag_CSCTightHaloFilter", &Flag_CSCTightHaloFilter, &b_Flag_CSCTightHaloFilter);
    fChain->SetBranchAddress("Flag_hcalLaserEventFilter", &Flag_hcalLaserEventFilter, &b_Flag_hcalLaserEventFilter);
    fChain->SetBranchAddress("Flag_EcalDeadCellTriggerPrimitiveFilter", &Flag_EcalDeadCellTriggerPrimitiveFilter, &b_Flag_EcalDeadCellTriggerPrimitiveFilter);
@@ -407,6 +424,7 @@ void HggTree::Init(TTree *tree)
    fChain->SetBranchAddress("t1MET", &t1MET, &b_t1MET);
    fChain->SetBranchAddress("t1MET_JESUp", &t1MET_JESUp, &b_t1MET_JESUp);
    fChain->SetBranchAddress("t1MET_JESDown", &t1MET_JESDown, &b_t1MET_JESDown);
+   fChain->SetBranchAddress("HT", &HT, &b_HT);
    fChain->SetBranchAddress("nSelectedPhotons", &nSelectedPhotons, &b_nSelectedPhotons);
    fChain->SetBranchAddress("mGammaGamma", &mGammaGamma, &b_mGammaGamma);
    fChain->SetBranchAddress("pTGammaGamma", &pTGammaGamma, &b_pTGammaGamma);
@@ -459,6 +477,9 @@ void HggTree::Init(TTree *tree)
    fChain->SetBranchAddress("jet_Pt", jet_Pt, &b_jet_Pt);
    fChain->SetBranchAddress("jet_Eta", jet_Eta, &b_jet_Eta);
    fChain->SetBranchAddress("jet_Phi", jet_Phi, &b_jet_Phi);
+   fChain->SetBranchAddress("jetIsCSVL", jetIsCSVL, &b_jetIsCSVL);
+   fChain->SetBranchAddress("jetIsCSVM", jetIsCSVM, &b_jetIsCSVM);
+   fChain->SetBranchAddress("jetIsCSVT", jetIsCSVT, &b_jetIsCSVT);
    fChain->SetBranchAddress("n_Jets_JESUp", &n_Jets_JESUp, &b_n_Jets_JESUp);
    fChain->SetBranchAddress("n_Jets_JESDown", &n_Jets_JESDown, &b_n_Jets_JESDown);
    fChain->SetBranchAddress("HLTDecision", HLTDecision, &b_HLTDecision);

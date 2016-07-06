@@ -1,0 +1,8 @@
+data /afs/cern.ch/work/s/sixie/public/releases/run2/CMSSW_7_4_2/src/RazorEWKSUSYAnalysis/HggRazor/PlottingAndSystematic/lists/cern/Diphoton/Data.list
+gammaJet /afs/cern.ch/work/s/sixie/public/releases/run2/CMSSW_7_4_2/src/RazorEWKSUSYAnalysis/HggRazor/PlottingAndSystematic/lists/cern/Diphoton/GJets.list
+ggH	 /afs/cern.ch/work/s/sixie/public/releases/run2/CMSSW_7_4_2/src/RazorEWKSUSYAnalysis/HggRazor/PlottingAndSystematic/lists/cern/Diphoton/GGH.list
+vbfH	 /afs/cern.ch/work/s/sixie/public/releases/run2/CMSSW_7_4_2/src/RazorEWKSUSYAnalysis/HggRazor/PlottingAndSystematic/lists/cern/Diphoton/VBFH.list
+vH	 /afs/cern.ch/work/s/sixie/public/releases/run2/CMSSW_7_4_2/src/RazorEWKSUSYAnalysis/HggRazor/PlottingAndSystematic/lists/cern/Diphoton/VH.list
+ttH	 /afs/cern.ch/work/s/sixie/public/releases/run2/CMSSW_7_4_2/src/RazorEWKSUSYAnalysis/HggRazor/PlottingAndSystematic/lists/cern/Diphoton/TTH.list
+diphoton /afs/cern.ch/work/s/sixie/public/releases/run2/CMSSW_7_4_2/src/RazorEWKSUSYAnalysis/HggRazor/PlottingAndSystematic/lists/cern/Diphoton/Diphoton.list
+qcd	 /afs/cern.ch/work/s/sixie/public/releases/run2/CMSSW_7_4_2/src/RazorEWKSUSYAnalysis/HggRazor/PlottingAndSystematic/lists/cern/Diphoton/QCD.list

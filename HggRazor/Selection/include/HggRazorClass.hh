@@ -3,6 +3,7 @@
 //C++ INCLUDES
 #include <iostream>
 #include <string>
+#include <sstream>
 //ROOT INCLUDES
 #include <TH1F.h>
 #include <TH2F.h>
@@ -55,6 +56,7 @@ public:
   bool IntUnrollHistos( );
   void Loop();
   void CreateEffTable( float ntotal );
+  void PrintEventInfo(  std::map< std::string, double > eventList );
   void PrintEventInfo( std::vector< std::pair<long int, long int> > eventList );
   void PrintEventInfo( );
   float GetYields( float mr, float rsq, float mgg_l, float mgg_h );

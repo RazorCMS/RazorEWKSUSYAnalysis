@@ -21,14 +21,14 @@
 //float HggRazorClass::mgg_h = 160.;
 
 //HighMass Diphotons
-int HggRazorClass::n_mgg   = 50;
-float HggRazorClass::mgg_l = 230.;
-float HggRazorClass::mgg_h = 1230.;
+//int HggRazorClass::n_mgg   = 50;
+//float HggRazorClass::mgg_l = 230.;
+//float HggRazorClass::mgg_h = 1230.;
 
 //Z
-//int HggRazorClass::n_mgg = 28;
-//float HggRazorClass::mgg_l = 70.;
-//float HggRazorClass::mgg_h = 112.;
+int HggRazorClass::n_mgg = 60;
+float HggRazorClass::mgg_l = 60.;
+float HggRazorClass::mgg_h = 120.;
 
 int HggRazorClass::n_ptgg   = 52;
 float HggRazorClass::ptgg_l = 0.;
@@ -176,12 +176,16 @@ float lres_k[2] = { 1.0, 1.0};
 
 //DATA
 //GammaGamma
-//TString cut = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1";
+//TString cut = "MR > 0 && t1Rsq > 0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1";
 //MGammaGamma HighMass
-TString cut = "abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>0 && mGammaGamma>230 && mGammaGamma<1230 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1";
+//TString cut = "abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>0 && mGammaGamma>230 && mGammaGamma<1230 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1";
 
+
+//----------------
+//Zee
+//----------------
 //EBEB
-//TString cut = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) < 1.479 && abs( pho2Eta ) < 1.479 && mGammaGamma>60. && mGammaGamma<120. && pho1Pt>30 && pho2Pt>20";
+TString cut = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) < 1.479 && abs( pho2Eta ) < 1.479 && mGammaGamma>60. && mGammaGamma<120. && pho1Pt>30 && pho2Pt>20";
 
 //EBEE
 //TString cut = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && ( ( abs( pho1Eta ) < 1.479 && abs( pho2Eta ) > 1.479 ) || (abs( pho1Eta ) > 1.479 && abs( pho2Eta ) < 1.479 ) ) && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && mGammaGamma>60. && mGammaGamma<120.";
@@ -194,11 +198,11 @@ TString cut = "abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && pho1Pt > 25. &&
 //GammaGamma
 //TString cut_mc = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1";
 //GammaGamma HighMass
-TString cut_mc = "abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>0 && mGammaGamma>230 && mGammaGamma<1230 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1";
+//TString cut_mc = "abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>0 && mGammaGamma>230 && mGammaGamma<1230 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1";
 
 //Zee
 //EBEB
-//TString cut_mc = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) < 1.479 && abs( pho2Eta ) < 1.479 && mGammaGamma>60. && mGammaGamma<120. && pho1Pt>30 && pho2Pt>20";
+TString cut_mc = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && abs( pho1Eta ) < 1.479 && abs( pho2Eta ) < 1.479 && mGammaGamma>60. && mGammaGamma<120. && pho1Pt>30 && pho2Pt>20";
 
 //EBEE
 //TString cut_mc = "pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && ( ( abs( pho1Eta ) < 1.479 && abs( pho2Eta ) > 1.479 ) || (abs( pho1Eta ) > 1.479 && abs( pho2Eta ) < 1.479 ) )  && ( HLTDecision[30] == 1 || HLTDecision[31] == 1 ) && mGammaGamma>60. && mGammaGamma<120.";
@@ -304,7 +308,7 @@ int main ( int argc, char* argv[] )
   TH1D* mc2 = new TH1D();
 
   int map_size = mapList.size();
-  const int nprocesses = 4;//mc+data
+  const int nprocesses = 2;//mc+data
   //check nprocesses and map_size consistency
   if( map_size != nprocesses )
     {
@@ -314,7 +318,7 @@ int main ( int argc, char* argv[] )
   const int nplots = 4;
   double k_f = 1.37;//Difference in data/mc normalization
   const double lumi_frac = 1.0; // (5./19.8)
-  const double lumi = 2317.0;
+  const double lumi = 2000.0;
   const int mod = 0; 
   if ( treeType == "inclusive" )
     {
@@ -325,12 +329,12 @@ int main ( int argc, char* argv[] )
 	{
 	  std::string processName = GetProcessString( process );
 	  //DY control region
-	  //	  if ( !(process == Process::data || process == Process::dy) ) continue;
+	  if ( !(process == Process::data || process == Process::dy) ) continue;
 	  //HggRazor
 	  /*if ( !(process == Process::data || process == Process::diphoton || process == Process::gammaJet
 	    || process == Process::ggH || process == Process::vbfH || process == Process::vH || process == Process::ttH) ) continue;*/
 	  //highmass
-	  if ( !(process == Process::data || process == Process::diphoton || process == Process::gammaJet || process == Process::qcd) ) continue;
+	  //if ( !(process == Process::data || process == Process::diphoton || process == Process::gammaJet || process == Process::qcd) ) continue;
 	  //Hggrazor with Signal
 	  /*if ( !(process == Process::data || process == Process::signal || process == Process::diphoton || process == Process::gammaJet
 		 || process == Process::ggH  || process == Process::vbfH || process == Process::vH || process == Process::ttH) ) continue;
@@ -342,16 +346,6 @@ int main ( int argc, char* argv[] )
 	  AddTChain( chain, mapList[processName] );
 	  //need to create temporary root file to store cutTree
 	  TFile* tmp = new TFile("tmp.root","recreate");
-	  
-	  //if ( !(process == Process::data || process == Process::diphoton || process == Process::gammaJet || process == Process::signal) ) continue;
-
-	  /*if ( !(process == Process::data || process == Process::diphoton || process == Process::gammaJet || process == Process::qcd
-	    || process == Process::ggH  || process == Process::vbfH || process == Process::vH || process == Process::ttH) ) continue;*/
-
-	  /*if ( !(process == Process::data || process == Process::diphoton || process == Process::gammaJet
-	    || process == Process::ggH  || process == Process::vbfH || process == Process::vH || process == Process::ttH) ) continue;*/
-	  
-	  //if ( !(process == Process::data || process == Process::diphoton || process == Process::gammaJet) ) continue;
 
 	  
 	  if ( chain == NULL )
@@ -364,11 +358,13 @@ int main ( int argc, char* argv[] )
 	  //------------------------
 	  if ( process == Process::data )
 	    {
-	      cutTree = (TTree*)chain->CopyTree( cut + " && " + mggCut + " && " + triggerCut );
+	      std::cout << "CUT--> " << cut << std::endl; 
+	      cutTree = (TTree*)chain->CopyTree( cut );
 	    }
 	  else
 	    {
-	      cutTree = (TTree*)chain->CopyTree( cut_mc + " && " + mggCut + " && " + triggerCut );
+	      std::cout << "CUT--> " << cut << std::endl;
+	      cutTree = (TTree*)chain->CopyTree( cut );
 	    }
 	  
 	  if ( cutTree == NULL )

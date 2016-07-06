@@ -469,8 +469,8 @@ void HggRazorClass::Loop()
 	}
       else
 	{ 
-	  w = weight*pileupWeight;
-	  //w = weight;
+	  //w = weight*pileupWeight;
+	  w = weight;
 	}
       total_in += w;
       bool pho1_isFake = false;
@@ -480,7 +480,7 @@ void HggRazorClass::Loop()
       bool prompt_prompt = false;
       bool prompt_fake = false;
       if ( abs(pho1MotherID) > 6 && pho1MotherID != 21 && pho1MotherID != 2212 ) pho1_isFake = true;
-      if ( abs(pho2MotherID) > 6 && pho2MotherID != 21 && pho1MotherID != 2212) pho2_isFake = true;
+      if ( abs(pho2MotherID) > 6 && pho2MotherID != 21 && pho2MotherID != 2212 ) pho2_isFake = true;
       if ( pho1_isFake && pho2_isFake ) isFakeFake = true;
       if ( pho1_isFake || pho2_isFake ) isFake = true;
       if ( !pho1_isFake && !pho2_isFake ) prompt_prompt = true;
@@ -509,15 +509,24 @@ void HggRazorClass::Loop()
       if ( this->processName == "data") {
 	eventListFile << run << ":" << lumi << ":" << event << " " << mGammaGamma << " " << pTGammaGamma << "\n";
 
-	if (run == 256868 && event == 249023291) {
-	  std::cout << run << " " << lumi << " " << event << " " 
-	       << mGammaGamma << " " << pho1Pt << " " << pho2Pt << " "<< pho1SC_Eta << " " << pho2SC_Eta << " "
-	       << pho1passIso << " " << pho1passEleVeto << " " << pho2passIso << " " << pho2passEleVeto << " " 
-	       << pho1sumChargedHadronPt << " " << pho1sumPhotonEt << " "
-	       << pho2sumChargedHadronPt << " " << pho2sumPhotonEt << " "
-	       << "\n";
-	}
+	if ( (run == 257599 && event == 70453791)
+	     || (run == 257751 && event == 574166707)
+	     || (run == 257819 && event == 282341157)
+	     || (run == 258158 && event == 1085902048)
+	     || (run == 258706 && event == 408647369)
+	     || (run == 258745 && event == 281691943)
+	     || (run == 260577 && event == 78202076)
+	     || (run == 260627 && event == 1194561753)
+	     || (run == 260627 && event == 1654748778)
 
+	     ) {
+	  std::cout << run << " " << lumi << " " << event << " " 
+		    << mGammaGamma << " " << pho1Pt << " " << pho2Pt << " "<< pho1SC_Eta << " " << pho2SC_Eta << " "
+		    << pho1passIso << " " << pho1passEleVeto << " " << pho2passIso << " " << pho2passEleVeto << " " 
+		    << pho1sumChargedHadronPt << " " << pho1sumPhotonEt << " "
+		    << pho2sumChargedHadronPt << " " << pho2sumPhotonEt << " "
+		    << "\n";
+	}	
       }
 
 
@@ -581,6 +590,42 @@ void HggRazorClass::Loop()
   std::cout << "NEventsMgg500_EBEE = " << NEventsMgg500_EBEE  << "\n";
 
   if ( _debug ) std::cout << "[DEBUG]: Finishing Loop" << std::endl;
+};
+
+void HggRazorClass::PrintEventInfo(  std::vector< std::pair<long int, long int> > eventList )
+{
+  if ( _debug ) std::cout << "[DEBUG]: Entering Loop" << std::endl;
+  if (fChain == 0) return;
+  
+  Long64_t nentries = fChain->GetEntriesFast();
+  Long64_t nbytes = 0, nb = 0;
+  double total_in = 0, total_rm = 0;
+  std::cout << "[INFO]: nentries: " << nentries << std::endl;
+  
+  for (Long64_t jentry=0; jentry < nentries; jentry++ )
+    {
+      Long64_t ientry = LoadTree(jentry);
+      
+      if (ientry < 0) break;
+      nb = fChain->GetEntry(jentry);   nbytes += nb;
+      std::pair<long int, long int> myPair = std::make_pair(run,event);
+      for ( auto tmp : eventList )
+	{
+	  //std::cout << "test: " << tmp.first << " " << tmp.second << "\n";
+	  if ( long (tmp.first) == long (run) && long (tmp.second) == long (event) )
+	    {
+	      std::cout << run << " " << lumi << " " << event << " " << mGammaGamma << " " << pho1Pt << " " << pho1Eta << " " << pho1SC_Eta
+			<< " " << pho1passIso << " " << pho1passEleVeto << " " << pho1sumChargedHadronPt << " " << pho1sumNeutralHadronEt << " "  << pho1sumPhotonEt
+			<< " " << pho2Pt << " " << pho2Eta << " " << pho2SC_Eta << " " << pho2passIso << " " << pho2passEleVeto
+			<< " " << pho2sumChargedHadronPt << " " << pho2sumNeutralHadronEt << " "  << pho2sumPhotonEt;
+	      if ( pho1passIso == 0 || pho2passIso == 0 ) std::cout << " Iso!" << std::endl;
+	      else if ( ( fabs(pho1SC_Eta) > 1.4442 && fabs(pho1SC_Eta) < 1.566 ) || ( fabs(pho2SC_Eta) > 1.4442 && fabs(pho2SC_Eta) < 1.566 ) ) std::cout << " crack!\n";
+	      else if ( mGammaGamma < 230.0 ) std::cout << " mgg!\n";
+	      else std::cout << "\n";
+	    }
+	}
+    }
+  
 };
 
 float HggRazorClass::GetHighPtGB( double mr, double r2 )

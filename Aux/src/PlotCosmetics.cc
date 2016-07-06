@@ -30,8 +30,8 @@ const float bottomMargin = 0.12;
 //CMS STANDARD
 TString CMSText = "CMS";
 TString extraText   = "Preliminary";
-//TString lumiText = "2.32 fb^{-1} (13 TeV)";
-TString lumiText = "27 pb^{-1} (13 TeV)";
+TString lumiText = "2.0 fb^{-1} (13 TeV)";
+//TString lumiText = "27 pb^{-1} (13 TeV)";
 //TString lumiText = "19.8 fb^{-1} (8 TeV)";
 
 bool MakeCustomMrRsq( TH2F* h, TString outName )
@@ -742,6 +742,7 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
   //pad1->SetLogy();
   pad1->Update();
   c->SaveAs( outName+".pdf" );
+  c->SaveAs( outName+".png" );
   c->SaveAs( outName+".C" );
   delete c;
   return true;

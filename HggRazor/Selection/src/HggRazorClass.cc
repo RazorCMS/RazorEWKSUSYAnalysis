@@ -434,6 +434,20 @@ bool HggRazorClass::IntUnrollHistos( )
 
 void HggRazorClass::Loop()
 {
+
+  //--------------------------------
+  //Photon Trigger Efficiency
+  //--------------------------------
+  TFile *photonTriggerEffFile_LeadingLeg = TFile::Open("root://eoscms:///eos/cms/store/group/phys_susy/razor/Run2Analysis/ScaleFactors/PhotonEfficiencies/2016_Golden_2p6ifb/PhoHLTLeadingLegEffDenominatorLoose.root");
+  TFile *photonTriggerEffFile_TrailingLeg = TFile::Open("root://eoscms:///eos/cms/store/group/phys_susy/razor/Run2Analysis/ScaleFactors/PhotonEfficiencies/2016_Golden_2p6ifb/PhoHLTTrailingLegEffDenominatorLoose.root");
+  TH2D *photonTriggerEffHist_LeadingLeg = (TH2D*)photonTriggerEffFile_LeadingLeg->Get("hEffEtaPt");
+  TH2D *photonTriggerEffHist_TrailingLeg = (TH2D*)photonTriggerEffFile_TrailingLeg->Get("hEffEtaPt");
+  if(!(photonTriggerEffHist_LeadingLeg && photonTriggerEffHist_TrailingLeg) ) {
+    std::cout << "Error: Trigger efficiency files not loaded.\n";
+    return;
+  }
+
+
   if ( _debug ) std::cout << "[DEBUG]: Entering Loop" << std::endl;
   if (fChain == 0) return;
   if ( h_mgg == NULL || h_ptgg == NULL )
@@ -451,6 +465,41 @@ void HggRazorClass::Loop()
       
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
+
+      //**********************************************************
+      //compute trigger efficiency weight correction
+      //**********************************************************
+      double triggerEffWeight = 1.0;
+      double leadPhoPt=0;
+      double leadPhoEta=0;
+      double trailingPhoPt=0;
+      double trailingPhoEta=0;
+      if (pho1Pt > pho2Pt) {
+	leadPhoPt = pho1Pt;
+	leadPhoEta = pho1Eta;
+	trailingPhoPt = pho2Pt;
+	trailingPhoEta= pho2Eta;
+      } else {
+	leadPhoPt = pho2Pt;
+	leadPhoEta = pho2Eta;
+	trailingPhoPt = pho1Pt;
+	trailingPhoEta= pho1Eta;
+      }
+
+      double triggerEffLeadingLeg = 
+	photonTriggerEffHist_LeadingLeg->GetBinContent( photonTriggerEffHist_LeadingLeg->GetXaxis()->FindFixBin( fabs(leadPhoEta) ),
+							photonTriggerEffHist_LeadingLeg->GetYaxis()->FindFixBin( fmax( fmin(leadPhoPt,99.9), 20.01 ) )
+							);
+      double triggerEffTrailingLeg = 
+	photonTriggerEffHist_TrailingLeg->GetBinContent( photonTriggerEffHist_TrailingLeg->GetXaxis()->FindFixBin( fabs(trailingPhoEta) ),
+							 photonTriggerEffHist_TrailingLeg->GetYaxis()->FindFixBin( fmax( fmin(trailingPhoPt,99.9), 20.01 ) )
+							 );
+      triggerEffWeight = triggerEffLeadingLeg*triggerEffTrailingLeg;
+      
+
+      //**********************************************************
+      //Calculate weights
+      //**********************************************************
       double w;
       if ( this->processName == "data" || this->processName == "signal")
 	{
@@ -458,8 +507,10 @@ void HggRazorClass::Loop()
 	}
       else
 	{ 
-	  w = weight*pileupWeight;
+	  w = weight*pileupWeight*triggerEffWeight;
+	  //w = weight;
 	}
+
       total_in += w;
       bool pho1_isFake = false;
       bool pho2_isFake = false;
@@ -467,8 +518,8 @@ void HggRazorClass::Loop()
       bool isFake = false;
       bool prompt_prompt = false;
       bool prompt_fake = false;
-      if ( abs(pho1MotherID) > 6 && pho1MotherID != 21 && pho1MotherID != 2212 ) pho1_isFake = true;
-      if ( abs(pho2MotherID) > 6 && pho2MotherID != 21 && pho1MotherID != 2212) pho2_isFake = true;
+      if ( !((abs(pho1MotherID) >= 1 && abs(pho1MotherID) <= 6) || pho1MotherID == 21 || pho1MotherID == 2212) ) pho1_isFake = true;
+      if ( !((abs(pho2MotherID) >= 1 && abs(pho2MotherID) <= 6) || pho2MotherID == 21 || pho2MotherID == 2212) ) pho2_isFake = true;
       if ( pho1_isFake && pho2_isFake ) isFakeFake = true;
       if ( pho1_isFake || pho2_isFake ) isFake = true;
       if ( !pho1_isFake && !pho2_isFake ) prompt_prompt = true;
@@ -491,6 +542,9 @@ void HggRazorClass::Loop()
 	}
 
       
+
+
+
       h_mgg->Fill( mGammaGamma, w );
       h_ptgg->Fill( pTGammaGamma, w );
       h_sigmaMoverM->Fill( sigmaMoverM, w );
@@ -615,7 +669,7 @@ void HggRazorClass::PrintEventInfo( )
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
       //ofs << run << ":" << lumi << ":" << event << " " << mGammaGamma << " " << pTGammaGamma << "\n";
-      ofs << run << ":" << lumi << ":" << event << "\n";
+      ofs << run << ":" << lumi << ":" << event << " " << mGammaGamma << "\n";
 
 		
     }
@@ -655,6 +709,41 @@ void HggRazorClass::PrintEventInfo(  std::vector< std::pair<long int, long int> 
 	}
     }
   
+};
+
+
+void HggRazorClass::PrintEventInfo(  std::map< std::string, double > eventList )
+{
+  if ( _debug ) std::cout << "[DEBUG]: Entering Loop" << std::endl;
+  if (fChain == 0) return;
+  
+  Long64_t nentries = fChain->GetEntriesFast();
+  Long64_t nbytes = 0, nb = 0;
+  double total_in = 0, total_rm = 0;
+  std::cout << "[INFO]: nentries: " << nentries << std::endl;
+  TFile* fout = new TFile("massDiff.root", "RECREATE");
+  TH1F* h_m = new TH1F( "h_m", "h_m", 10000, -1e-5, 1e-5 );
+  for (Long64_t jentry=0; jentry < nentries; jentry++ )
+    {
+      Long64_t ientry = LoadTree(jentry);
+      
+      if (ientry < 0) break;
+      nb = fChain->GetEntry(jentry);   nbytes += nb;
+      std::stringstream ss;
+      ss << run << ":" << lumi << ":"  << event;
+      std::string key = ss.str();
+      for ( auto tmp : eventList )
+	{
+	  if ( tmp.first == key )
+	    {
+	      h_m->Fill( (mGammaGamma - tmp.second)/tmp.second );
+	    }
+	}
+    }
+
+  h_m->Write("massDiff");
+  fout->Close();
+  delete fout;
 };
 
 float HggRazorClass::GetHighPtGB( double mr, double r2 )
