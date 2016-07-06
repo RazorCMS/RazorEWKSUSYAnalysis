@@ -420,7 +420,7 @@ int main( int argc, char* argv[])
   //----------------
   /*CP's Tree Format is default*/
   
-  TString cut = "mGammaGamma >103. && mGammaGamma < 160. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25. && pho1SigmaIetaIeta < 0.0102 && pho1HoverE < 0.05 && pho2SigmaIetaIeta < 0.0102 && pho2HoverE < 0.05";
+  TString cut = "mGammaGamma >103. && mGammaGamma < 160. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.";
   TString cutMETfilters = "";
   TString cutTrigger = "";
 
