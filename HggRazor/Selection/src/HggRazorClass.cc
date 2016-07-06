@@ -517,8 +517,8 @@ void HggRazorClass::Loop()
       bool isFake = false;
       bool prompt_prompt = false;
       bool prompt_fake = false;
-      if ( abs(pho1MotherID) > 6 && pho1MotherID != 21 && pho1MotherID != 2212 ) pho1_isFake = true;
-      if ( abs(pho2MotherID) > 6 && pho2MotherID != 21 && pho2MotherID != 2212) pho2_isFake = true;
+      if ( !((abs(pho1MotherID) >= 1 && abs(pho1MotherID) <= 6) || pho1MotherID == 21 || pho1MotherID == 2212) ) pho1_isFake = true;
+      if ( !((abs(pho2MotherID) >= 1 && abs(pho2MotherID) <= 6) || pho2MotherID == 21 || pho2MotherID == 2212) ) pho2_isFake = true;
       if ( pho1_isFake && pho2_isFake ) isFakeFake = true;
       if ( pho1_isFake || pho2_isFake ) isFake = true;
       if ( !pho1_isFake && !pho2_isFake ) prompt_prompt = true;
