@@ -205,16 +205,20 @@ int main( int argc, char* argv[])
   //combine datacard related
   //------------------------
   std::string inputFileSignal = ParseCommandLine( argc, argv, "-inputFileSignal=" );
-  if (  inputFileSignal == "" && fitMode == "datacard" && !_highMassMode )
+  if (  inputFileSignal == "" && (fitMode == "datacard"  || fitMode == "sb") && !_highMassMode )
     {
-      std::cerr << "[WARNING]: please provide an input file using --inputFileSignal=<path_to_file>" << std::endl;
+      std::cerr << "[ERROR]: please provide an input file using --inputFileSignal=<path_to_file>" << std::endl;
+      exit (EXIT_FAILURE);
+    }
+  
+  std::string inputFileSMH = ParseCommandLine( argc, argv, "-inputFileSMH=" );
+  if (  inputFileSMH == "" && (fitMode == "datacard" || fitMode == "sb") && !_highMassMode )
+    {
+      std::cerr << "[ERROR]: please provide an input file using --inputFileSMH=<path_to_file>" << std::endl;
+      exit (EXIT_FAILURE);
     }
 
-  std::string inputFileSMH = ParseCommandLine( argc, argv, "-inputFileSMH=" );
-  if (  inputFileSMH == "" && fitMode == "datacard" && !_highMassMode )
-    {
-      std::cerr << "[WARNING]: please provide an input file using --inputFileSMH=<path_to_file>" << std::endl;
-    }
+  
 
   //SMH nominal yield
   std::string SMH_Yield = ParseCommandLine( argc, argv, "-SMH_Yield=" );
@@ -314,11 +318,17 @@ int main( int argc, char* argv[])
   else if ( dataMode == "data+signal" )
     {
       f = new TFile( inputFile.c_str() , "READ");
+      assert ( f );
       tree = (TTree*)f->Get( treeName.c_str() );
+      assert ( tree );
       fs = new TFile( inputFileSignal.c_str() , "READ");
+      assert ( fs );
       treeSignal = (TTree*)fs->Get( treeName.c_str() );
+      assert ( treeSignal );
       fsmh = new TFile( inputFileSMH.c_str() , "READ");
+      assert ( fsmh );
       treeSMH = (TTree*)fsmh->Get( treeName.c_str() );
+      assert ( treeSMH );
       _getSignal = true;
     }
  
@@ -415,8 +425,9 @@ int main( int argc, char* argv[])
   TString cutTrigger = "";
 
   TString cutMETfiltersData = " && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1)";
-  //TString cutTriggerData = " && ( HLTDecision[82] == 1 || HLTDecision[83] || HLTDecision[93] || HLTDecision[87] )";
   TString cutTriggerData = " && ( HLTDecision[82] == 1 || HLTDecision[83] || HLTDecision[93] )";
+  
+  //TString cutTriggerData = " && ( HLTDecision[82] == 1 || HLTDecision[83] || HLTDecision[93] || HLTDecision[87] )";
   //TString cutMETfiltersData = " && 1";
   //TString cutTriggerData = " && 1";
   

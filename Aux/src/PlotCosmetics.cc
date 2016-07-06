@@ -742,6 +742,7 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
   //pad1->SetLogy();
   pad1->Update();
   c->SaveAs( outName+".pdf" );
+  c->SaveAs( outName+".png" );
   c->SaveAs( outName+".C" );
   delete c;
   return true;

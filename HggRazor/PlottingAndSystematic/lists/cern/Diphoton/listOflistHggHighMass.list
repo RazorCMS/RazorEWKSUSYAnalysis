@@ -1,0 +1,4 @@
+data /afs/cern.ch/work/s/sixie/public/releases/run2/CMSSW_7_4_2/src/RazorEWKSUSYAnalysis/Diphoton750/PlottingAndSystematic/lists/cern/Diphoton/DataHighMass.list
+gammaJet /afs/cern.ch/work/s/sixie/public/releases/run2/CMSSW_7_4_2/src/RazorEWKSUSYAnalysis/Diphoton750/PlottingAndSystematic/lists/cern/Diphoton/GJetsHighMass.list
+diphoton /afs/cern.ch/work/s/sixie/public/releases/run2/CMSSW_7_4_2/src/RazorEWKSUSYAnalysis/Diphoton750/PlottingAndSystematic/lists/cern/Diphoton/DiphotonHighMass.list
+qcd	 /afs/cern.ch/work/s/sixie/public/releases/run2/CMSSW_7_4_2/src/RazorEWKSUSYAnalysis/Diphoton750/PlottingAndSystematic/lists/cern/Diphoton/QCDHighMass.list

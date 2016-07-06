@@ -289,8 +289,12 @@ void HggRazorSystematics::Loop()
 	      //PDF
 	      for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
 		{
-		  h2p_Pdf[ipdf]->Fill( MR, t1Rsq, commonW );
-		  //h2p_Pdf[ipdf]->Fill( MR, t1Rsq, commonW*sf_pdf->at(ipdf)*N_events/N_Pdf[ipdf] );
+		  //protect against missing pdf vector
+		  if (ipdf < sf_pdf->size() ) {
+		    h2p_Pdf[ipdf]->Fill( MR, t1Rsq, commonW*sf_pdf->at(ipdf)*N_events/N_Pdf[ipdf] );
+		  } else {
+		    h2p_Pdf[ipdf]->Fill( MR, t1Rsq, commonW );
+		  }
 		}
 	      
 	      h2p_btagUp->Fill( MR, t1Rsq, commonW*sf_btagUp );
@@ -325,8 +329,11 @@ void HggRazorSystematics::Loop()
 	      //PDF
 	      for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
 		{
-		  h2p_Pdf[ipdf]->Fill( MR, 0.999, commonW );
-		  //h2p_Pdf[ipdf]->Fill( MR, 0.999, commonW*sf_pdf->at(ipdf)*N_events/N_Pdf[ipdf] );
+		  if (ipdf < sf_pdf->size() ) {
+		    h2p_Pdf[ipdf]->Fill( MR, 0.999, commonW*sf_pdf->at(ipdf)*N_events/N_Pdf[ipdf] );
+		  } else {
+		    h2p_Pdf[ipdf]->Fill( MR, 0.999, commonW );
+		  }
 		}
 	      
 	      h2p_btagUp->Fill( MR, 0.999, commonW*sf_btagUp );
