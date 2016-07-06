@@ -395,11 +395,12 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
       mgg.setMin( 103. );
       mgg.setMax( 160. );
       mgg.setUnit( "GeV" );
-      mgg.setBins(38);
+      mgg.setBins(57);
       mgg.setRange( "signal", 115, 135. );
       mgg.setRange( "high", 135., 160. );
       mgg.setRange( "low", 103., 120. );
       mgg.setRange( "full", 103., 160. );
+      mgg.setRange( "Full", 103., 160. );
     }
 
   //--------------------------------
@@ -504,7 +505,7 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   
   TString tag_bkg = MakeSingleExp( "fullsb_fit_singleExp", mgg, *ws );
   TString tag_bkg_hm;
-  RooFitResult* bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+  RooFitResult* bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
   npoints     = ws->var("fullsb_fit_singleExp_Nbkg")->getVal();
   float exp_a = ws->var("fullsb_fit_singleExp_a")->getVal();
 
@@ -646,10 +647,10 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   //SMH mass constraint
   //---------------------------
   //RooRealVar HiggsMass("HiggsMass","", ws->var("Signal_SG_mu")->getVal());
-  RooRealVar HiggsMass("HiggsMass","", ws->var("Signal_SG_mu")->getVal() );
-  RooRealVar HiggsMassUn("HiggsMassUn","", 0.05*ws->var("Signal_SG_mu")->getVal() );
+  RooRealVar HiggsMass("HiggsMass","", ws->var("smodel_DCB_muCB")->getVal() );
+  RooRealVar HiggsMassUn("HiggsMassUn","", 0.01*ws->var("smodel_DCB_muCB")->getVal() );//1% scale uncertainty
   std::cout << "[INFO]: MC measured mass is:  " << HiggsMass.getVal() << " +/- " << HiggsMassUn.getVal() << std::endl;
-  RooGaussian HiggsMass_Constraint("SMH_Constraint", "SMH_Constraint",  *ws->var("Signal_SG_mu"), HiggsMass, HiggsMassUn );
+  RooGaussian HiggsMass_Constraint("SMH_Constraint", "SMH_Constraint",  *ws->var("smodel_DCB_muCB"), HiggsMass, HiggsMassUn );
   std::cout << "pass constraints" << std::endl;
   std::cout << "pass forceSigma" << std::endl;
 
@@ -734,7 +735,7 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   //-----------------------------
   RooPlot *fmgg;
   if ( isHighMass ) fmgg = mgg.frame( 230, 1230, 50);
-  else fmgg = mgg.frame( 103, 160, 38);
+  else fmgg = mgg.frame( 103, 160, 57);
   data.plotOn(fmgg);
   //data_toys->plotOn(fmgg);
   model->plotOn(fmgg, RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("Full"));
