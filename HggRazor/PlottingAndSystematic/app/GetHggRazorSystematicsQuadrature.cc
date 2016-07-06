@@ -166,7 +166,7 @@ std::vector<float*> SetBinning_lowres()
 //----------------
 //Static Variables
 //----------------
-float HggRazorSystematics::Lumi  = 8000.0;
+float HggRazorSystematics::Lumi  = 4000.0;
 float HggRazorSystematics::NR_kf = 1.0;
 int   HggRazorSystematics::n_PdfSys = 60;
 
@@ -192,6 +192,16 @@ int main( int argc, char* argv[] )
       std::cerr << "[ERROR]: please provide the category. Use --category=<highpt,hzbb,highres,lowres>" << std::endl;
       return -1;
     }
+
+  //-----------------
+  //Analysis Tag
+  //-----------------
+  std::string analysisTag = ParseCommandLine( argc, argv, "-analysisTag=" );
+  if ( analysisTag == "" )
+    {
+      std::cerr << "[ERROR]: please provide the analysisTag. Use --analysisTag=<Razor2015_76X,Razor2016_80X>" << std::endl;
+      return -1;
+    } 
   
   TString cut = "mGammaGamma > 103. && mGammaGamma < 160. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.";
   TString categoryCutString;
@@ -202,7 +212,20 @@ int main( int argc, char* argv[] )
   else if (categoryMode == "lowres") categoryCutString  = " && pTGammaGamma < 110 && abs(mbbH_L-125.) >= 15 && abs(mbbZ_L-91.) >= 15 && sigmaMoverM >= 0.0085 ";
   else if (categoryMode == "inclusive") categoryCutString = "";
 
-  cut = cut + categoryCutString;
+  TString triggerCut = " && ( HLTDecision[82] || HLTDecision[83] || HLTDecision[93] ) ";
+  TString metFilterCut = " && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1)";
+
+
+  if ( analysisTag == "Razor2015_76X" ) {
+    cut = cut + categoryCutString + triggerCut+ metFilterCut;  
+  } else if ( analysisTag == "Razor2016_80X" ) {
+    //for 80X MC, trigger table doesn't exist. so don't apply triggers.
+    cut = cut + categoryCutString + metFilterCut;
+  } else {
+    std::cout << "Analysis Tag " << _analysisTag << " not recognized. Error!\n";
+    return;
+  }
+  
 
   //std::cout << "===========================================================================" << std::endl;
   //std::cout << "[INFO]: cut--> " << cut << std::endl;
@@ -351,7 +374,7 @@ int main( int argc, char* argv[] )
       //---------------------------
       //Create HggSystematic object
       //---------------------------
-      HggRazorSystematics* hggSys = new HggRazorSystematics( cutTree, currentProcess, categoryMode, true, true );
+      HggRazorSystematics* hggSys = new HggRazorSystematics( cutTree, currentProcess, categoryMode, analysisTag, _debug, _debug );
       //hggSys->PrintBinning();
       //hggSys->SetBinningMap( binningMap );
       //hggSys->PrintBinning();

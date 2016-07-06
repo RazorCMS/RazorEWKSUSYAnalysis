@@ -192,6 +192,17 @@ int main( int argc, char* argv[] )
       return -1;
     }
   
+  //-----------------
+  //Analysis Tag
+  //-----------------
+  std::string analysisTag = ParseCommandLine( argc, argv, "-analysisTag=" );
+  if ( analysisTag == "" )
+    {
+      std::cerr << "[ERROR]: please provide the analysisTag. Use --analysisTag=<Razor2015_76X,Razor2016_80X>" << std::endl;
+      return -1;
+    } 
+  
+
   TString cut = "mGammaGamma > 103. && mGammaGamma < 160. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.";
   TString categoryCutString;
 
@@ -350,7 +361,7 @@ int main( int argc, char* argv[] )
       //---------------------------
       //Create HggSystematic object
       //---------------------------
-      HggRazorSystematics* hggSys = new HggRazorSystematics( cutTree, currentProcess, categoryMode, false, false );
+      HggRazorSystematics* hggSys = new HggRazorSystematics( cutTree, currentProcess, categoryMode, analysisTag, false, false );
       //hggSys->PrintBinning();
       //hggSys->SetBinningMap( binningMap );
       //hggSys->PrintBinning();
