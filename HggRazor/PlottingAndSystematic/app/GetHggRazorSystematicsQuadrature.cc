@@ -222,10 +222,10 @@ int main( int argc, char* argv[] )
     //for 80X MC, trigger table doesn't exist. so don't apply triggers.
     cut = cut + categoryCutString + metFilterCut;
   } else {
-    std::cout << "Analysis Tag " << _analysisTag << " not recognized. Error!\n";
-    return;
+    std::cout << "Analysis Tag " << analysisTag << " not recognized. Error!\n";
+    return -1;
   }
-  
+  std::cout << "Using Analysis Tag: " << analysisTag  << "\n";
 
   //std::cout << "===========================================================================" << std::endl;
   //std::cout << "[INFO]: cut--> " << cut << std::endl;
