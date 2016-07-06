@@ -51,6 +51,14 @@ int main( int argc, char* argv[] )
       std::cerr << "[ERROR]: please provide an input sModel name --sModel=<signalModelName>" << std::endl;
       return -1;
     }
+
+  bool sOnly = false;
+  std::string sOnlyOpt = ParseCommandLine( argc, argv, "-sOnly=" );
+  if ( sOnlyOpt == "yes" )
+    {
+      std::cerr << "[INFO]: ignoring SM Higgs contribution to the fit" << std::endl;
+      sOnly = true;
+    }
   
   std::ifstream ifs( inputCF.c_str(), std::ifstream::in );
   assert(ifs);
@@ -150,7 +158,13 @@ int main( int argc, char* argv[] )
 		    << " --SMH_Yield=" << SMH << " --SMH_CL=" << SMH_sys.str()
 		    << " --Signal_Yield=" << Signal << " --Signal_CL=" << Signal_sys.str()
 		    << " --sModel=" << sModel
-		    << " --binNumber=" << binNumber << " --detector=ebeb" << std::endl;
+		    << " --binNumber=" << binNumber << " --detector=ebeb";
+          if ( sOnly ) {
+              std::cout << " --sOnly=yes" << std::endl;
+          }
+          else {
+              std::cout << std::endl;
+          }
 	  binNumber++;
 	}
       //tmpF.close();
