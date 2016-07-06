@@ -115,7 +115,6 @@ int main( int argc, char* argv[] )
                   }
 
                   std::string tmp2;
-                  SMH_sys << "\"";
                   // ignore the systematics values from this input file
                   for ( int i = 0; i < 68; i++ ) ifs2 >> tmp2;
                   // get the signal yield
