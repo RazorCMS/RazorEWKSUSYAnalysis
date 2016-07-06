@@ -291,6 +291,17 @@ int main( int argc, char* argv[])
     {
       _sModel = sModel;
     }
+
+  bool _signalOnly = false;
+  std::string sOnly = ParseCommandLine( argc, argv, "-sOnly=" );
+  if (  sOnly == "yes" && fitMode == "datacard" )
+    {
+      _signalOnly = true;
+    }
+  else
+    {
+      std::cerr << "[WARNING]: please provide a valid option for signal Only datacard, --sOnly=<yes>" << std::endl;
+    }
   
   if (  f1 != "" ) std::cout << "[INFO]: f1    :" << f1 << std::endl;
   if (  f2 != "" ) std::cout << "[INFO]: f2    :" << f2 << std::endl;
@@ -583,7 +594,7 @@ int main( int argc, char* argv[])
       else
 	{
 	  w_sb = MakeDataCard( tree->CopyTree( cut+cutMETfiltersData+cutTriggerData ), treeSignal->CopyTree( cut ), treeSMH->CopyTree( cut ), mggName, _SMH_Yield, SMH_CL,
-			       _Signal_Yield, Signal_CL, binNumber, categoryMode, _highMassMode, _sModel, f1 );
+			       _Signal_Yield, Signal_CL, binNumber, categoryMode, _highMassMode, _sModel, f1, _signalOnly );
 	}
       std::cout << "finish MakeDataCard" << std::endl;
       //w_sb->Write("w_sb");
