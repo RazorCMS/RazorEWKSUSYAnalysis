@@ -465,16 +465,6 @@ void HggRazorClass::Loop()
       
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
-      double w;
-      if ( this->processName == "data" || this->processName == "signal")
-	{
-	  w = 1.0;
-	}
-      else
-	{ 
-	  w = weight*pileupWeight;
-	  //w = weight;
-	}
 
       //**********************************************************
       //compute trigger efficiency weight correction
@@ -506,9 +496,20 @@ void HggRazorClass::Loop()
 							 );
       triggerEffWeight = triggerEffLeadingLeg*triggerEffTrailingLeg;
       
-      w = w * triggerEffWeight;
-      //**********************************************************
 
+      //**********************************************************
+      //Calculate weights
+      //**********************************************************
+      double w;
+      if ( this->processName == "data" || this->processName == "signal")
+	{
+	  w = 1.0;
+	}
+      else
+	{ 
+	  w = weight*pileupWeight*triggerEffWeight;
+	  //w = weight;
+	}
 
       total_in += w;
       bool pho1_isFake = false;
