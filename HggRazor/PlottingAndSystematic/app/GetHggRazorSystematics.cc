@@ -167,7 +167,6 @@ std::vector<float*> SetBinning_lowres()
 //----------------
 //Static Variables
 //----------------
-float HggRazorSystematics::Lumi  = 2300.0;
 float HggRazorSystematics::NR_kf = 1.0;
 int   HggRazorSystematics::n_PdfSys = 60;
 
@@ -192,6 +191,19 @@ int main( int argc, char* argv[] )
       return -1;
     }
   
+  //-----------------
+  //Lumi Normalization
+  //-----------------
+  double lumi = 0;
+  std::string lumiString = ParseCommandLine( argc, argv, "-lumi=" );
+  if (  lumiString == "" )
+    {
+      std::cerr << "[ERROR]: please provide the luminosity. For example, use --lumi=2000" << std::endl;
+      return -1;
+    }
+  lumi = float(atoi(lumiString.c_str()));
+  std::cout << "[INFO] : Using Luminosity = " << lumi << "\n";
+
   //-----------------
   //Analysis Tag
   //-----------------
@@ -362,6 +374,7 @@ int main( int argc, char* argv[] )
       //Create HggSystematic object
       //---------------------------
       HggRazorSystematics* hggSys = new HggRazorSystematics( cutTree, currentProcess, categoryMode, analysisTag, false, false );
+      hggSys->SetLumi(lumi);
       //hggSys->PrintBinning();
       //hggSys->SetBinningMap( binningMap );
       //hggSys->PrintBinning();

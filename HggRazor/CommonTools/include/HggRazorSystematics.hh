@@ -50,13 +50,15 @@ public:
   bool SetNeventsHisto( TH1F* histo );
   bool SetFacScaleWeightsHisto( TH1F* histo );
   bool SetPdfWeightsHisto( TH1F* histo );
+  void SetLumi( double lumi ) { this->Lumi = lumi; };
+
 private:
 
   static constexpr float hggBF = 2.28e-3;
-  static float Lumi;//lumi in pb-1
   static float NR_kf;//lumi in pb-1
   static int n_PdfSys;
   
+  float Lumi;//lumi in pb-1
   std::string _analysisTag;
   bool _debug;
   bool _info;
