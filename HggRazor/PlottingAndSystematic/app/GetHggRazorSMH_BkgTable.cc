@@ -540,8 +540,10 @@ int main( int argc, char* argv[] )
       ss << categoryMode << "_" << tmp[0] << "-" << tmp[2] << "_" << tmp[1] << "-" << tmp[3]; 
       //std::cout << mybin.bin << " " << mybin.box << " " << mybin.x1 << " " << mybin.x2 << " " << mybin.y1 << " " << mybin.y2 << " " << myMap[mybin] << std::endl;
       std::stringstream ss_fn;
-      ss_fn << "/Users/cmorgoth/Work/git/RazorEWKSUSYAnalysis/HggRazor/FitMgg/MaxLikelihoodFits/sb300_lsp1_unblinded_6p3ifb_Fixed/mlfit_bin"
-	    << myMap2[ss.str()].bin << ".root";
+      /*ss_fn << "/Users/cmorgoth/Work/git/RazorEWKSUSYAnalysis/HggRazor/PlottingAndSystematic/dustinPlots/combineFits_7July/mlfit_bin"
+	<< myMap2[ss.str()].bin << ".root";*/
+      ss_fn << "/Users/cmorgoth/Dropbox/HggRazorCollaboration/CrossCheck/cpena/combineFits/HggRazorDataCards_SMH/sb300_lsp1_unblinded_6p3ifb.txt/mlfit_bin" << myMap2[ss.str()].bin << ".root";
+      
       float Ns = GetNs( ss_fn.str(),  myMap2[ss.str()].bin );
       float NsErr = GetNsErr( ss_fn.str(),  myMap2[ss.str()].bin );
       float Nbkg = GetNbkg( ss_fn.str(),  myMap2[ss.str()].f1, myMap2[ss.str()].bin );
