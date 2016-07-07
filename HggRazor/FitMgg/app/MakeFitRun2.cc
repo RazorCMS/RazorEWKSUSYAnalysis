@@ -303,6 +303,15 @@ int main( int argc, char* argv[])
       std::cerr << "[WARNING]: please provide a valid option for signal Only datacard, --sOnly=<yes>" << std::endl;
     }
   
+  //-----------------
+  //pTGammaGamma cut
+  //-----------------
+  std::string usePtGammaGamma = ParseCommandLine( argc, argv, "-usePtGammaGamma=" );
+  if ( usePtGammaGamma == "yes" )
+    {
+      std::cerr << "[INFO]: enabling pTGammaGamma cut for all boxes" << std::endl;
+    } 
+  
   if (  f1 != "" ) std::cout << "[INFO]: f1    :" << f1 << std::endl;
   if (  f2 != "" ) std::cout << "[INFO]: f2    :" << f2 << std::endl;
 
@@ -432,6 +441,9 @@ int main( int argc, char* argv[])
   /*CP's Tree Format is default*/
   
   TString cut = "mGammaGamma >103. && mGammaGamma < 160. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.";
+  if ( usePtGammaGamma == "yes" ) {
+      cut = cut + " && pTGammaGamma > 20 ";
+  }
   TString cutMETfilters = "";
   TString cutTrigger = "";
 
