@@ -279,7 +279,7 @@ void HggRazorSystematics::Loop()
 	      
 	      h2p_facRenScaleUp->Fill( MR, t1Rsq, commonW*sf_facRenScaleUp*N_events/N_facScale[4] );
 	      h2p_facRenScaleDown->Fill( MR, t1Rsq, commonW*sf_facRenScaleDown*N_events/N_facScale[5] );
-	      std::cout << "before pdf--> " << pdfWeights->size() << std::endl;
+	      //std::cout << "before pdf--> " << pdfWeights->size() << std::endl;
 	      //PDF
 	      if ( sf_pdf->size() != 60 ) continue;
 	      for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
