@@ -227,10 +227,10 @@ int main( int argc, char* argv[] )
   TString metFilterCut = " && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1)";
 
  if ( analysisTag == "Razor2015_76X" ) {
-    cut = cut + categoryCutString + triggerCut+ metFilterCut;  
+   //cut = cut + categoryCutString + triggerCut+ metFilterCut;  
   } else if ( analysisTag == "Razor2016_80X" ) {
     //for 80X MC, trigger table doesn't exist. so don't apply triggers.
-    cut = cut + categoryCutString + metFilterCut;
+   //cut = cut + categoryCutString + metFilterCut;
   } else {
     std::cout << "Analysis Tag " << analysisTag << " not recognized. Error!\n";
     return -1;
@@ -542,7 +542,7 @@ int main( int argc, char* argv[] )
       std::stringstream ss_fn;
       /*ss_fn << "/Users/cmorgoth/Work/git/RazorEWKSUSYAnalysis/HggRazor/PlottingAndSystematic/dustinPlots/combineFits_7July/mlfit_bin"
 	<< myMap2[ss.str()].bin << ".root";*/
-      ss_fn << "/Users/cmorgoth/Dropbox/HggRazorCollaboration/CrossCheck/cpena/combineFits/HggRazorDataCards_SMH/sb300_lsp1_unblinded_6p3ifb.txt/mlfit_bin" << myMap2[ss.str()].bin << ".root";
+      ss_fn << "/afs/cern.ch/work/c/cpena/public/combineDiphotonHM/CMSSW_7_4_7/src/HiggsAnalysis/CombinedLimit/HggRazor/testNewCode/dustin/HggRazorDataCards-SMH/sb300_lsp1_unblinded_6p3ifb.txt/mlfit_bin" << myMap2[ss.str()].bin << ".root";
       
       float Ns = GetNs( ss_fn.str(),  myMap2[ss.str()].bin );
       float NsErr = GetNsErr( ss_fn.str(),  myMap2[ss.str()].bin );
