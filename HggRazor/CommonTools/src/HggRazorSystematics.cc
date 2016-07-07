@@ -1,6 +1,7 @@
 //C++ INCLUDES
 #include <iostream>
 #include <math.h>
+#include <string>
 //ROOT INCLUDES
 //LOCAL INCLUDES
 #include "HggRazorSystematics.hh"
@@ -12,7 +13,7 @@ HggRazorSystematics::HggRazorSystematics( TTree* tree ) : HggTree( tree ), _info
 
 };
 
-HggRazorSystematics::HggRazorSystematics( TTree* tree, TString processName, TString boxName, bool info, bool debug ) : HggTree( tree ), _info( info ), _debug( debug )
+HggRazorSystematics::HggRazorSystematics( TTree* tree, TString processName, TString boxName, std::string analysisTag, bool info, bool debug ) : HggTree( tree ), _analysisTag(analysisTag), _info( info ), _debug( debug )
 {
   //processName
   if ( processName == "" )
@@ -244,6 +245,21 @@ void HggRazorSystematics::Loop()
   
   if ( _debug ) std::cout << "[DEBUG]: Passed N_events, N_facScale, N_PDF" << std::endl;
   
+
+  //--------------------------------
+  //Photon Trigger Efficiency
+  //--------------------------------
+  TFile *photonTriggerEffFile_LeadingLeg = TFile::Open("root://eoscms:///eos/cms/store/group/phys_susy/razor/Run2Analysis/ScaleFactors/PhotonEfficiencies/2016_Golden_2p6ifb/PhoHLTLeadingLegEffDenominatorLoose.root");
+  TFile *photonTriggerEffFile_TrailingLeg = TFile::Open("root://eoscms:///eos/cms/store/group/phys_susy/razor/Run2Analysis/ScaleFactors/PhotonEfficiencies/2016_Golden_2p6ifb/PhoHLTTrailingLegEffDenominatorLoose.root");
+  TH2D *photonTriggerEffHist_LeadingLeg = (TH2D*)photonTriggerEffFile_LeadingLeg->Get("hEffEtaPt");
+  TH2D *photonTriggerEffHist_TrailingLeg = (TH2D*)photonTriggerEffFile_TrailingLeg->Get("hEffEtaPt");
+  if(!(photonTriggerEffHist_LeadingLeg && photonTriggerEffHist_TrailingLeg) ) {
+    std::cout << "Error: Trigger efficiency files not loaded.\n";
+    return;
+  }
+
+
+
   Long64_t nentries = fChain->GetEntriesFast();
   Long64_t nbytes = 0, nb = 0;
   double total_in = 0, total_rm = 0;
@@ -254,8 +270,48 @@ void HggRazorSystematics::Loop()
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
 
-      //float commonW = this->Lumi*weight*pileupWeight*btagCorrFactor;//including btag weight
-      float commonW = this->Lumi*weight*btagCorrFactor;
+
+      //**********************************************************
+      //compute trigger efficiency weight correction
+      //**********************************************************
+      double triggerEffWeight = 1.0;
+      double leadPhoPt=0;
+      double leadPhoEta=0;
+      double trailingPhoPt=0;
+      double trailingPhoEta=0;
+      if (pho1Pt > pho2Pt) {
+	leadPhoPt = pho1Pt;
+	leadPhoEta = pho1Eta;
+	trailingPhoPt = pho2Pt;
+	trailingPhoEta= pho2Eta;
+      } else {
+	leadPhoPt = pho2Pt;
+	leadPhoEta = pho2Eta;
+	trailingPhoPt = pho1Pt;
+	trailingPhoEta= pho1Eta;
+      }
+
+      double triggerEffLeadingLeg = 
+	photonTriggerEffHist_LeadingLeg->GetBinContent( photonTriggerEffHist_LeadingLeg->GetXaxis()->FindFixBin( fabs(leadPhoEta) ),
+							photonTriggerEffHist_LeadingLeg->GetYaxis()->FindFixBin( fmax( fmin(leadPhoPt,99.9), 20.01 ) )
+							);
+      double triggerEffTrailingLeg = 
+	photonTriggerEffHist_TrailingLeg->GetBinContent( photonTriggerEffHist_TrailingLeg->GetXaxis()->FindFixBin( fabs(trailingPhoEta) ),
+							 photonTriggerEffHist_TrailingLeg->GetYaxis()->FindFixBin( fmax( fmin(trailingPhoPt,99.9), 20.01 ) )
+							 );
+      triggerEffWeight = triggerEffLeadingLeg*triggerEffTrailingLeg;
+      //**********************************************************
+
+
+      float commonW = 0;
+      if (_analysisTag == "Razor2015_76X") {
+	commonW = this->Lumi*weight*pileupWeight*btagCorrFactor;
+      } else if (_analysisTag == "Razor2016_80X") {
+	commonW = this->Lumi*weight*pileupWeight*btagCorrFactor*triggerEffWeight;
+      } else {
+	std::cout << "Analysis Tag " << _analysisTag << " not recognized. Error!\n";
+	return;
+      }
       
       if ( this->processName == "signal" )
 	{
@@ -279,11 +335,17 @@ void HggRazorSystematics::Loop()
 	      
 	      h2p_facRenScaleUp->Fill( MR, t1Rsq, commonW*sf_facRenScaleUp*N_events/N_facScale[4] );
 	      h2p_facRenScaleDown->Fill( MR, t1Rsq, commonW*sf_facRenScaleDown*N_events/N_facScale[5] );
-	      
+
 	      //PDF
+	      if ( sf_pdf->size() != 60 ) continue;
 	      for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
 		{
-		  h2p_Pdf[ipdf]->Fill( MR, t1Rsq, commonW*sf_pdf->at(ipdf)*N_events/N_Pdf[ipdf] );
+		  //protect against missing pdf vector
+		  if (ipdf < sf_pdf->size() ) {
+		    h2p_Pdf[ipdf]->Fill( MR, t1Rsq, commonW*sf_pdf->at(ipdf)*N_events/N_Pdf[ipdf] );
+		  } else {
+		    h2p_Pdf[ipdf]->Fill( MR, t1Rsq, commonW );
+		  }
 		}
 	      
 	      h2p_btagUp->Fill( MR, t1Rsq, commonW*sf_btagUp );
@@ -310,7 +372,11 @@ void HggRazorSystematics::Loop()
 	      //PDF
 	      for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
 		{
-		  h2p_Pdf[ipdf]->Fill( MR, 0.999, commonW*sf_pdf->at(ipdf)*N_events/N_Pdf[ipdf] );
+		  if (ipdf < sf_pdf->size() ) {
+		    h2p_Pdf[ipdf]->Fill( MR, 0.999, commonW*sf_pdf->at(ipdf)*N_events/N_Pdf[ipdf] );
+		  } else {
+		    h2p_Pdf[ipdf]->Fill( MR, 0.999, commonW );
+		  }
 		}
 	      
 	      h2p_btagUp->Fill( MR, 0.999, commonW*sf_btagUp );
