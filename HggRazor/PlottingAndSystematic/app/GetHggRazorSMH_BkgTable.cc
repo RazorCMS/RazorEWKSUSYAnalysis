@@ -223,14 +223,16 @@ int main( int argc, char* argv[] )
   else if (categoryMode == "lowres") categoryCutString  = " && pTGammaGamma < 110 && abs(mbbH_L-125.) >= 15 && abs(mbbZ_L-91.) >= 15 && sigmaMoverM >= 0.0085 ";
   else if (categoryMode == "inclusive") categoryCutString = "";
 
-  TString triggerCut = " && ( HLTDecision[82] || HLTDecision[83] || HLTDecision[93] ) ";
-  TString metFilterCut = " && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1)";
-
+  //TString triggerCut = " && ( HLTDecision[82] || HLTDecision[83] || HLTDecision[93] ) ";
+  //TString metFilterCut = " && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1)";
+  
+  TString triggerCut = "";
+  TString metFilterCut = "";
  if ( analysisTag == "Razor2015_76X" ) {
-    cut = cut + categoryCutString + triggerCut+ metFilterCut;  
+   //cut = cut + categoryCutString + triggerCut+ metFilterCut;  
   } else if ( analysisTag == "Razor2016_80X" ) {
     //for 80X MC, trigger table doesn't exist. so don't apply triggers.
-    cut = cut + categoryCutString + metFilterCut;
+   //cut = cut + categoryCutString + metFilterCut;
   } else {
     std::cout << "Analysis Tag " << analysisTag << " not recognized. Error!\n";
     return -1;
@@ -540,8 +542,10 @@ int main( int argc, char* argv[] )
       ss << categoryMode << "_" << tmp[0] << "-" << tmp[2] << "_" << tmp[1] << "-" << tmp[3]; 
       //std::cout << mybin.bin << " " << mybin.box << " " << mybin.x1 << " " << mybin.x2 << " " << mybin.y1 << " " << mybin.y2 << " " << myMap[mybin] << std::endl;
       std::stringstream ss_fn;
-      ss_fn << "/Users/cmorgoth/Work/git/RazorEWKSUSYAnalysis/HggRazor/FitMgg/MaxLikelihoodFits/sb300_lsp1_unblinded_6p3ifb_Fixed/mlfit_bin"
-	    << myMap2[ss.str()].bin << ".root";
+      /*ss_fn << "/Users/cmorgoth/Work/git/RazorEWKSUSYAnalysis/HggRazor/PlottingAndSystematic/dustinPlots/combineFits_7July/mlfit_bin"
+	<< myMap2[ss.str()].bin << ".root";*/
+      ss_fn << "/Users/cmorgoth/Dropbox/HggRazorCollaboration/CrossCheck/cpena/combineFits/HggRazorDataCards-SMH/sb300_lsp1_unblinded_6p3ifb.txt/mlfit_bin" << myMap2[ss.str()].bin << ".root";
+      
       float Ns = GetNs( ss_fn.str(),  myMap2[ss.str()].bin );
       float NsErr = GetNsErr( ss_fn.str(),  myMap2[ss.str()].bin );
       float Nbkg = GetNbkg( ss_fn.str(),  myMap2[ss.str()].f1, myMap2[ss.str()].bin );

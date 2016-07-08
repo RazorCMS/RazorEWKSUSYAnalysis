@@ -51,7 +51,23 @@ int main( int argc, char* argv[] )
       std::cerr << "[ERROR]: please provide an input sModel name --sModel=<signalModelName>" << std::endl;
       return -1;
     }
+
+  bool sOnly = false;
+  std::string sOnlyOpt = ParseCommandLine( argc, argv, "-sOnly=" );
+  if ( sOnlyOpt == "yes" )
+    {
+      std::cerr << "[INFO]: ignoring SM Higgs contribution to the fit" << std::endl;
+      sOnly = true;
+    }
   
+  bool usePtGammaGamma = false;
+  std::string usePtGammaGammaOpt = ParseCommandLine( argc, argv, "-usePtGammaGamma=" );
+  if ( usePtGammaGammaOpt == "yes" )
+    {
+      std::cerr << "[INFO]: applying cut on pTGammaGamma" << std::endl;
+      usePtGammaGamma = true;
+    }
+
   std::ifstream ifs( inputCF.c_str(), std::ifstream::in );
   assert(ifs);
   // get secondary input stream, if provided
@@ -135,8 +151,10 @@ int main( int argc, char* argv[] )
 	 
 	  Bkg_f1 = "singleExp";
 	  if ( binNumber == 3 || binNumber == 5 ) Bkg_f1 = "poly2";
-	  if ( binNumber == 9 || binNumber == 16 ) Bkg_f1 = "poly3";
-	  if ( binNumber == 15 ) Bkg_f1 = "modExp";
+	  if ( binNumber == 9 || binNumber == 14 ) Bkg_f1 = "poly3"; //modify to synchronize LowRes and HighRes binning
+	  //if ( binNumber == 9 || binNumber == 16 ) Bkg_f1 = "poly3"; //old LowRes binning
+	  //if ( binNumber == 15 ) Bkg_f1 = "modExp"; //old LowRes binning
+
 	  /*std::cout << category << "\t" << MR_l << "\t" << MR_h << "\t" << Rsq_l << "\t" << Rsq_h << "\t" << SMH << "\t" << SMH_sys.str()
 	    << "\t" << Signal << "\t"  << Signal_sys.str() << std::endl; 
 	  */
@@ -150,7 +168,16 @@ int main( int argc, char* argv[] )
 		    << " --SMH_Yield=" << SMH << " --SMH_CL=" << SMH_sys.str()
 		    << " --Signal_Yield=" << Signal << " --Signal_CL=" << Signal_sys.str()
 		    << " --sModel=" << sModel
-		    << " --binNumber=" << binNumber << " --detector=ebeb" << std::endl;
+		    << " --binNumber=" << binNumber << " --detector=ebeb";
+          if ( usePtGammaGamma ) {
+              std::cout << " --usePtGammaGamma=yes";
+          }
+          if ( sOnly ) {
+              std::cout << " --sOnly=yes" << std::endl;
+          }
+          else {
+              std::cout << std::endl;
+          }
 	  binNumber++;
 	}
       //tmpF.close();

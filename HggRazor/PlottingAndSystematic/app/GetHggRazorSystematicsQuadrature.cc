@@ -151,15 +151,8 @@ float bin_lowres5[4] = {500,0,800,0.01};
 float bin_lowres6[4] = {800,0,10000,0.01};
 std::vector<float*> SetBinning_lowres()
 {
-  std::vector<float*> myVec;
-  myVec.push_back(bin_lowres0);
-  myVec.push_back(bin_lowres1);
-  myVec.push_back(bin_lowres2);
-  myVec.push_back(bin_lowres3);
-  myVec.push_back(bin_lowres4);
-  myVec.push_back(bin_lowres5);
-  myVec.push_back(bin_lowres6);
-  return myVec;
+    // Use highres binning in lowres box
+    return SetBinning_highres();
 };
 
 
@@ -203,7 +196,7 @@ int main( int argc, char* argv[] )
       return -1;
     }
   lumi = float(atoi(lumiString.c_str()));
-  std::cout << "[INFO] : Using Luminosity = " << lumi << "\n";
+  std::cerr << "[INFO] : Using Luminosity = " << lumi << "\n";
 
   //-----------------
   //Analysis Tag
@@ -215,17 +208,33 @@ int main( int argc, char* argv[] )
       return -1;
     } 
   
+  //-----------------
+  //pTGammaGamma cut
+  //-----------------
+  std::string usePtGammaGamma = ParseCommandLine( argc, argv, "-usePtGammaGamma=" );
+  if ( usePtGammaGamma == "yes" )
+    {
+      std::cerr << "[INFO]: enabling pTGammaGamma cut for all boxes" << std::endl;
+    } 
+  
   TString cut = "mGammaGamma > 103. && mGammaGamma < 160. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.";
-  TString categoryCutString;
+  if (usePtGammaGamma == "yes") {
+      cut = cut + " && pTGammaGamma > 20 ";
+  }
 
+  TString categoryCutString;
   if (categoryMode == "highpt") categoryCutString = " && pTGammaGamma >= 110 ";
   else if (categoryMode == "hzbb") categoryCutString = " && pTGammaGamma < 110 && ( abs(mbbH_L-125.) < 15. || ( abs(mbbH_L-125.) >= 15. && abs(mbbZ_L-91.) < 15 ) )";
   else if (categoryMode == "highres") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH_L-125.) >= 15 && abs(mbbZ_L-91.) >= 15 && sigmaMoverM < 0.0085";
   else if (categoryMode == "lowres") categoryCutString  = " && pTGammaGamma < 110 && abs(mbbH_L-125.) >= 15 && abs(mbbZ_L-91.) >= 15 && sigmaMoverM >= 0.0085 ";
   else if (categoryMode == "inclusive") categoryCutString = "";
+  // combined highres / lowres box
+  else if (categoryMode == "highreslowres") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH_L-125.) >= 15 && abs(mbbZ_L-91.) >= 15";
 
-  TString triggerCut = " && ( HLTDecision[82] || HLTDecision[83] || HLTDecision[93] ) ";
+  //TString triggerCut = " && ( HLTDecision[82] || HLTDecision[83] || HLTDecision[93] ) ";
   TString metFilterCut = " && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1)";
+  TString triggerCut = "";
+  //TString metFilterCut = "";
 
 
   if ( analysisTag == "Razor2015_76X" ) {
@@ -234,14 +243,14 @@ int main( int argc, char* argv[] )
     //for 80X MC, trigger table doesn't exist. so don't apply triggers.
     cut = cut + categoryCutString + metFilterCut;
   } else {
-    std::cout << "Analysis Tag " << analysisTag << " not recognized. Error!\n";
+    std::cerr << "Analysis Tag " << analysisTag << " not recognized. Error!\n";
     return -1;
   }
-  std::cout << "[INFO] : Using Analysis Tag: " << analysisTag  << "\n";
+  std::cerr << "[INFO] : Using Analysis Tag: " << analysisTag  << "\n";
 
-  std::cout << "===========================================================================" << std::endl;
-  std::cout << "[INFO]: cut--> " << cut << std::endl;
-  std::cout << "===========================================================================" << std::endl;
+  std::cerr << "===========================================================================" << std::endl;
+  std::cerr << "[INFO]: cut--> " << cut << std::endl;
+  std::cerr << "===========================================================================" << std::endl;
   
   std::ifstream ifs( inputList, std::ifstream::in );
   assert(ifs);
@@ -267,6 +276,11 @@ int main( int argc, char* argv[] )
     {
       myVectBinning = SetBinning_lowres();
     }
+  else if (categoryMode == "highreslowres" )
+    {
+      myVectBinning = SetBinning_highres();
+    }
+
   else
     {
       std::cerr << "[ERROR]: category is not <highpt/hzbb/highres/lowres>; quitting" << std::endl;
