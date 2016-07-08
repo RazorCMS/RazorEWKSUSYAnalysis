@@ -229,10 +229,10 @@ int main( int argc, char* argv[] )
   TString triggerCut = "";
   TString metFilterCut = "";
  if ( analysisTag == "Razor2015_76X" ) {
-    cut = cut + categoryCutString + triggerCut+ metFilterCut;  
+   //cut = cut + categoryCutString + triggerCut+ metFilterCut;  
   } else if ( analysisTag == "Razor2016_80X" ) {
     //for 80X MC, trigger table doesn't exist. so don't apply triggers.
-    cut = cut + categoryCutString + metFilterCut;
+   //cut = cut + categoryCutString + metFilterCut;
   } else {
     std::cout << "Analysis Tag " << analysisTag << " not recognized. Error!\n";
     return -1;

@@ -215,17 +215,31 @@ int main( int argc, char* argv[] )
       return -1;
     } 
   
+  //-----------------
+  //pTGammaGamma cut
+  //-----------------
+  std::string usePtGammaGamma = ParseCommandLine( argc, argv, "-usePtGammaGamma=" );
+  if ( usePtGammaGamma == "yes" )
+    {
+      std::cerr << "[INFO]: enabling pTGammaGamma cut for all boxes" << std::endl;
+    } 
+  
   TString cut = "mGammaGamma > 103. && mGammaGamma < 160. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.";
-  TString categoryCutString;
+  if (usePtGammaGamma == "yes") {
+      cut = cut + " && pTGammaGamma > 20 ";
+  }
 
+  TString categoryCutString;
   if (categoryMode == "highpt") categoryCutString = " && pTGammaGamma >= 110 ";
   else if (categoryMode == "hzbb") categoryCutString = " && pTGammaGamma < 110 && ( abs(mbbH_L-125.) < 15. || ( abs(mbbH_L-125.) >= 15. && abs(mbbZ_L-91.) < 15 ) )";
   else if (categoryMode == "highres") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH_L-125.) >= 15 && abs(mbbZ_L-91.) >= 15 && sigmaMoverM < 0.0085";
   else if (categoryMode == "lowres") categoryCutString  = " && pTGammaGamma < 110 && abs(mbbH_L-125.) >= 15 && abs(mbbZ_L-91.) >= 15 && sigmaMoverM >= 0.0085 ";
   else if (categoryMode == "inclusive") categoryCutString = "";
 
-  TString triggerCut = " && ( HLTDecision[82] || HLTDecision[83] || HLTDecision[93] ) ";
+  //TString triggerCut = " && ( HLTDecision[82] || HLTDecision[83] || HLTDecision[93] ) ";
   TString metFilterCut = " && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1)";
+  TString triggerCut = "";
+  //TString metFilterCut = "";
 
 
   if ( analysisTag == "Razor2015_76X" ) {

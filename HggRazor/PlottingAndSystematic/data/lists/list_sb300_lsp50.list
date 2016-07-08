@@ -1,5 +1,5 @@
-GluGluH /Users/cmorgoth/Work/data/HggRazor/2016/SMH/HggRazor_GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8_1pb_weighted.root
-ttH	/Users/cmorgoth/Work/data/HggRazor/2016/SMH/HggRazor_ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_TOTAL_1pb_weighted.root
-VBFH	/Users/cmorgoth/Work/data/HggRazor/2016/SMH/HggRazor_VBFHToGG_M125_13TeV_amcatnlo_pythia8_1pb_weighted.root
-VH	/Users/cmorgoth/Work/data/HggRazor/2016/SMH/HggRazor_VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_1pb_weighted.root
-signal 	/Users/cmorgoth/Work/data/HggRazor/2016/Signal/HggRazor_SMS-T2bH_mSbottom-300_mLSP-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_1pb_weighted.root
+GluGluH /afs/cern.ch/work/c/cpena/public/CMSSW_7_6_3/src/RazorAnalyzer/eos/cms/store/group/phys_susy/razor/Run2Analysis/HggRazor/2016/V3p4_PhotonCorrJune28_ID/HggRazor_GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8_1pb_weighted.root
+ttH	/afs/cern.ch/work/c/cpena/public/CMSSW_7_6_3/src/RazorAnalyzer/eos/cms/store/group/phys_susy/razor/Run2Analysis/HggRazor/2016/V3p4_PhotonCorrJune28_ID/HggRazor_ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2_1pb_weighted.root
+VBFH	/afs/cern.ch/work/c/cpena/public/CMSSW_7_6_3/src/RazorAnalyzer/eos/cms/store/group/phys_susy/razor/Run2Analysis/HggRazor/2016/V3p4_PhotonCorrJune28_ID/HggRazor_VBFHToGG_M125_13TeV_amcatnlo_pythia8_1pb_weighted.root
+VH	/afs/cern.ch/work/c/cpena/public/CMSSW_7_6_3/src/RazorAnalyzer/eos/cms/store/group/phys_susy/razor/Run2Analysis/HggRazor/2016/V3p4_PhotonCorrJune28_ID/HggRazor_VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_1pb_weighted.root
+signal  /afs/cern.ch/work/c/cpena/public/CMSSW_7_6_3/src/RazorAnalyzer/eos/cms/store/group/phys_susy/razor/Run2Analysis/HggRazor/2016/V3p4_PhotonCorrJune28_ID/HggRazor_SMS-T2bH_mSbottom-300_mLSP-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_1pb_weighted.root
