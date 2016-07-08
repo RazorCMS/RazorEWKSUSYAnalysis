@@ -187,7 +187,7 @@ int main( int argc, char** argv )
 
   for ( auto tmp : myMap2 )
     {
-      // std::cout << tmp.first << "; binN--->" << tmp.second.bin << std::endl;
+      std::cout << tmp.first << "; binN--->" << tmp.second.bin << std::endl;
     }
 
   //-----------------
@@ -243,7 +243,7 @@ int main( int argc, char** argv )
 	{
 	  ifs >> fname;
 	  if ( ifs.eof() ) break;
-	  //std::cout << "fname: " << fname << std::endl;
+	  std::cout << "fname: " << fname << std::endl;
 	  TFile* fin = new TFile( fname.c_str(), "READ" );
 	  int low  = fname.find("_bin")+4;
 	  int high = fname.find(".root") - low;
