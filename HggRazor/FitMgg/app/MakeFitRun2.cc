@@ -510,6 +510,8 @@ int main( int argc, char* argv[])
       else if (categoryMode == "lowres") categoryCutString = " && pTGammaGamma < 110  && abs(mbbH_L-125.)>=15 && abs(mbbZ_L-91.)>=15 && sigmaMoverM >= 0.0085";
       else if (categoryMode == "highresInclusive") categoryCutString = " && sigmaMoverM < 0.0085";
       else if (categoryMode == "highreslowres") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH_L-125.)>=15 && abs(mbbZ_L-91.)>=15";
+      else if (categoryMode == "highpthighres") categoryCutString = " && pTGammaGamma >= 110 && sigmaMoverM < 0.0085";
+      else if (categoryMode == "highptlowres") categoryCutString = " && pTGammaGamma >= 110 && sigmaMoverM >= 0.0085";
       else if (categoryMode == "inclusive") categoryCutString = "";
     }
   //---------------------------------------------
