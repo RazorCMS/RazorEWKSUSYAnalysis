@@ -48,6 +48,7 @@ struct Bin
 };
 
 
+const float rsqOffset = 0.01;
 
 //----------------------------------------------
 //New Binning From Significance Calculation 2016 
@@ -238,8 +239,12 @@ int main( int argc, char** argv )
   //Create TH2Poly
   //------------------------------
   TH2Poly* nominal  = new TH2Poly("nominal_SMH", "", 150, 10000, 0, 1 );
+
   
-  for ( auto tmp : myVectBinning ) nominal->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+  for ( auto tmp : myVectBinning )
+    {
+      nominal->AddBin( tmp[0], tmp[1]+rsqOffset, tmp[2], tmp[3]+rsqOffset );
+    }
   
   std::ifstream ifs ( inputList.c_str(), std::ifstream::in );
   std::map<float, Sig> mymap;
@@ -308,12 +313,15 @@ int main( int argc, char** argv )
       */
       std::stringstream ss;
       ss << categoryMode << "_" << tmp[0] << "-" << tmp[2] << "_" << tmp[1] << "-" << tmp[3];
-      
+      int bin = nominal->FindBin( tmp[0]+10, tmp[1]+rsqOffset+0.0001 );
+      nominal->SetBinContent( bin, mymap[myMap2[ss.str()].bin].sigma );
       std::cout << "[" << tmp[0] << "-" << tmp[2] << " ," << tmp[1] << "-" << tmp[3] << "] --> "  <<
 	mymap[myMap2[ss.str()].bin].sigma << std::endl;
     }
 
-  
+   TFile* fout = new TFile("test_significance.root", "recreate");
+   nominal->Write("sig");
+   fout->Close();
    
    return 0;
 }

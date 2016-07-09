@@ -509,6 +509,7 @@ int main( int argc, char* argv[])
       else if (categoryMode == "highres") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH_L-125.)>=15 && abs(mbbZ_L-91.)>=15 && sigmaMoverM < 0.0085";
       else if (categoryMode == "lowres") categoryCutString = " && pTGammaGamma < 110  && abs(mbbH_L-125.)>=15 && abs(mbbZ_L-91.)>=15 && sigmaMoverM >= 0.0085";
       else if (categoryMode == "highresInclusive") categoryCutString = " && sigmaMoverM < 0.0085";
+      else if (categoryMode == "lowresInclusive") categoryCutString = " && sigmaMoverM >= 0.0085";
       else if (categoryMode == "highreslowres") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH_L-125.)>=15 && abs(mbbZ_L-91.)>=15";
       else if (categoryMode == "inclusive") categoryCutString = "";
     }
@@ -592,7 +593,7 @@ int main( int argc, char* argv[])
       else
 	{
 	  std::cout << "[INFO]: S+B Fit with SMH and Signal Tree" << std::endl;
-	  w_sb = MakeSignalBkgFit( tree->CopyTree( cut ), treeSignal->CopyTree( cut ), treeSMH->CopyTree( cut ), mggName, _highMassMode );
+	  w_sb = MakeSignalBkgFit( tree->CopyTree( cut ), treeSignal->CopyTree( cut ), treeSMH->CopyTree( cut ), mggName, _highMassMode, outName );
 	}
       w_sb->Write("w_sb");
     }
@@ -648,10 +649,10 @@ int main( int argc, char* argv[])
 
        for(int i=0;i<8;i++)
         {
-        if(aic[i]<min_aic_tmp)
-                {
-                min_aic_tmp=aic[i];
-                }
+	  if(aic[i]<min_aic_tmp)
+	    {
+	      min_aic_tmp=aic[i];
+	    }
         }
 
        for(int i=0;i<8;i++)
