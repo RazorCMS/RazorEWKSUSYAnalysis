@@ -186,6 +186,16 @@ int main( int argc, char* argv[] )
     }
 
   //-----------------
+  //Output file TString
+  //-----------------
+  std::string outputFile = ParseCommandLine( argc, argv, "-outputFile=" );
+  if (  outputFile == "" )
+    {
+      std::cerr << "[ERROR]: please provide an output file using --outputFile=<outputfile>" << std::endl;
+      return -1;
+    }
+ 
+  //-----------------
   //Lumi Normalization
   //-----------------
   double lumi = 0;
@@ -230,6 +240,8 @@ int main( int argc, char* argv[] )
   else if (categoryMode == "inclusive") categoryCutString = "";
   // combined highres / lowres box
   else if (categoryMode == "highreslowres") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH_L-125.) >= 15 && abs(mbbZ_L-91.) >= 15";
+  else if (categoryMode == "highpthighres") categoryCutString = " && pTGammaGamma >= 110 && sigmaMoverM < 0.0085";
+  else if (categoryMode == "highptlowres") categoryCutString = " && pTGammaGamma >= 110 && sigmaMoverM >= 0.0085";
 
   //TString triggerCut = " && ( HLTDecision[82] || HLTDecision[83] || HLTDecision[93] ) ";
   TString metFilterCut = " && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1)";
@@ -279,6 +291,14 @@ int main( int argc, char* argv[] )
   else if (categoryMode == "highreslowres" )
     {
       myVectBinning = SetBinning_highres();
+    }
+  else if (categoryMode == "highpthighres" )
+    {
+      myVectBinning = SetBinning_highpt();
+    }
+  else if (categoryMode == "highptlowres" )
+    {
+      myVectBinning = SetBinning_highpt();
     }
 
   else
@@ -502,6 +522,12 @@ int main( int argc, char* argv[] )
       facScaleTotal[1] += tmp.second;
     } 
   
+  
+  //********************************************************
+  //Print output
+  //********************************************************
+  std::ofstream outf;
+  outf.open(outputFile.c_str());  
 
   /*
   std::cout << "#category\t\tmr_l\tmr_h\trsq_l\trsq_h\tSMHY\t\tFSU\t\tFSD";
@@ -544,54 +570,55 @@ int main( int argc, char* argv[] )
        misstagUpS->SetBinContent( bin, misstagUp->GetBinContent( bin )/nomS );
        misstagDownS->SetBinContent( bin, misstagDown->GetBinContent( bin )/nomS );
        
-       std::cout << categoryMode << "\t" << tmp[0] << "\t" << tmp[2] << " \t" << tmp[1] << "\t" << tmp[3] << "\t"
-		 << nominal->GetBinContent( bin ) << "\t"
-		 << JesUp->GetBinContent( bin ) << "\t" <<  JesDown->GetBinContent( bin ) << "\t"
-		 <<  facScaleUp->GetBinContent( bin ) << "\t" <<  facScaleDown->GetBinContent( bin ) << "\t"
-		 <<  renScaleUp->GetBinContent( bin ) << "\t" <<  renScaleDown->GetBinContent( bin ) << "\t"
-		 <<  facRenScaleUp->GetBinContent( bin ) << "\t" <<  facRenScaleDown->GetBinContent( bin ) << "\t";
+       outf << categoryMode << "\t" << tmp[0] << "\t" << tmp[2] << " \t" << tmp[1] << "\t" << tmp[3] << "\t"
+	    << nominal->GetBinContent( bin ) << "\t"
+	    << JesUp->GetBinContent( bin ) << "\t" <<  JesDown->GetBinContent( bin ) << "\t"
+	    <<  facScaleUp->GetBinContent( bin ) << "\t" <<  facScaleDown->GetBinContent( bin ) << "\t"
+	    <<  renScaleUp->GetBinContent( bin ) << "\t" <<  renScaleDown->GetBinContent( bin ) << "\t"
+	    <<  facRenScaleUp->GetBinContent( bin ) << "\t" <<  facRenScaleDown->GetBinContent( bin ) << "\t";
        
        for( int ipdf = 0; ipdf < 60; ipdf++ )
 	 {
 	   pdf[ipdf]->SetBinContent( bin, pdf[ipdf]->GetBinContent( bin )/nom );
-	   std::cout << pdf[ipdf]->GetBinContent( bin ) << "\t";
+	   outf << pdf[ipdf]->GetBinContent( bin ) << "\t";
 	 }
 
        //Signal
-       std::cout <<  nomS << "\t"
-		 << JesUpS->GetBinContent( bin ) << "\t" <<  JesDownS->GetBinContent( bin ) << "\t"
-		 << facScaleUpS->GetBinContent( bin ) << "\t" <<  facScaleDownS->GetBinContent( bin ) << "\t"
-		 <<  renScaleUpS->GetBinContent( bin )    << "\t" <<  renScaleDownS->GetBinContent( bin ) << "\t"
-		 <<  facRenScaleUpS->GetBinContent( bin ) << "\t" <<  facRenScaleDownS->GetBinContent( bin ) << "\t";
+       outf <<  nomS << "\t"
+	    << JesUpS->GetBinContent( bin ) << "\t" <<  JesDownS->GetBinContent( bin ) << "\t"
+	    << facScaleUpS->GetBinContent( bin ) << "\t" <<  facScaleDownS->GetBinContent( bin ) << "\t"
+	    <<  renScaleUpS->GetBinContent( bin )    << "\t" <<  renScaleDownS->GetBinContent( bin ) << "\t"
+	    <<  facRenScaleUpS->GetBinContent( bin ) << "\t" <<  facRenScaleDownS->GetBinContent( bin ) << "\t";
        
        for( int ipdf = 0; ipdf < 60; ipdf++ )
 	 {
 	   pdf[ipdf]->SetBinContent( bin, pdf[ipdf]->GetBinContent( bin )/nom );
-	   if ( ipdf < 59 ) std::cout << pdf[ipdf]->GetBinContent( bin ) << "\t";
-	   else std::cout << pdf[ipdf]->GetBinContent( bin ) << "\n";
+	   if ( ipdf < 59 ) outf << pdf[ipdf]->GetBinContent( bin ) << "\t";
+	   else outf << pdf[ipdf]->GetBinContent( bin ) << "\n";
 	 }
        
      }
 
+   outf.close();
    
    
-  TFile* sF = new TFile( "fullSys.root", "recreate" );
-  nominal->Write("SMH_nominal");
-  facScaleUp->Write("facScaleUp");
-  facScaleDown->Write("facScaleDown");
-  renScaleUp->Write("renScaleUp");
-  renScaleDown->Write("renScaleDown");
-  facRenScaleUp->Write("facRenScaleUp");
-  facRenScaleDown->Write("facRenScaleDown");
-  JesUp->Write("JesUp");
-  JesDown->Write("JesDown");
-  btagUp->Write("btagUp");
-  btagDown->Write("btagDown");
-  misstagUp->Write("misstagUp");
-  misstagDown->Write("misstagDown");
-  for( int ipdf = 0; ipdf < 60; ipdf++ ) pdf[ipdf]->Write();
-  sF->Close();
-  
-  return 0;
+   TFile* sF = new TFile( "fullSys.root", "recreate" );
+   nominal->Write("SMH_nominal");
+   facScaleUp->Write("facScaleUp");
+   facScaleDown->Write("facScaleDown");
+   renScaleUp->Write("renScaleUp");
+   renScaleDown->Write("renScaleDown");
+   facRenScaleUp->Write("facRenScaleUp");
+   facRenScaleDown->Write("facRenScaleDown");
+   JesUp->Write("JesUp");
+   JesDown->Write("JesDown");
+   btagUp->Write("btagUp");
+   btagDown->Write("btagDown");
+   misstagUp->Write("misstagUp");
+   misstagDown->Write("misstagDown");
+   for( int ipdf = 0; ipdf < 60; ipdf++ ) pdf[ipdf]->Write();
+   sF->Close();
+   
+   return 0;
 };
 
