@@ -240,6 +240,8 @@ int main( int argc, char* argv[] )
   else if (categoryMode == "inclusive") categoryCutString = "";
   // combined highres / lowres box
   else if (categoryMode == "highreslowres") categoryCutString = " && pTGammaGamma < 110 && abs(mbbH_L-125.) >= 15 && abs(mbbZ_L-91.) >= 15";
+  else if (categoryMode == "highpthighres") categoryCutString = " && pTGammaGamma >= 110 && sigmaMoverM < 0.0085";
+  else if (categoryMode == "highptlowres") categoryCutString = " && pTGammaGamma >= 110 && sigmaMoverM >= 0.0085";
 
   //TString triggerCut = " && ( HLTDecision[82] || HLTDecision[83] || HLTDecision[93] ) ";
   TString metFilterCut = " && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1)";
@@ -289,6 +291,14 @@ int main( int argc, char* argv[] )
   else if (categoryMode == "highreslowres" )
     {
       myVectBinning = SetBinning_highres();
+    }
+  else if (categoryMode == "highpthighres" )
+    {
+      myVectBinning = SetBinning_highpt();
+    }
+  else if (categoryMode == "highptlowres" )
+    {
+      myVectBinning = SetBinning_highpt();
     }
 
   else
