@@ -27,27 +27,27 @@ float GetNs( std::string fname, int bin );
 float GetNsErr( std::string fname, int bin );
 float GetNbkg( std::string fname, std::string f1, int bin, bool _err = false );
 
-struct Bin
-{
-  std::string box;
-  std::string f1;
-  int bin;
-  float x1;
-  float x2;
-  float y1;
-  float y2;
+// struct Bin
+// {
+//   std::string box;
+//   std::string f1;
+//   int bin;
+//   float x1;
+//   float x2;
+//   float y1;
+//   float y2;
 
   
-  bool const operator== (const Bin &b) const
-  {
-    return bin == b.bin;
-  }
+//   bool const operator== (const Bin &b) const
+//   {
+//     return bin == b.bin;
+//   }
   
-  bool const operator< (const Bin &b) const
-  {
-    return bin < b.bin;
-  }
-};
+//   bool const operator< (const Bin &b) const
+//   {
+//     return bin < b.bin;
+//   }
+// };
 
 
 //----------------------------------------------

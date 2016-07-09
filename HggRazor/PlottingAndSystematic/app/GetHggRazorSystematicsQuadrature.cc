@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <sstream>
 #include <algorithm>
 #include <assert.h>
 //ROOT INCLUDES
@@ -8,153 +9,34 @@
 #include <TROOT.h>
 //#include <RooArgSet.h>
 //LOCAL INCLUDES
+#include "HggAux.hh"
 #include "HggRazorSystematics.hh"
 #include "CommandLineInput.hh"
 
 const bool _debug = false;
 
-/*
-//----------------------------------------------
-//New Binning From Significance Calculation 2015 
-//----------------------------------------------
-//HighPt
-float bin_highpt0[4] = {150,0.13,10000,1};
-float bin_highpt1[4] = {750,0,10000,0.01};
-float bin_highpt2[4] = {750,0.01,10000,0.13};
-float bin_highpt3[4] = {500,0,750,0.03};
-float bin_highpt4[4] = {500,0.03,750,0.13};
-float bin_highpt5[4] = {150,0,400,0.13};
-float bin_highpt6[4] = {400,0,500,0.045};
-float bin_highpt7[4] = {400,0.045,500,0.13};
-std::vector<float*> SetBinning_highpt()
-{
-  std::vector<float*> myVec;
-  myVec.push_back(bin_highpt0);
-  myVec.push_back(bin_highpt1);
-  myVec.push_back(bin_highpt2);
-  myVec.push_back(bin_highpt3);
-  myVec.push_back(bin_highpt4);
-  myVec.push_back(bin_highpt5);
-  myVec.push_back(bin_highpt6);
-  myVec.push_back(bin_highpt7);
-  return myVec;
-};
-//HZbb
-float bin_hzbb0[4] = {150,0,10000,1};
-std::vector<float*> SetBinning_hzbb()
-{
-  std::vector<float*> myVec;
-  myVec.push_back(bin_hzbb0);
-  return myVec;
-};
-//HighRes
-float bin_highres0[4] = {600,0.01,10000,1};
-float bin_highres1[4] = {150,0.175,600,1};
-float bin_highres2[4] = {150,0,400,0.175};
-float bin_highres3[4] = {400,0,600,0.025};
-float bin_highres4[4] = {400,0.025,600,0.175};
-float bin_highres5[4] = {600,0,950,0.01};
-float bin_highres6[4] = {950,0,10000,0.01};
-std::vector<float*> SetBinning_highres()
-{
-  std::vector<float*> myVec;
-  myVec.push_back(bin_highres0);
-  myVec.push_back(bin_highres1);
-  myVec.push_back(bin_highres2);
-  myVec.push_back(bin_highres3);
-  myVec.push_back(bin_highres4);
-  myVec.push_back(bin_highres5);
-  myVec.push_back(bin_highres6);
-  return myVec;
-};
-//LowRes
-float bin_lowres0[4] = {500,0.01,10000,1};
-float bin_lowres1[4] = {150,0.15,500,1};
-float bin_lowres2[4] = {150,0,400,0.15};
-float bin_lowres3[4] = {400,0,500,0.015};
-float bin_lowres4[4] = {400,0.015,500,0.15};
-float bin_lowres5[4] = {500,0,800,0.01};
-float bin_lowres6[4] = {800,0,10000,0.01};
-std::vector<float*> SetBinning_lowres()
-{
-  std::vector<float*> myVec;
-  myVec.push_back(bin_lowres0);
-  myVec.push_back(bin_lowres1);
-  myVec.push_back(bin_lowres2);
-  myVec.push_back(bin_lowres3);
-  myVec.push_back(bin_lowres4);
-  myVec.push_back(bin_lowres5);
-  myVec.push_back(bin_lowres6);
-  return myVec;
-};
-*/
 
 
 //----------------------------------------------
-//New Binning From Significance Calculation 2016 
+//Load Binning
 //----------------------------------------------
-//HIGHPT
-float bin_highpt0[4] = {600,0.025,10000,1};
-float bin_highpt1[4] = {150,0.13,600,1};
-float bin_highpt2[4] = {1250,0,10000,0.025};
-float bin_highpt3[4] = {150,0,450,0.13};
-float bin_highpt4[4] = {450,0,600,0.035};
-float bin_highpt5[4] = {450,0.035,600,0.13};
-float bin_highpt6[4] = {600,0,1250,0.015};
-float bin_highpt7[4] = {600,0.015,1250,0.025};
-std::vector<float*> SetBinning_highpt()
+std::vector<float*> SetBinning(std::vector<Bin> bins, std::string category)
 {
-  std::vector<float*> myVec;
-  myVec.push_back(bin_highpt0);
-  myVec.push_back(bin_highpt1);
-  myVec.push_back(bin_highpt2);
-  myVec.push_back(bin_highpt3);
-  myVec.push_back(bin_highpt4);
-  myVec.push_back(bin_highpt5);
-  myVec.push_back(bin_highpt6);
-  myVec.push_back(bin_highpt7);
-  return myVec;
-};
-//HZBB
-float bin_hzbb0[4] = {150,0,10000,1};
-std::vector<float*> SetBinning_hzbb()
-{
-  std::vector<float*> myVec;
-  myVec.push_back(bin_hzbb0);
-  return myVec;
-};
-//HIGHRES
-float bin_highres0[4] = {150,0.0,250,0.175};
-float bin_highres1[4] = {150,0.175,250,1};
-float bin_highres2[4] = {250,0.05,10000,1};
-float bin_highres3[4] = {250,0.0,600,0.05};
-float bin_highres4[4] = {600,0.0,10000,0.05};
-std::vector<float*> SetBinning_highres()
-{
-  std::vector<float*> myVec;
-  myVec.push_back(bin_highres0);
-  myVec.push_back(bin_highres1);
-  myVec.push_back(bin_highres2);
-  myVec.push_back(bin_highres3);
-  myVec.push_back(bin_highres4);
-  //myVec.push_back(bin_highres5);
-  //myVec.push_back(bin_highres6);
-  return myVec;
-};
-//LOWRES
-float bin_lowres0[4] = {500,0.01,10000,1};
-float bin_lowres1[4] = {150,0.15,500,1};
-float bin_lowres2[4] = {150,0,400,0.15};
-float bin_lowres3[4] = {400,0,500,0.015};
-float bin_lowres4[4] = {400,0.015,500,0.15};
-float bin_lowres5[4] = {500,0,800,0.01};
-float bin_lowres6[4] = {800,0,10000,0.01};
-std::vector<float*> SetBinning_lowres()
-{
-    // Use highres binning in lowres box
-    return SetBinning_highres();
-};
 
+  std::vector<float*> myVec;
+  for(int i=0; i<bins.size(); ++i) {
+    float *tmpbin = new float[4];
+    if (bins[i].box == category) {
+      tmpbin[0] = bins[i].x1;
+      tmpbin[1] = bins[i].y1;
+      tmpbin[2] = bins[i].x2;
+      tmpbin[3] = bins[i].y2;
+      myVec.push_back(tmpbin);
+    }
+  }
+
+  return myVec;
+};
 
 //----------------
 //Static Variables
@@ -227,6 +109,63 @@ int main( int argc, char* argv[] )
       std::cerr << "[INFO]: enabling pTGammaGamma cut for all boxes" << std::endl;
     } 
   
+  //-----------------
+  //Binning File 
+  //-----------------
+  std::string binDefinitionFilename = ParseCommandLine( argc, argv, "-binningFile=" );
+  if ( binDefinitionFilename == "" )
+    {
+      std::cerr << "[ERROR]: please provide the bin definition file. Use --binningFile=<binningFile>" << std::endl;
+      return -1;
+    } 
+  
+
+
+  //-----------------
+  //Load Binning
+  //-----------------
+  std::map<Bin, std::string> mapBinToString;
+  std::map<std::string, Bin> mapStringToBin;
+  std::vector<Bin> binVector;
+  std::ifstream binDefFile( binDefinitionFilename.c_str(), std::fstream::in );
+  if ( binDefFile.is_open() ) {
+    float x1, x2, y1, y2;
+    int binN;
+    std::string box, f1;
+    while ( binDefFile.good() )
+      {
+	binDefFile >> binN >> x1 >> x2 >> y1 >> y2 >> box >> f1;
+	if ( binDefFile.eof() ) break;
+	Bin mybin;
+	mybin.bin = binN;
+	mybin.f1 = f1;
+	mybin.box = box;
+	mybin.x1 = x1;
+	mybin.x2 = x2;
+	mybin.y1 = y1;
+	mybin.y2 = y2;
+
+	std::cout << x1 << " " << x2 << " " << y1 << " " << y2 << "\n";
+	binVector.push_back(mybin);
+
+	std::stringstream ss;
+	ss << box << "_" << x1 << "-" << x2 << "_" << y1 << "-" << y2;
+	//myMap.find( mybin );
+	if ( mapBinToString.find( mybin ) == mapBinToString.end() ) mapBinToString[mybin] = f1;
+	if ( mapStringToBin.find( ss.str() ) == mapStringToBin.end() ) mapStringToBin[ss.str()] = mybin;
+	//std::cout << binN << " " <<  x1  << " " << x2 << " " << y1 << " " << y2 << " " <<  box << " " << f1 << std::endl;
+      }
+  } else {
+    std::cout << "Unable to open binning lookup table" << std::endl;
+  }
+
+
+
+
+
+
+
+
   TString cut = "mGammaGamma > 103. && mGammaGamma < 160. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.";
   if (usePtGammaGamma == "yes") {
       cut = cut + " && pTGammaGamma > 20 ";
@@ -272,41 +211,15 @@ int main( int argc, char* argv[] )
   std::vector<std::pair<float,float>> facRenScaleSys;
 
   std::vector<float*> myVectBinning;
-  if ( categoryMode == "highpt")
-    {
-      myVectBinning = SetBinning_highpt();
-    }
-  else if ( categoryMode == "hzbb" )
-    {
-      myVectBinning = SetBinning_hzbb();
-    }
-  else if ( categoryMode == "highres" )
-    {
-      myVectBinning = SetBinning_highres();
-    }
-  else if ( categoryMode == "lowres" )
-    {
-      myVectBinning = SetBinning_lowres();
-    }
-  else if (categoryMode == "highreslowres" )
-    {
-      myVectBinning = SetBinning_highres();
-    }
-  else if (categoryMode == "highpthighres" )
-    {
-      myVectBinning = SetBinning_highpt();
-    }
-  else if (categoryMode == "highptlowres" )
-    {
-      myVectBinning = SetBinning_highpt();
-    }
+  myVectBinning = SetBinning(binVector, categoryMode);
 
-  else
-    {
-      std::cerr << "[ERROR]: category is not <highpt/hzbb/highres/lowres>; quitting" << std::endl;
-      return -1;
-    }
-  
+  if (!(categoryMode == "highpt" || categoryMode == "hzbb" 
+	|| categoryMode == "highres"|| categoryMode == "lowres"))
+     {
+       std::cerr << "[ERROR]: category is not <highpt/hzbb/highres/lowres>; quitting" << std::endl;
+       return -1;
+     } 
+
   TH2Poly* nominal  = new TH2Poly("nominal_SMH", "", 150, 10000, 0, 1 );
   TH2Poly* nominalS = new TH2Poly("nominal_Signal", "", 150, 10000, 0, 1 );
 
