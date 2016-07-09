@@ -20,6 +20,32 @@ Boxes operator*( Boxes box );
 
 std::string GetBoxString( Boxes box );
 
+
+//--------------------------------------------------------------------------------
+// Binning class
+//--------------------------------------------------------------------------------
+struct Bin
+{
+  std::string box;
+  std::string f1;
+  int bin;
+  float x1;
+  float x2;
+  float y1;
+  float y2;
+  
+  bool const operator== (const Bin &b) const
+  {
+    return bin == b.bin;
+  }
+  
+  bool const operator< (const Bin &b) const
+  {
+    return bin < b.bin;
+  }
+};
+
+
 enum class Process{ gammaJet, diphoton, qcd, ggH, vbfH, vH, ttH, w, znunu, dy, tt, top, vv, ww, zz, wz, signal,data, unknown, Last };
 struct Yields
 {
