@@ -1043,8 +1043,8 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
       _fout->Close();
       
       TString dataCardName;
-      if ( isEBEB ) dataCardName = Form("HggRazorCombinedCard_EBEB_m%.0f.txt", _mass);
-      else dataCardName = Form("HggRazorCombinedCard_EBEE_m%.0f.txt", _mass);
+      if ( isEBEB ) dataCardName = Form("HggRazorCard_EBEB_m%.0f.txt", _mass);
+      else dataCardName = Form("HggRazorCard_EBEE_m%.0f.txt", _mass);
       
       std::ofstream ofs( dataCardName , std::ofstream::out );
       TString det;
@@ -1719,7 +1719,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   std::cout << "[INFO]: Creating combine datacard" << std::endl;
   //std::string bNumber( binNumber );//TString to std::string
   combinedRootFileName = "HggRazorWorkspace_bin" + binNumber + ".root";
-  TString dataCardName = "HggRazorDataCards/" + sModel + "/HggRazorCombinedCard_bin" + binNumber + ".txt";
+  TString dataCardName = "HggRazorDataCards/" + sModel + "/HggRazorCard_bin" + binNumber + ".txt";
   std::ofstream ofs( dataCardName , std::ofstream::out );
 
   if ( !_signalOnly )
