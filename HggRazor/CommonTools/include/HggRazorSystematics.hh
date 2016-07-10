@@ -74,6 +74,7 @@ private:
   //TH2Poly Histos
   TH2Poly* h2p;
   TH2Poly* h2p_Err;
+  TH2Poly* h2p_eff;
   TH2Poly* h2p_facScaleUp;
   TH2Poly* h2p_facScaleDown;
   TH2Poly* h2p_renScaleUp;

@@ -54,6 +54,7 @@ HggRazorSystematics::~HggRazorSystematics()
   if ( _debug ) std::cout << "[DEBUG]: Entering Destructor" << std::endl;
   
   if ( this->h2p != NULL ) delete h2p;
+  if ( this->h2p_eff != NULL ) delete h2p_eff;
   if ( this->h2p_facScaleUp != NULL ) delete h2p_facScaleUp;
   if ( this->h2p_facScaleDown != NULL ) delete h2p_facScaleDown;
   if ( this->h2p_renScaleUp != NULL ) delete h2p_renScaleUp;
@@ -90,8 +91,9 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
 	  std::cerr << "[ERROR]: Imposible to create TH2Poly; no binning defined yet, please use object->SetBinningMap( yourMap );" << std::endl;
 	  return false;
 	}
-      h2p = new TH2Poly(this->processName+"+nominal", "", 150, 10000, 0, 1);
-      h2p_Err = new TH2Poly(this->processName+"+nominal", "", 150, 10000, 0, 1);
+      h2p = new TH2Poly(this->processName+"_nominal", "", 150, 10000, 0, 1);
+      h2p_Err = new TH2Poly(this->processName+"_nominal_err", "", 150, 10000, 0, 1);
+      h2p_eff = new TH2Poly(this->processName+"_eff", "", 150, 10000, 0, 1);
       
       h2p_facScaleUp      = new TH2Poly(this->processName+"_facScaleUp", "", 150, 10000, 0, 1);
       h2p_facScaleDown    = new TH2Poly(this->processName+"_facScaleDown", "", 150, 10000, 0, 1);
@@ -120,6 +122,7 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
 	    {
 	      h2p->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
 	      h2p_Err->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
+	      h2p_eff->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
 	      h2p_facScaleUp->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
 	      h2p_facScaleDown->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
 	      h2p_renScaleUp->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
@@ -148,8 +151,9 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
 	}
 
       
-      h2p = new TH2Poly(this->processName+"+nominal", "", 150, 10000, 0, 1);
-      h2p_Err = new TH2Poly(this->processName+"+nominal", "", 150, 10000, 0, 1);
+      h2p = new TH2Poly(this->processName+"_nominal", "", 150, 10000, 0, 1);
+      h2p_Err = new TH2Poly(this->processName+"_nominal_err", "", 150, 10000, 0, 1);
+      h2p_eff = new TH2Poly(this->processName+"_eff", "", 150, 10000, 0, 1);
       
       h2p_facScaleUp      = new TH2Poly(this->processName+"_facScaleUp", "", 150, 10000, 0, 1);
       h2p_facScaleDown    = new TH2Poly(this->processName+"_facScaleDown", "", 150, 10000, 0, 1);
@@ -180,6 +184,7 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
 	  if ( _debug ) std::cout << "adding bin: " << tmp[0] << "," <<  tmp[1] << "," << tmp[2] << "," << tmp[3] << std::endl;
 	  h2p->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
 	  h2p_Err->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
+	  h2p_eff->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
 	  
 	  h2p_facScaleUp->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
 	  h2p_facScaleDown->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
@@ -221,6 +226,12 @@ void HggRazorSystematics::Loop()
       std::cerr << "[ERROR]: TH2Poly has not been created; impossible to fill TH2Poly, please use: obj->InitMrRsqTH2Poly();" << std::endl;
       return;
     }
+
+   if ( h2p_eff == NULL )
+    {
+      std::cerr << "[ERROR]: TH2Poly has not been created; impossible to fill TH2Poly, please check efficiecy TH2Poly;" << std::endl;
+      return;
+    }
   
   if ( (this->NEvents == NULL || this->SumScaleWeights == NULL || this->SumPdfWeights == NULL ) && this->processName != "signal" )
     {
@@ -238,7 +249,7 @@ void HggRazorSystematics::Loop()
   float N_Pdf[n_PdfSys];
   if ( this->processName != "signal" )
     {
-      N_events= this->NEvents->GetBinContent(1);
+      N_events = this->NEvents->GetBinContent(1);
       for ( int i = 0; i < n_facScaleSys; i++ ) N_facScale[i] = this->SumScaleWeights->GetBinContent( i+1 );
       for ( int i = 0; i < n_PdfSys; i++ ) N_Pdf[i] = this->SumPdfWeights->GetBinContent( i+1 );
     }
@@ -249,10 +260,11 @@ void HggRazorSystematics::Loop()
   //--------------------------------
   //Photon Trigger Efficiency
   //--------------------------------
-  TFile *photonTriggerEffFile_LeadingLeg = TFile::Open("root://eoscms:///eos/cms/store/group/phys_susy/razor/Run2Analysis/ScaleFactors/PhotonEfficiencies/2016_Golden_2p6ifb/PhoHLTLeadingLegEffDenominatorLoose.root");
-  TFile *photonTriggerEffFile_TrailingLeg = TFile::Open("root://eoscms:///eos/cms/store/group/phys_susy/razor/Run2Analysis/ScaleFactors/PhotonEfficiencies/2016_Golden_2p6ifb/PhoHLTTrailingLegEffDenominatorLoose.root");
+  TFile *photonTriggerEffFile_LeadingLeg = TFile::Open("data/triggerEff/PhoHLTLeadingLegEffDenominatorLoose.root");
+  TFile *photonTriggerEffFile_TrailingLeg = TFile::Open("data/triggerEff/PhoHLTTrailingLegEffDenominatorLoose.root");
   TH2D *photonTriggerEffHist_LeadingLeg = (TH2D*)photonTriggerEffFile_LeadingLeg->Get("hEffEtaPt");
   TH2D *photonTriggerEffHist_TrailingLeg = (TH2D*)photonTriggerEffFile_TrailingLeg->Get("hEffEtaPt");
+
   if(!(photonTriggerEffHist_LeadingLeg && photonTriggerEffHist_TrailingLeg) ) {
     std::cout << "Error: Trigger efficiency files not loaded.\n";
     return;
@@ -326,6 +338,7 @@ void HggRazorSystematics::Loop()
 	      //std::cout << "facScale: "<<  weight << " " << weight*sf_facScaleUp*N_events/N_facScale[0] << std::endl;
 	      h2p->Fill( MR, t1Rsq, commonW );
 	      h2p_Err->Fill( MR, t1Rsq, commonW*commonW );
+	      h2p_eff->Fill( MR, t1Rsq, 1./N_events );
 	      
 	      h2p_facScaleUp->Fill( MR, t1Rsq, commonW*sf_facScaleUp*N_events/N_facScale[0] );
 	      h2p_facScaleDown->Fill( MR, t1Rsq, commonW*sf_facScaleDown*N_events/N_facScale[1] );
@@ -359,7 +372,7 @@ void HggRazorSystematics::Loop()
 	    {
 	      h2p->Fill( MR, 0.999, commonW );
 	      h2p_Err->Fill( MR, 0.999, commonW*commonW );
-	      
+	      h2p_eff->Fill( MR, 0.999, 1./N_events );
 	      h2p_facScaleUp->Fill( MR, 0.999, commonW*sf_facScaleUp*N_events/N_facScale[0] );
 	      h2p_facScaleDown->Fill( MR, 0.999, commonW*sf_facScaleDown*N_events/N_facScale[1] );
 	      
@@ -528,6 +541,7 @@ bool HggRazorSystematics::WriteOutput( TString outName )
   if ( _debug ) std::cout << "[DEBUG]: Entering WriteOutput" << std::endl;
   this->fout = new TFile( outName + "_" + this->processName + ".root", "recreate");
   if ( h2p != NULL ) h2p->Write( this->boxName + "_histo" );
+  if ( h2p_eff != NULL ) h2p_eff->Write( this->boxName + "_histo_eff" );
   if ( h2p_facScaleUp != NULL ) h2p_facScaleUp->Write( this->boxName + "_histo_facScaleUp" );
   if ( h2p_facScaleDown != NULL ) h2p_facScaleDown->Write( this->boxName + "_histo_facScaleDown" );
   if ( h2p_renScaleUp != NULL ) h2p_renScaleUp->Write( this->boxName + "_histo_renScaleUp" );
