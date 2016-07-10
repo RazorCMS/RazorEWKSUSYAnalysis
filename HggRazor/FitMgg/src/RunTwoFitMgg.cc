@@ -1091,8 +1091,8 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
       _fout->Close();
       
       TString dataCardName;
-      if ( isEBEB ) dataCardName = Form("HggRazorCombinedCard_EBEB_m%.0f.txt", _mass);
-      else dataCardName = Form("HggRazorCombinedCard_EBEE_m%.0f.txt", _mass);
+      if ( isEBEB ) dataCardName = Form("HggRazorCard_EBEB_m%.0f.txt", _mass);
+      else dataCardName = Form("HggRazorCard_EBEE_m%.0f.txt", _mass);
       
       std::ofstream ofs( dataCardName , std::ofstream::out );
       TString det;
@@ -1767,7 +1767,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   std::cout << "[INFO]: Creating combine datacard" << std::endl;
   //std::string bNumber( binNumber );//TString to std::string
   combinedRootFileName = "HggRazorWorkspace_bin" + binNumber + ".root";
-  TString dataCardName = "HggRazorDataCards/" + sModel + "/HggRazorCombinedCard_bin" + binNumber + ".txt";
+  TString dataCardName = "HggRazorDataCards/" + sModel + "/HggRazorCard_bin" + binNumber + ".txt";
   std::ofstream ofs( dataCardName , std::ofstream::out );
 
   if ( !_signalOnly )
@@ -1791,6 +1791,13 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
       ofs << "Photon_Trigger\t\t\tlnN\t\t1.05\t\t1.05\t\t-\n";
       ofs << "ScaleNorm\t\t\tlnN\t\t-\t\t0.931/1.065\t\t-\n";
       ofs << "PdfNorm\t\t\t\tlnN\t\t-\t\t0.948/1.062\t\t-\n";
+      
+      if ( category == "highres" ) {
+	ofs << "SigmaMoverMEfficiency\t\t\t\tlnN\t\t0.947/1.053\t\t0.947/1.053\t\t-\n";
+      } else if (category == "lowres" ) {
+	ofs << "SigmaMoverMEfficiency\t\t\t\tlnN\t\t1.167/0.833\t\t1.167/0.833\t\t-\n";
+      }
+
       int totalSys = smh_sys.size();
       int ctr = 0;
       for( int isys = 0; isys < totalSys; isys++ )
