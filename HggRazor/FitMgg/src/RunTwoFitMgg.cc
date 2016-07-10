@@ -1743,6 +1743,13 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
       ofs << "Photon_Trigger\t\t\tlnN\t\t1.05\t\t1.05\t\t-\n";
       ofs << "ScaleNorm\t\t\tlnN\t\t-\t\t0.931/1.065\t\t-\n";
       ofs << "PdfNorm\t\t\t\tlnN\t\t-\t\t0.948/1.062\t\t-\n";
+      
+      if ( category == "highres" ) {
+	ofs << "SigmaMoverMEfficiency\t\t\t\tlnN\t\t0.947/1.053\t\t0.947/1.053\t\t-\n";
+      } else if (category == "lowres" ) {
+	ofs << "SigmaMoverMEfficiency\t\t\t\tlnN\t\t1.167/0.833\t\t1.167/0.833\t\t-\n";
+      }
+
       int totalSys = smh_sys.size();
       int ctr = 0;
       for( int isys = 0; isys < totalSys; isys++ )
