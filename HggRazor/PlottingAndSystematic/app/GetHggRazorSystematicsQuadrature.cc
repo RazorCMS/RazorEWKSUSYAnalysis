@@ -25,12 +25,13 @@ std::vector<float*> SetBinning(std::vector<Bin> bins, std::string category)
 
   std::vector<float*> myVec;
   for(int i=0; i<bins.size(); ++i) {
-    float *tmpbin = new float[4];
+    float *tmpbin = new float[5];
     if (bins[i].box == category) {
       tmpbin[0] = bins[i].x1;
       tmpbin[1] = bins[i].y1;
       tmpbin[2] = bins[i].x2;
       tmpbin[3] = bins[i].y2;
+      tmpbin[4] = bins[i].bin;
       myVec.push_back(tmpbin);
     }
   }
@@ -124,46 +125,28 @@ int main( int argc, char* argv[] )
   //-----------------
   //Load Binning
   //-----------------
-  std::map<Bin, std::string> mapBinToString;
-  std::map<std::string, Bin> mapStringToBin;
   std::vector<Bin> binVector;
   std::ifstream binDefFile( binDefinitionFilename.c_str(), std::fstream::in );
   if ( binDefFile.is_open() ) {
     float x1, x2, y1, y2;
     int binN;
     std::string box, f1;
-    while ( binDefFile.good() )
-      {
-	binDefFile >> binN >> x1 >> x2 >> y1 >> y2 >> box >> f1;
-	if ( binDefFile.eof() ) break;
-	Bin mybin;
-	mybin.bin = binN;
-	mybin.f1 = f1;
-	mybin.box = box;
-	mybin.x1 = x1;
-	mybin.x2 = x2;
-	mybin.y1 = y1;
-	mybin.y2 = y2;
-
-	std::cout << x1 << " " << x2 << " " << y1 << " " << y2 << "\n";
-	binVector.push_back(mybin);
-
-	std::stringstream ss;
-	ss << box << "_" << x1 << "-" << x2 << "_" << y1 << "-" << y2;
-	//myMap.find( mybin );
-	if ( mapBinToString.find( mybin ) == mapBinToString.end() ) mapBinToString[mybin] = f1;
-	if ( mapStringToBin.find( ss.str() ) == mapStringToBin.end() ) mapStringToBin[ss.str()] = mybin;
-	//std::cout << binN << " " <<  x1  << " " << x2 << " " << y1 << " " << y2 << " " <<  box << " " << f1 << std::endl;
-      }
+    while ( binDefFile.good() ) {
+      binDefFile >> binN >> x1 >> x2 >> y1 >> y2 >> box >> f1;
+      if ( binDefFile.eof() ) break;
+      Bin mybin;
+      mybin.bin = binN;
+      mybin.f1 = f1;
+      mybin.box = box;
+      mybin.x1 = x1;
+      mybin.x2 = x2;
+      mybin.y1 = y1;
+      mybin.y2 = y2;
+      binVector.push_back(mybin);
+    }
   } else {
     std::cout << "Unable to open binning lookup table" << std::endl;
   }
-
-
-
-
-
-
 
 
   TString cut = "mGammaGamma > 103. && mGammaGamma < 160. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.";
@@ -483,7 +466,7 @@ int main( int argc, char* argv[] )
        misstagUpS->SetBinContent( bin, misstagUp->GetBinContent( bin )/nomS );
        misstagDownS->SetBinContent( bin, misstagDown->GetBinContent( bin )/nomS );
        
-       outf << categoryMode << "\t" << tmp[0] << "\t" << tmp[2] << " \t" << tmp[1] << "\t" << tmp[3] << "\t"
+       outf << tmp[4] << "\t" << categoryMode << "\t" << tmp[0] << "\t" << tmp[2] << " \t" << tmp[1] << "\t" << tmp[3] << "\t"
 	    << nominal->GetBinContent( bin ) << "\t"
 	    << JesUp->GetBinContent( bin ) << "\t" <<  JesDown->GetBinContent( bin ) << "\t"
 	    <<  facScaleUp->GetBinContent( bin ) << "\t" <<  facScaleDown->GetBinContent( bin ) << "\t"
