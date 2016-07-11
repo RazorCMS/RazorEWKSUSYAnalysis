@@ -48,6 +48,8 @@ do
     ./GetHggRazorSystematicsQuadrature --inputList=$inlist --category=$i --outputFile=$outfile"_"$i".txt" --lumi=$lumi --analysisTag=$anTag --binningFile=$bFile
 done
 
+cat $outfile"_"${categories[0]}".txt" $outfile"_"${categories[2]}".txt" $outfile"_"${categories[2]}".txt" $outfile"_"${categories[3]}".txt" > $outfile"_AllCategories.txt"
+
 if [[ -n $1 ]]; then
     echo "Last line of file specified as non-opt/last argument:"
     tail -1 $1
