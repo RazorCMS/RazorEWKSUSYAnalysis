@@ -157,7 +157,7 @@ int main( int argc, char* argv[] )
       ifs >> binNumber >> category >> MR_l >> MR_h >> Rsq_l >> Rsq_h >> SMH;
 
       //check for consistency
-      if (!(mapBinNumberToBin[binNumber].box == category && 
+      if (!(
 	    mapBinNumberToBin[binNumber].x1 == MR_l &&
 	    mapBinNumberToBin[binNumber].x2 == MR_h &&
 	    mapBinNumberToBin[binNumber].y1 == Rsq_l &&

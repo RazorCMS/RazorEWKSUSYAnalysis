@@ -166,7 +166,8 @@ int main( int argc, char* argv[] )
   else if (categoryMode == "highptlowres") categoryCutString = " && pTGammaGamma >= 110 && sigmaMoverM >= 0.0085";
 
   //TString triggerCut = " && ( HLTDecision[82] || HLTDecision[83] || HLTDecision[93] ) ";
-  TString metFilterCut = " && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1)";
+  TString metFilterCut = " && (Flag_HBHENoiseFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1)";
+  //TString metFilterCut = " && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1)";
   TString triggerCut = "";
   //TString metFilterCut = "";
 
@@ -194,10 +195,20 @@ int main( int argc, char* argv[] )
   std::vector<std::pair<float,float>> facRenScaleSys;
 
   std::vector<float*> myVectBinning;
-  myVectBinning = SetBinning(binVector, categoryMode);
 
-  if (!(categoryMode == "highpt" || categoryMode == "hzbb" 
-	|| categoryMode == "highres"|| categoryMode == "lowres"))
+  //get correct binning category in case of nonstandard box choice
+  std::string binCategory = categoryMode;
+  if ( categoryMode == "highreslowres" ) {
+      binCategory = "highres"; //use highres binning
+  }
+  else if ( categoryMode == "highpthighres" || categoryMode == "highptlowres" ) {
+      binCategory = "highpt"; //use highpt binning
+  }
+
+  myVectBinning = SetBinning(binVector, binCategory);
+
+  if (!(binCategory == "highpt" || binCategory == "hzbb" 
+	|| binCategory == "highres"|| binCategory == "lowres"))
      {
        std::cerr << "[ERROR]: category is not <highpt/hzbb/highres/lowres>; quitting" << std::endl;
        return -1;
@@ -316,7 +327,7 @@ int main( int argc, char* argv[] )
       //---------------------------
       //Create HggSystematic object
       //---------------------------
-      HggRazorSystematics* hggSys = new HggRazorSystematics( cutTree, currentProcess, categoryMode, analysisTag, _debug, _debug );
+      HggRazorSystematics* hggSys = new HggRazorSystematics( cutTree, currentProcess, binCategory, analysisTag, _debug, _debug );
       hggSys->SetLumi(lumi);
       //hggSys->PrintBinning();
       //hggSys->SetBinningMap( binningMap );
