@@ -364,10 +364,8 @@ void HggRazorSystematics::Loop()
 	    } else {
 	      h2p_Pdf[ipdf]->Fill( MR, fmin(t1Rsq,0.999), commonW );
 	    }
-<<<<<<< HEAD
 	  }
       }
-=======
 	  else
 	    {
 	      h2p->Fill( MR, 0.999, commonW );
@@ -399,7 +397,6 @@ void HggRazorSystematics::Loop()
 	      h2p_misstagUp->Fill( MR, 0.999, commonW*sf_bmistagUp );
 	      h2p_misstagDown->Fill( MR, 0.999, commonW*sf_bmistagDown );
 	    }
->>>>>>> 3d0733aedcf00368e321f272d62c3e4db6f89b35
 	  
     } //loop over events
     
