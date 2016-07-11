@@ -35,6 +35,7 @@ public:
   TH2Poly* GetNominalTH2Poly( ){ return this->h2p; };
   float GetNominalYield( float mr, float rsq );
   float GetNominalError( float mr, float rsq );
+  float GetEff( float mr, float rsq );
   
   std::pair<float, float> GetFacScaleSystematic( float mr, float rsq );
   std::pair<float, float> GetRenScaleSystematic( float mr, float rsq );

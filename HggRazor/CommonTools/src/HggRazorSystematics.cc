@@ -338,7 +338,7 @@ void HggRazorSystematics::Loop()
 	      //std::cout << "facScale: "<<  weight << " " << weight*sf_facScaleUp*N_events/N_facScale[0] << std::endl;
 	      h2p->Fill( MR, t1Rsq, commonW );
 	      h2p_Err->Fill( MR, t1Rsq, commonW*commonW );
-	      h2p_eff->Fill( MR, t1Rsq, 1./N_events );
+	      h2p_eff->Fill( MR, t1Rsq, weight/N_events );
 	      
 	      h2p_facScaleUp->Fill( MR, t1Rsq, commonW*sf_facScaleUp*N_events/N_facScale[0] );
 	      h2p_facScaleDown->Fill( MR, t1Rsq, commonW*sf_facScaleDown*N_events/N_facScale[1] );
@@ -373,6 +373,7 @@ void HggRazorSystematics::Loop()
 	      h2p->Fill( MR, 0.999, commonW );
 	      h2p_Err->Fill( MR, 0.999, commonW*commonW );
 	      h2p_eff->Fill( MR, 0.999, 1./N_events );
+	      
 	      h2p_facScaleUp->Fill( MR, 0.999, commonW*sf_facScaleUp*N_events/N_facScale[0] );
 	      h2p_facScaleDown->Fill( MR, 0.999, commonW*sf_facScaleDown*N_events/N_facScale[1] );
 	      
@@ -616,6 +617,12 @@ float HggRazorSystematics::GetNominalError( float mr, float rsq )
 {
   int bin = h2p_Err->FindBin( mr+10, rsq+0.0001 );
   return h2p_Err->GetBinContent( bin );
+};
+
+float HggRazorSystematics::GetEff( float mr, float rsq )
+{
+  int bin = h2p_eff->FindBin( mr+10, rsq+0.0001 );
+  return h2p_eff->GetBinContent( bin );
 };
 
 std::pair<float, float> HggRazorSystematics::GetFacScaleSystematic( float mr, float rsq )

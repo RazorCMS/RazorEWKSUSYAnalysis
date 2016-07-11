@@ -13,7 +13,7 @@
 #include "HggRazorSystematics.hh"
 #include "CommandLineInput.hh"
 
-const bool _debug = true;
+const bool _debug = false;
 
 
 
@@ -119,11 +119,18 @@ int main( int argc, char* argv[] )
       std::cerr << "[ERROR]: please provide the bin definition file. Use --binningFile=<binningFile>" << std::endl;
       return -1;
     } 
+
+
+  //----------------------------------------
+  //eff maps containing eff and th2poly(eff)
+  //----------------------------------------
+  std::map< std::string, TH2Poly* > smhMapNominal;
+  std::map< std::string, double > smhBLMReff;
   
   //-----------------
   //Load Binning
   //-----------------
-  std::vector<Bin> binVector;
+ std::vector<Bin> binVector;
   std::ifstream binDefFile( binDefinitionFilename.c_str(), std::fstream::in );
   if ( binDefFile.is_open() ) {
     float x1, x2, y1, y2;
@@ -201,11 +208,16 @@ int main( int argc, char* argv[] )
        return -1;
      } 
 
-  TH2Poly* nominal  = new TH2Poly("nominal_SMH", "", 150, 10000, 0, 1 );
+  //TH2Poly containing eff for each MR-Rsq bin
+  TH2Poly* nominal[4];//4 smh channnels
+ 
   std::map< std::pair<float,float>, float > sysMap;
-  for ( auto tmp : myVectBinning ) nominal->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
-  
+    
   std::string process, rootFileName;
+  int nprocess = 0;
+  TString baselineCut = "mGammaGamma > 103. && mGammaGamma < 160. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1Eta) <1.48 && abs(pho2Eta)<1.48 && (pho1Pt>40||pho2Pt>40)  && pho1Pt> 25. && pho2Pt>25.";
+  double nbaseline[4];
+  double nMRbaseline[4];
   while ( ifs.good() )
     {
       ifs >> process >> rootFileName;
@@ -213,7 +225,7 @@ int main( int argc, char* argv[] )
       if ( process.find("#") != std::string::npos ) continue;
       if ( _debug ) std::cout << process << " " << rootFileName << std::endl;
       TFile* fin = new TFile( rootFileName.c_str(), "READ");
-      std::cout << "[INFO]: checking file: " << rootFileName << std::endl;
+      //std::cout << "[INFO]: checking file: " << rootFileName << std::endl;
       assert( fin );
       if ( _debug ) std::cout << "[INFO]: file: " << rootFileName << " passed check\n\n"<< std::endl;
       
@@ -228,7 +240,24 @@ int main( int argc, char* argv[] )
       if ( process != "signal" ) assert( SumScaleWeights );
       TH1F* SumPdfWeights   = (TH1F*)fin->Get("SumPdfWeights");
       if ( process != "signal" ) assert( SumPdfWeights );
+
+      //----------------------
+      //Getting baseline yield
+      //----------------------
+      //nbaseline[nprocess] = tree->GetEntries("weight*(" + baselineCut + ")");
+      tree->Draw("mGammaGamma>>tmpBL(57,103,160)", "weight*(" + baselineCut + ")", "goff");
+      TH1F* h_baseline = (TH1F*)gDirectory->Get("tmpBL");
+      nbaseline[nprocess] = h_baseline->Integral()/NEvents->Integral();
+      //-------------------------
+      //Getting baseline+MR yield
+      //-------------------------
+      tree->Draw("mGammaGamma>>tmpBL_MR(57,103,160)", "weight*(" + baselineCut + categoryCutString + " && MR > 150. )", "goff");
+      TH1F* h_baseline_mr = (TH1F*)gDirectory->Get("tmpBL_MR");
+      nMRbaseline[nprocess] = h_baseline_mr->Integral()/NEvents->Integral();
       
+      std::cout << "nbaseline: " << nbaseline[nprocess] << " & " << nMRbaseline[nprocess] << std::endl;
+
+      smhBLMReff[process] = nMRbaseline[nprocess];
       TFile* tmp = new TFile("tmp.root", "RECREATE");
       TTree* cutTree = tree->CopyTree( cut );
       TString currentProcess = process.c_str();
@@ -236,6 +265,10 @@ int main( int argc, char* argv[] )
       //---------------------------
       //Create HggSystematic object
       //---------------------------
+      TString th2pName = Form("nominal_SMH_eff_%s", process.c_str()); 
+      nominal[nprocess] = new TH2Poly( th2pName, "", 150, 10000, 0, 1 );
+      for ( auto tmp : myVectBinning ) nominal[nprocess]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+      
       HggRazorSystematics* hggSys = new HggRazorSystematics( cutTree, currentProcess, categoryMode, analysisTag, _debug, _debug );
       hggSys->SetLumi(lumi);
       hggSys->SetBinningVector( myVectBinning );
@@ -246,10 +279,11 @@ int main( int argc, char* argv[] )
       hggSys->Loop();
       for ( auto tmp: myVectBinning )
 	{
-	  int bin = nominal->FindBin( tmp[0]+10, tmp[1]+0.0001 );
-	  nominal->SetBinContent( bin, nominal->GetBinContent(bin) + hggSys->GetNominalYield( tmp[0], tmp[1] ) );
+	  int bin = nominal[nprocess]->FindBin( tmp[0]+10, tmp[1]+0.0001 );
+	  nominal[nprocess]->SetBinContent( bin, hggSys->GetEff( tmp[0], tmp[1] ) );
 	}
-      
+
+      smhMapNominal[process] = nominal[nprocess];
       hggSys->WriteOutput( "histoMR_Rsq" );
       delete hggSys;
       if ( _debug ) std::cout << "deleted hggSys" << std::endl;
@@ -264,22 +298,47 @@ int main( int argc, char* argv[] )
   std::ofstream outf;
   outf.open(outputFile.c_str());  
 
-  /*
-  std::cout << "#category\t\tmr_l\tmr_h\trsq_l\trsq_h\tSMHY\t\tFSU\t\tFSD";
-  for( int ipdf = 0; ipdf < 60; ipdf++ ) std::cout << "\t\tPDF" << ipdf;
-  std::cout << "\t\tJESU\t\tJESD"<< std::endl;
-  */
+  std::cout << "\\begin{table*}[htb]\n\\footnotesize\n\\begin{center}\n\\caption{";
+  std::cout << categoryMode << " category; baseline SMH efficiency}\n";
+  std::cout << "\\def\\arraystretch{1.5}\n\\begin{tabular}{|c|c|c|c|c|}\n\\hline\ncategory";
+  std::cout << " & ggH & vbfH & vH & ttH\\\\" << std::endl;
+  std::cout << "\\hline" << std::endl;
+  double eff[4];
+  eff[0] = smhBLMReff["ggH"];
+  eff[1] = smhBLMReff["vbfH"];
+  eff[2] = smhBLMReff["vH"];
+  eff[3] = smhBLMReff["ttH"];
+  TString line_eff = Form("%s & %.2e & %.2e & %.2e & %.2e\\\\", categoryMode.c_str(), eff[0], eff[1], eff[2], eff[3]);
+  std::cout << line_eff << std::endl;
+  std::cout << "\\hline\n\\end{tabular}\n\\end{center}\n\\end{table*}" << std::endl;
+
+  //--------------------
+  //MR-Rsq bin eff
+  //--------------------
+  std::cout << "\\begin{table*}[htb]\n\\footnotesize\n\\begin{center}\n\\caption{";
+  std::cout << categoryMode << " category; SMH efficiency}\n";
+  std::cout << "\\def\\arraystretch{1.5}\n\\begin{tabular}{|c|c|c|c|c|}\n\\hline\n$\\mathrm{M_{R}} (GeV)\\otimes\\mathrm{R^{2}}$";
+  std::cout << " & ggH & vbfH & vH & ttH\\\\" << std::endl;
+  std::cout << "\\hline" << std::endl;
    for ( auto tmp: myVectBinning )
      {
-       int bin   = nominal->FindBin( tmp[0]+10, tmp[1]+0.0001 );
-       float nom = nominal->GetBinContent( bin );
+       int bin   = smhMapNominal["ggH"]->FindBin( tmp[0]+10, tmp[1]+0.0001 );
+       float nom[4];
+       nom[0] = smhMapNominal["ggH"]->GetBinContent( bin );
+       nom[1] = smhMapNominal["vbfH"]->GetBinContent( bin );
+       nom[2] = smhMapNominal["vH"]->GetBinContent( bin );
+       nom[3] = smhMapNominal["ttH"]->GetBinContent( bin );
+       TString line = Form("%0.f-%0.f $\\otimes$ %.3f-%.3f & %.2e & %.2e & %.2e & %.2e\\\\", tmp[0], tmp[2], tmp[1], tmp[3], nom[0], nom[1], nom[2], nom[3]);
+       std::cout << line << std::endl;
      }
-
+   std::cout << "\\hline\n\\end{tabular}\n\\end{center}\n\\end{table*}" << std::endl;
+   
    outf.close();
    
    
    TFile* sF = new TFile( "fullSys.root", "recreate" );
-   nominal->Write("SMH_nominal");
+   
+   for ( int i = 0; i < nprocess; i++ ) nominal[i]->Write();
    sF->Close();
    
    return 0;
