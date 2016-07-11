@@ -333,22 +333,19 @@ int main( int argc, char* argv[] )
 	  if ( currentProcess == "signal" )
 	    {
 	      nominalS->SetBinContent( bin, hggSys->GetNominalYield( tmp[0], tmp[1] ) );
-	      //facScale
-	      std::pair<float, float> facSys = hggSys->GetFacScaleSystematic( tmp[0], tmp[1] );
-	      facScaleUpS->SetBinContent( bin, facSys.first );
-	      facScaleDownS->SetBinContent( bin, facSys.second );
-	      //renScale
-	      facSys = hggSys->GetRenScaleSystematic( tmp[0], tmp[1] );
-	      renScaleUpS->SetBinContent( bin, facSys.first );
-	      renScaleDownS->SetBinContent( bin, facSys.second );
-	      //facRenScale
-	      facSys = hggSys->GetFacRenScaleSystematic( tmp[0], tmp[1] );
-	      facRenScaleUpS->SetBinContent( bin,  facSys.first );
-	      facRenScaleDownS->SetBinContent( bin, facSys.second );
+	      std::pair<float, float> facSys;
+	    
 	      //JES
 	      facSys = hggSys->GetJesSystematic( tmp[0], tmp[1] );
 	      JesUpS->SetBinContent( bin, facSys.first );
 	      JesDownS->SetBinContent( bin, facSys.second );
+
+	      // std::cout << "Signal Bin: " << tmp[4] << " | " << tmp[0] << " " << tmp[1] << " "
+	      // 	   << tmp[2] << " " << tmp[3] << " | " 
+	      // 	   << hggSys->GetNominalYield( tmp[0], tmp[1] ) << " | "
+	      // 	   << facSys.first << " , " << facSys.second  << " "
+	      // 	   << "\n";
+
 	      //btag
 	      facSys = hggSys->GetBtagSystematic( tmp[0], tmp[1] );
 	      btagUpS->SetBinContent( bin, facSys.first );
@@ -357,10 +354,31 @@ int main( int argc, char* argv[] )
 	      facSys = hggSys->GetMisstagSystematic( tmp[0], tmp[1] );
 	      misstagUpS->SetBinContent( bin, facSys.first );
 	      misstagDownS->SetBinContent( bin, facSys.second );
+
+	      //*****************************************************************
+	      //Turn off signal theory systematics for now, because it isn't working
+	      //*****************************************************************
+	      //facScale
+	      facSys = hggSys->GetFacScaleSystematic( tmp[0], tmp[1] );
+	      facSys = std::pair<float,float>(0,0);
+	      facScaleUpS->SetBinContent( bin, facSys.first );
+	      facScaleDownS->SetBinContent( bin, facSys.second );
+	      //renScale
+	      facSys = hggSys->GetRenScaleSystematic( tmp[0], tmp[1] );
+	      facSys = std::pair<float,float>(0,0);
+	      renScaleUpS->SetBinContent( bin, facSys.first );
+	      renScaleDownS->SetBinContent( bin, facSys.second );
+	      //facRenScale
+	      facSys = hggSys->GetFacRenScaleSystematic( tmp[0], tmp[1] );
+	      facSys = std::pair<float,float>(0,0);
+	      facRenScaleUpS->SetBinContent( bin,  facSys.first );
+	      facRenScaleDownS->SetBinContent( bin, facSys.second );
+
 	      //PDF
 	      for ( int ipdf = 0; ipdf < 60; ipdf++ )
 		{
 		  pdfS[ipdf]->SetBinContent( bin, hggSys->GetPdfSystematic( ipdf, tmp[0], tmp[1] ) );
+		  pdfS[ipdf]->SetBinContent( bin, 0 );
 		  //std::cout << "mr: " << tmp[0] << " rsq: " << tmp[1] << "; pdf: " << hggSys->GetPdfSystematic( ipdf, tmp[0], tmp[1] ) << std::endl;
 		}
 	    }
@@ -386,6 +404,16 @@ int main( int argc, char* argv[] )
 	      facSys = hggSys->GetJesSystematic( tmp[0], tmp[1] );
 	      JesUp->SetBinContent( bin, JesUp->GetBinContent(bin) + facSys.first );
 	      JesDown->SetBinContent( bin, JesDown->GetBinContent(bin) + facSys.second );
+
+	      // std::cout << "SMH " << process << " Bin: " << tmp[4] << " | " << tmp[0] << " " << tmp[1] << " "
+	      // 	   << tmp[2] << " " << tmp[3] << " | " 
+	      // 	   << hggSys->GetNominalYield( tmp[0], tmp[1] ) << " | "
+	      // 	   << facSys.first << " , " << facSys.second  << " "
+	      // 	   << "\n";
+
+
+
+
 	      //btag
 	      facSys = hggSys->GetBtagSystematic( tmp[0], tmp[1] );
 	      btagUp->SetBinContent( bin, btagUp->GetBinContent(bin) + facSys.first );
@@ -438,33 +466,41 @@ int main( int argc, char* argv[] )
        //Fac
        facScaleUp->SetBinContent( bin, facScaleUp->GetBinContent(bin)/nom );
        facScaleDown->SetBinContent( bin, facScaleDown->GetBinContent(bin)/nom );
-       facScaleUpS->SetBinContent( bin, facScaleUp->GetBinContent(bin)/nomS );//FIX SIGNAL SYSTEMATIC WHEN FULL SIGNAL MODEL AVAILABLE
-       facScaleDownS->SetBinContent( bin, facScaleDown->GetBinContent(bin)/nomS );
+       facScaleUpS->SetBinContent( bin, facScaleUpS->GetBinContent(bin)/nomS );
+       facScaleDownS->SetBinContent( bin, facScaleDownS->GetBinContent(bin)/nomS );
        //Ren
        renScaleUp->SetBinContent( bin, renScaleUp->GetBinContent(bin)/nom );
        renScaleDown->SetBinContent( bin, renScaleDown->GetBinContent(bin)/nom );
-       renScaleUpS->SetBinContent( bin, renScaleUp->GetBinContent(bin)/nomS );
-       renScaleDownS->SetBinContent( bin, renScaleDown->GetBinContent(bin)/nomS );
+       renScaleUpS->SetBinContent( bin, renScaleUpS->GetBinContent(bin)/nomS );
+       renScaleDownS->SetBinContent( bin, renScaleDownS->GetBinContent(bin)/nomS );
        //facRen
        facRenScaleUp->SetBinContent( bin, facRenScaleUp->GetBinContent(bin)/nom );
        facRenScaleDown->SetBinContent( bin, facRenScaleDown->GetBinContent(bin)/nom );
-       facRenScaleUpS->SetBinContent( bin, facRenScaleUp->GetBinContent(bin)/nomS );
-       facRenScaleDownS->SetBinContent( bin, facRenScaleDown->GetBinContent(bin)/nomS );
+       facRenScaleUpS->SetBinContent( bin, facRenScaleUpS->GetBinContent(bin)/nomS );
+       facRenScaleDownS->SetBinContent( bin, facRenScaleDownS->GetBinContent(bin)/nomS );
        //JES
        JesUp->SetBinContent( bin, JesUp->GetBinContent( bin )/nom );
        JesDown->SetBinContent( bin, JesDown->GetBinContent( bin )/nom );
-       JesUpS->SetBinContent( bin, JesUp->GetBinContent( bin )/nomS );
-       JesDownS->SetBinContent( bin, JesDown->GetBinContent( bin )/nomS );
+       JesUpS->SetBinContent( bin, JesUpS->GetBinContent( bin )/nomS );
+       JesDownS->SetBinContent( bin, JesDownS->GetBinContent( bin )/nomS );
+
+       std::cout << "\n\n"
+		 << "Check : " << bin << " : " << nomS << " | " << JesUp->GetBinContent( bin ) << " " 
+		 << JesDown->GetBinContent( bin ) << " "
+		 << JesUpS->GetBinContent( bin ) << " "
+		 << JesDownS->GetBinContent( bin ) << " "
+		 << "\n";
+
        //btag
        btagUp->SetBinContent( bin, btagUp->GetBinContent( bin )/nom );
        btagDown->SetBinContent( bin, btagDown->GetBinContent( bin )/nom );
-       btagUpS->SetBinContent( bin, btagUp->GetBinContent( bin )/nomS );
-       btagDownS->SetBinContent( bin, btagDown->GetBinContent( bin )/nomS );
+       btagUpS->SetBinContent( bin, btagUpS->GetBinContent( bin )/nomS );
+       btagDownS->SetBinContent( bin, btagDownS->GetBinContent( bin )/nomS );
        //misstag
        misstagUp->SetBinContent( bin, misstagUp->GetBinContent( bin )/nom );
        misstagDown->SetBinContent( bin, misstagDown->GetBinContent( bin )/nom );
-       misstagUpS->SetBinContent( bin, misstagUp->GetBinContent( bin )/nomS );
-       misstagDownS->SetBinContent( bin, misstagDown->GetBinContent( bin )/nomS );
+       misstagUpS->SetBinContent( bin, misstagUpS->GetBinContent( bin )/nomS );
+       misstagDownS->SetBinContent( bin, misstagDownS->GetBinContent( bin )/nomS );
        
        outf << tmp[4] << "\t" << categoryMode << "\t" << tmp[0] << "\t" << tmp[2] << " \t" << tmp[1] << "\t" << tmp[3] << "\t"
 	    << nominal->GetBinContent( bin ) << "\t"
@@ -489,6 +525,7 @@ int main( int argc, char* argv[] )
        for( int ipdf = 0; ipdf < 60; ipdf++ )
 	 {
 	   pdf[ipdf]->SetBinContent( bin, pdf[ipdf]->GetBinContent( bin )/nom );
+	   pdf[ipdf]->SetBinContent( bin, 0 ); //zero out pdf uncertainties for signal for now
 	   if ( ipdf < 59 ) outf << pdf[ipdf]->GetBinContent( bin ) << "\t";
 	   else outf << pdf[ipdf]->GetBinContent( bin ) << "\n";
 	 }
