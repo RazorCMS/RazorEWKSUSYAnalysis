@@ -343,34 +343,32 @@ void HggRazorSystematics::Loop()
       //Signal samples don't have this information stored.
       //************************************************************
       // if (this->processName != TString("signal")) {
-	h2p_facScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facScaleUp*N_events/N_facScale[0] );
-	h2p_facScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facScaleDown*N_events/N_facScale[1] );
+      h2p_facScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facScaleUp*N_events/N_facScale[0] );
+      h2p_facScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facScaleDown*N_events/N_facScale[1] );
 	
-	h2p_renScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_renScaleUp*N_events/N_facScale[2] );
-	h2p_renScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_renScaleDown*N_events/N_facScale[3] );
+      h2p_renScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_renScaleUp*N_events/N_facScale[2] );
+      h2p_renScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_renScaleDown*N_events/N_facScale[3] );
 	
-	h2p_facRenScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facRenScaleUp*N_events/N_facScale[4] );
-	h2p_facRenScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facRenScaleDown*N_events/N_facScale[5] );
+      h2p_facRenScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facRenScaleUp*N_events/N_facScale[4] );
+      h2p_facRenScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facRenScaleDown*N_events/N_facScale[5] );
 	
-	if (this->processName == TString("signal")) {
-	  std::cout << "DEBUG: " << MR << " " << t1Rsq << " : " << commonW << " " << sf_facScaleUp << " " << N_events << " " << N_facScale[0] << " : " << commonW*sf_facScaleUp*N_events/N_facScale[0] << "\n";
-	}
+      if (this->processName == TString("signal")) {
+	std::cout << "DEBUG: " << MR << " " << t1Rsq << " : " << commonW << " " << sf_facScaleUp << " " << N_events << " " << N_facScale[0] << " : " << commonW*sf_facScaleUp*N_events/N_facScale[0] << "\n";
+      }
 
-	//std::cout << "before pdf--> " << pdfWeights->size() << std::endl;
-	//PDF
-	//if ( sf_pdf->size() != 60 ) continue;
-	for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
-	  {
-	    //protect against missing pdf vector
-	    if (ipdf < sf_pdf->size() ) {
-	      h2p_Pdf[ipdf]->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_pdf->at(ipdf)*N_events/N_Pdf[ipdf] );
-	    } else {
-	      h2p_Pdf[ipdf]->Fill( MR, fmin(t1Rsq,0.999), commonW );
-	    }
+      //std::cout << "before pdf--> " << pdfWeights->size() << std::endl;
+      //PDF
+      //if ( sf_pdf->size() != 60 ) continue;
+      for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
+	{
+	  //protect against missing pdf vector
+	  if (ipdf < sf_pdf->size() ) {
+	    h2p_Pdf[ipdf]->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_pdf->at(ipdf)*N_events/N_Pdf[ipdf] );
+	  } else {
+	    h2p_Pdf[ipdf]->Fill( MR, fmin(t1Rsq,0.999), commonW );
 	  }
-
-	//      }
-
+	}
+    
     } //loop over events
     
  
