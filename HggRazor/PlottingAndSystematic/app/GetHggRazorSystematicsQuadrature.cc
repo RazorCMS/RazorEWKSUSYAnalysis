@@ -166,7 +166,8 @@ int main( int argc, char* argv[] )
   else if (categoryMode == "highptlowres") categoryCutString = " && pTGammaGamma >= 110 && sigmaMoverM >= 0.0085";
 
   //TString triggerCut = " && ( HLTDecision[82] || HLTDecision[83] || HLTDecision[93] ) ";
-  TString metFilterCut = " && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1)";
+  // TString metFilterCut = " && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1)";
+  TString metFilterCut = " && (Flag_HBHENoiseFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1)";
   TString triggerCut = "";
   //TString metFilterCut = "";
 
@@ -293,7 +294,6 @@ int main( int argc, char* argv[] )
       if ( process.find("#") != std::string::npos ) continue;
       if ( _debug ) std::cout << process << " " << rootFileName << std::endl;
       TFile* fin = new TFile( rootFileName.c_str(), "READ");
-      //std::cout << "[INFO]: checking file: " << rootFileName << std::endl;
       assert( fin );
       if ( _debug ) std::cout << "[INFO]: file: " << rootFileName << " passed check\n\n"<< std::endl;
       
@@ -307,8 +307,8 @@ int main( int argc, char* argv[] )
       TH1F* SumScaleWeights   = (TH1F*)fin->Get("SumScaleWeights");
       if ( process != "signal" ) assert( SumScaleWeights );
       TH1F* SumPdfWeights   = (TH1F*)fin->Get("SumPdfWeights");
-      if ( process != "signal" ) assert( SumPdfWeights );
-      
+      if ( process != "signal" ) assert( SumPdfWeights );     
+ 
       TFile* tmp = new TFile("tmp.root", "RECREATE");
       TTree* cutTree = tree->CopyTree( cut );
       TString currentProcess = process.c_str();
@@ -340,12 +340,6 @@ int main( int argc, char* argv[] )
 	      JesUpS->SetBinContent( bin, facSys.first );
 	      JesDownS->SetBinContent( bin, facSys.second );
 
-	      // std::cout << "Signal Bin: " << tmp[4] << " | " << tmp[0] << " " << tmp[1] << " "
-	      // 	   << tmp[2] << " " << tmp[3] << " | " 
-	      // 	   << hggSys->GetNominalYield( tmp[0], tmp[1] ) << " | "
-	      // 	   << facSys.first << " , " << facSys.second  << " "
-	      // 	   << "\n";
-
 	      //btag
 	      facSys = hggSys->GetBtagSystematic( tmp[0], tmp[1] );
 	      btagUpS->SetBinContent( bin, facSys.first );
@@ -360,17 +354,17 @@ int main( int argc, char* argv[] )
 	      //*****************************************************************
 	      //facScale
 	      facSys = hggSys->GetFacScaleSystematic( tmp[0], tmp[1] );
-	      facSys = std::pair<float,float>(0,0);
+	      //facSys = std::pair<float,float>(0,0);
 	      facScaleUpS->SetBinContent( bin, facSys.first );
 	      facScaleDownS->SetBinContent( bin, facSys.second );
 	      //renScale
 	      facSys = hggSys->GetRenScaleSystematic( tmp[0], tmp[1] );
-	      facSys = std::pair<float,float>(0,0);
+	      //facSys = std::pair<float,float>(0,0);
 	      renScaleUpS->SetBinContent( bin, facSys.first );
 	      renScaleDownS->SetBinContent( bin, facSys.second );
 	      //facRenScale
 	      facSys = hggSys->GetFacRenScaleSystematic( tmp[0], tmp[1] );
-	      facSys = std::pair<float,float>(0,0);
+	      //facSys = std::pair<float,float>(0,0);
 	      facRenScaleUpS->SetBinContent( bin,  facSys.first );
 	      facRenScaleDownS->SetBinContent( bin, facSys.second );
 
@@ -378,8 +372,7 @@ int main( int argc, char* argv[] )
 	      for ( int ipdf = 0; ipdf < 60; ipdf++ )
 		{
 		  pdfS[ipdf]->SetBinContent( bin, hggSys->GetPdfSystematic( ipdf, tmp[0], tmp[1] ) );
-		  pdfS[ipdf]->SetBinContent( bin, 0 );
-		  //std::cout << "mr: " << tmp[0] << " rsq: " << tmp[1] << "; pdf: " << hggSys->GetPdfSystematic( ipdf, tmp[0], tmp[1] ) << std::endl;
+		  //pdfS[ipdf]->SetBinContent( bin, 0 );		 
 		}
 	    }
 	  else
@@ -405,15 +398,6 @@ int main( int argc, char* argv[] )
 	      JesUp->SetBinContent( bin, JesUp->GetBinContent(bin) + facSys.first );
 	      JesDown->SetBinContent( bin, JesDown->GetBinContent(bin) + facSys.second );
 
-	      // std::cout << "SMH " << process << " Bin: " << tmp[4] << " | " << tmp[0] << " " << tmp[1] << " "
-	      // 	   << tmp[2] << " " << tmp[3] << " | " 
-	      // 	   << hggSys->GetNominalYield( tmp[0], tmp[1] ) << " | "
-	      // 	   << facSys.first << " , " << facSys.second  << " "
-	      // 	   << "\n";
-
-
-
-
 	      //btag
 	      facSys = hggSys->GetBtagSystematic( tmp[0], tmp[1] );
 	      btagUp->SetBinContent( bin, btagUp->GetBinContent(bin) + facSys.first );
@@ -425,8 +409,7 @@ int main( int argc, char* argv[] )
 	      //PDF
 	      for ( int ipdf = 0; ipdf < 60; ipdf++ )
 		{
-		  pdf[ipdf]->SetBinContent( bin, sqrt( pow( pdf[ipdf]->GetBinContent(bin), 2 ) + pow( hggSys->GetPdfSystematic( ipdf, tmp[0], tmp[1] ), 2 ) ) );
-		  //std::cout << "mr: " << tmp[0] << " rsq: " << tmp[1] << "; pdf: " << hggSys->GetPdfSystematic( ipdf, tmp[0], tmp[1] ) << std::endl;
+		  pdf[ipdf]->SetBinContent( bin, sqrt( pow( pdf[ipdf]->GetBinContent(bin), 2 ) + pow( hggSys->GetPdfSystematic( ipdf, tmp[0], tmp[1] ), 2 ) ) );		  
 		}
 	    }     
 	}
@@ -463,6 +446,9 @@ int main( int argc, char* argv[] )
        int bin   = nominal->FindBin( tmp[0]+10, tmp[1]+0.0001 );
        float nom = nominal->GetBinContent( bin );
        float nomS = nominalS->GetBinContent( bin );
+
+       float totalFractionalUncertaintySqr = 0;
+
        //Fac
        facScaleUp->SetBinContent( bin, facScaleUp->GetBinContent(bin)/nom );
        facScaleDown->SetBinContent( bin, facScaleDown->GetBinContent(bin)/nom );
@@ -484,13 +470,6 @@ int main( int argc, char* argv[] )
        JesUpS->SetBinContent( bin, JesUpS->GetBinContent( bin )/nomS );
        JesDownS->SetBinContent( bin, JesDownS->GetBinContent( bin )/nomS );
 
-       std::cout << "\n\n"
-		 << "Check : " << bin << " : " << nomS << " | " << JesUp->GetBinContent( bin ) << " " 
-		 << JesDown->GetBinContent( bin ) << " "
-		 << JesUpS->GetBinContent( bin ) << " "
-		 << JesDownS->GetBinContent( bin ) << " "
-		 << "\n";
-
        //btag
        btagUp->SetBinContent( bin, btagUp->GetBinContent( bin )/nom );
        btagDown->SetBinContent( bin, btagDown->GetBinContent( bin )/nom );
@@ -509,11 +488,27 @@ int main( int argc, char* argv[] )
 	    <<  renScaleUp->GetBinContent( bin ) << "\t" <<  renScaleDown->GetBinContent( bin ) << "\t"
 	    <<  facRenScaleUp->GetBinContent( bin ) << "\t" <<  facRenScaleDown->GetBinContent( bin ) << "\t";
        
+       totalFractionalUncertaintySqr += pow( (fabs(JesUp->GetBinContent( bin )) + fabs(JesDown->GetBinContent( bin )))/2,2) 
+	 + pow( (fabs(facScaleUp->GetBinContent( bin )) + fabs(facScaleDown->GetBinContent( bin )))/2,2) 
+	 + pow( (fabs(renScaleUp->GetBinContent( bin )) + fabs(renScaleDown->GetBinContent( bin )))/2,2) 
+	 + pow( (fabs(facRenScaleUp->GetBinContent( bin )) + fabs(facRenScaleDown->GetBinContent( bin )))/2,2);
+
        for( int ipdf = 0; ipdf < 60; ipdf++ )
 	 {
 	   pdf[ipdf]->SetBinContent( bin, pdf[ipdf]->GetBinContent( bin )/nom );
 	   outf << pdf[ipdf]->GetBinContent( bin ) << "\t";
+	   totalFractionalUncertaintySqr += pow( pdf[ipdf]->GetBinContent( bin )/nom ,2);
 	 }
+
+       //add total cross section uncertainties
+       totalFractionalUncertaintySqr += 
+	 pow( 0.04 ,2)  //lumi
+	 + pow( 0.05 ,2)  //photon selection
+	 + pow( 0.067 ,2)  //scale variation
+	 + pow( 0.057 ,2)  //PDF
+	 ;
+
+       if (tmp[5] == 8) totalFractionalUncertaintySqr += pow( 0.04 ,2); //for btag efficiency systematic
 
        //Signal
        outf <<  nomS << "\t"
@@ -525,11 +520,14 @@ int main( int argc, char* argv[] )
        for( int ipdf = 0; ipdf < 60; ipdf++ )
 	 {
 	   pdf[ipdf]->SetBinContent( bin, pdf[ipdf]->GetBinContent( bin )/nom );
-	   pdf[ipdf]->SetBinContent( bin, 0 ); //zero out pdf uncertainties for signal for now
+	   //pdf[ipdf]->SetBinContent( bin, 0 ); //zero out pdf uncertainties for signal for now
 	   if ( ipdf < 59 ) outf << pdf[ipdf]->GetBinContent( bin ) << "\t";
 	   else outf << pdf[ipdf]->GetBinContent( bin ) << "\n";
 	 }
-       
+      
+       std::cout << "Bin : " << bin << " " << tmp[0] << " " << tmp[1] << " " << tmp[2] << " " << tmp[3] << " : "
+	    << nom << " +/- " << 100*sqrt(totalFractionalUncertaintySqr) << "%\n";
+ 
      }
 
    outf.close();
