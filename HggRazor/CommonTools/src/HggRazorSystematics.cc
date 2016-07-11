@@ -342,7 +342,6 @@ void HggRazorSystematics::Loop()
       //Don't run theory systematics for signal for now.
       //Signal samples don't have this information stored.
       //************************************************************
-      // if (this->processName != TString("signal")) {
       h2p_facScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facScaleUp*N_events/N_facScale[0] );
       h2p_facScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facScaleDown*N_events/N_facScale[1] );
 	
@@ -352,13 +351,6 @@ void HggRazorSystematics::Loop()
       h2p_facRenScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facRenScaleUp*N_events/N_facScale[4] );
       h2p_facRenScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facRenScaleDown*N_events/N_facScale[5] );
 	
-      if (this->processName == TString("signal")) {
-	std::cout << "DEBUG: " << MR << " " << t1Rsq << " : " << commonW << " " << sf_facScaleUp << " " << N_events << " " << N_facScale[0] << " : " << commonW*sf_facScaleUp*N_events/N_facScale[0] << "\n";
-      }
-
-      //std::cout << "before pdf--> " << pdfWeights->size() << std::endl;
-      //PDF
-      //if ( sf_pdf->size() != 60 ) continue;
       for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
 	{
 	  //protect against missing pdf vector
