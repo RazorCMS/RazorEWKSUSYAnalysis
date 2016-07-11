@@ -324,11 +324,10 @@ void HggRazorSystematics::Loop()
 	return;
       }
       
- 
       h2p->Fill( MR, fmin(t1Rsq,0.999), commonW );	      
       h2p_Err->Fill( MR, fmin(t1Rsq,0.999), commonW*commonW );
-      h2p_eff->Fill( MR, fmin(t1Rsq,0.999), 1./N_events );
-	      
+      h2p_eff->Fill( MR, fmin(t1Rsq,0.999), weight/N_events );
+
       //btagging
       h2p_btagUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_btagUp );
       h2p_btagDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_btagDown );
@@ -365,8 +364,42 @@ void HggRazorSystematics::Loop()
 	    } else {
 	      h2p_Pdf[ipdf]->Fill( MR, fmin(t1Rsq,0.999), commonW );
 	    }
+<<<<<<< HEAD
 	  }
       }
+=======
+	  else
+	    {
+	      h2p->Fill( MR, 0.999, commonW );
+	      h2p_Err->Fill( MR, 0.999, commonW*commonW );
+	      h2p_eff->Fill( MR, 0.999, 1./N_events );
+	      
+	      h2p_facScaleUp->Fill( MR, 0.999, commonW*sf_facScaleUp*N_events/N_facScale[0] );
+	      h2p_facScaleDown->Fill( MR, 0.999, commonW*sf_facScaleDown*N_events/N_facScale[1] );
+	      
+	      h2p_renScaleUp->Fill( MR, 0.999, commonW*sf_renScaleUp*N_events/N_facScale[2] );
+	      h2p_renScaleDown->Fill( MR, 0.999, commonW*sf_renScaleDown*N_events/N_facScale[3] );
+	      
+	      h2p_facRenScaleUp->Fill( MR, 0.999, commonW*sf_facRenScaleUp*N_events/N_facScale[4] );
+	      h2p_facRenScaleDown->Fill( MR, 0.999, commonW*sf_facRenScaleDown*N_events/N_facScale[5] );
+	      
+	      //PDF
+	      for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
+		{
+		  if (ipdf < sf_pdf->size() ) {
+		    h2p_Pdf[ipdf]->Fill( MR, 0.999, commonW*sf_pdf->at(ipdf)*N_events/N_Pdf[ipdf] );
+		  } else {
+		    h2p_Pdf[ipdf]->Fill( MR, 0.999, commonW );
+		  }
+		}
+	      
+	      h2p_btagUp->Fill( MR, 0.999, commonW*sf_btagUp );
+	      h2p_btagDown->Fill( MR, 0.999, commonW*sf_btagDown );
+	      
+	      h2p_misstagUp->Fill( MR, 0.999, commonW*sf_bmistagUp );
+	      h2p_misstagDown->Fill( MR, 0.999, commonW*sf_bmistagDown );
+	    }
+>>>>>>> 3d0733aedcf00368e321f272d62c3e4db6f89b35
 	  
     } //loop over events
     
@@ -579,6 +612,12 @@ float HggRazorSystematics::GetNominalError( float mr, float rsq )
 {
   int bin = h2p_Err->FindBin( mr+10, rsq+0.0001 );
   return h2p_Err->GetBinContent( bin );
+};
+
+float HggRazorSystematics::GetEff( float mr, float rsq )
+{
+  int bin = h2p_eff->FindBin( mr+10, rsq+0.0001 );
+  return h2p_eff->GetBinContent( bin );
 };
 
 std::pair<float, float> HggRazorSystematics::GetFacScaleSystematic( float mr, float rsq )
