@@ -247,16 +247,15 @@ void HggRazorSystematics::Loop()
   float N_facScale[n_facScaleSys];
   //PDF
   float N_Pdf[n_PdfSys];
-  if ( this->processName != "signal" )
-    {
-      N_events = this->NEvents->GetBinContent(1);
-      for ( int i = 0; i < n_facScaleSys; i++ ) N_facScale[i] = this->SumScaleWeights->GetBinContent( i+1 );
-      for ( int i = 0; i < n_PdfSys; i++ ) N_Pdf[i] = this->SumPdfWeights->GetBinContent( i+1 );
-    }
-  
+
+  N_events = this->NEvents->GetBinContent(1);
+  for ( int i = 0; i < n_facScaleSys; i++ ) {
+    N_facScale[i] = this->SumScaleWeights->GetBinContent( i+1 );
+  }
+  for ( int i = 0; i < n_PdfSys; i++ ) N_Pdf[i] = this->SumPdfWeights->GetBinContent( i+1 );
+    
   if ( _debug ) std::cout << "[DEBUG]: Passed N_events, N_facScale, N_PDF" << std::endl;
   
-
   //--------------------------------
   //Photon Trigger Efficiency
   //--------------------------------
@@ -271,6 +270,7 @@ void HggRazorSystematics::Loop()
   }
 
 
+
   Long64_t nentries = fChain->GetEntriesFast();
   Long64_t nbytes = 0, nb = 0;
   double total_in = 0, total_rm = 0;
@@ -280,7 +280,6 @@ void HggRazorSystematics::Loop()
       Long64_t ientry = LoadTree(jentry);
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
-
 
       //**********************************************************
       //compute trigger efficiency weight correction
@@ -343,7 +342,7 @@ void HggRazorSystematics::Loop()
       //Don't run theory systematics for signal for now.
       //Signal samples don't have this information stored.
       //************************************************************
-      if (this->processName != TString("signal")) {
+      // if (this->processName != TString("signal")) {
 	h2p_facScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facScaleUp*N_events/N_facScale[0] );
 	h2p_facScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facScaleDown*N_events/N_facScale[1] );
 	
@@ -353,6 +352,10 @@ void HggRazorSystematics::Loop()
 	h2p_facRenScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facRenScaleUp*N_events/N_facScale[4] );
 	h2p_facRenScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facRenScaleDown*N_events/N_facScale[5] );
 	
+	if (this->processName == TString("signal")) {
+	  std::cout << "DEBUG: " << MR << " " << t1Rsq << " : " << commonW << " " << sf_facScaleUp << " " << N_events << " " << N_facScale[0] << " : " << commonW*sf_facScaleUp*N_events/N_facScale[0] << "\n";
+	}
+
 	//std::cout << "before pdf--> " << pdfWeights->size() << std::endl;
 	//PDF
 	//if ( sf_pdf->size() != 60 ) continue;
@@ -364,43 +367,10 @@ void HggRazorSystematics::Loop()
 	    } else {
 	      h2p_Pdf[ipdf]->Fill( MR, fmin(t1Rsq,0.999), commonW );
 	    }
-<<<<<<< HEAD
 	  }
-      }
-=======
-	  else
-	    {
-	      h2p->Fill( MR, 0.999, commonW );
-	      h2p_Err->Fill( MR, 0.999, commonW*commonW );
-	      h2p_eff->Fill( MR, 0.999, 1./N_events );
-	      
-	      h2p_facScaleUp->Fill( MR, 0.999, commonW*sf_facScaleUp*N_events/N_facScale[0] );
-	      h2p_facScaleDown->Fill( MR, 0.999, commonW*sf_facScaleDown*N_events/N_facScale[1] );
-	      
-	      h2p_renScaleUp->Fill( MR, 0.999, commonW*sf_renScaleUp*N_events/N_facScale[2] );
-	      h2p_renScaleDown->Fill( MR, 0.999, commonW*sf_renScaleDown*N_events/N_facScale[3] );
-	      
-	      h2p_facRenScaleUp->Fill( MR, 0.999, commonW*sf_facRenScaleUp*N_events/N_facScale[4] );
-	      h2p_facRenScaleDown->Fill( MR, 0.999, commonW*sf_facRenScaleDown*N_events/N_facScale[5] );
-	      
-	      //PDF
-	      for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
-		{
-		  if (ipdf < sf_pdf->size() ) {
-		    h2p_Pdf[ipdf]->Fill( MR, 0.999, commonW*sf_pdf->at(ipdf)*N_events/N_Pdf[ipdf] );
-		  } else {
-		    h2p_Pdf[ipdf]->Fill( MR, 0.999, commonW );
-		  }
-		}
-	      
-	      h2p_btagUp->Fill( MR, 0.999, commonW*sf_btagUp );
-	      h2p_btagDown->Fill( MR, 0.999, commonW*sf_btagDown );
-	      
-	      h2p_misstagUp->Fill( MR, 0.999, commonW*sf_bmistagUp );
-	      h2p_misstagDown->Fill( MR, 0.999, commonW*sf_bmistagDown );
-	    }
->>>>>>> 3d0733aedcf00368e321f272d62c3e4db6f89b35
-	  
+
+	//      }
+
     } //loop over events
     
  
@@ -587,6 +557,7 @@ bool HggRazorSystematics::SetFacScaleWeightsHisto( TH1F* histo )
       return false;
     }
   this->SumScaleWeights = new TH1F( *histo );
+
   return true;
 };
 
