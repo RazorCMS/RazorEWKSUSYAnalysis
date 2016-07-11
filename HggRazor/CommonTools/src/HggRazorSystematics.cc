@@ -271,7 +271,6 @@ void HggRazorSystematics::Loop()
   }
 
 
-
   Long64_t nentries = fChain->GetEntriesFast();
   Long64_t nbytes = 0, nb = 0;
   double total_in = 0, total_rm = 0;
@@ -325,89 +324,53 @@ void HggRazorSystematics::Loop()
 	return;
       }
       
-      if ( this->processName == "signal" )
-	{
-	  if ( t1Rsq < 1.0 ) h2p->Fill( MR, t1Rsq, this->Lumi*weight );
-	  else h2p->Fill( MR, 0.999, this->Lumi*weight);
-	}
-      else
-	{
-	  if ( t1Rsq < 1.0 )
-	    {
-	      //std::cout << "PDF: " << weight << " " << weight*sf_pdf->at(0)*N_events/N_Pdf[0] << std::endl;
-	      //std::cout << "facScale: "<<  weight << " " << weight*sf_facScaleUp*N_events/N_facScale[0] << std::endl;
-	      h2p->Fill( MR, t1Rsq, commonW );
-	      h2p_Err->Fill( MR, t1Rsq, commonW*commonW );
-	      h2p_eff->Fill( MR, t1Rsq, 1./N_events );
+ 
+      h2p->Fill( MR, fmin(t1Rsq,0.999), commonW );	      
+      h2p_Err->Fill( MR, fmin(t1Rsq,0.999), commonW*commonW );
+      h2p_eff->Fill( MR, fmin(t1Rsq,0.999), 1./N_events );
 	      
-	      h2p_facScaleUp->Fill( MR, t1Rsq, commonW*sf_facScaleUp*N_events/N_facScale[0] );
-	      h2p_facScaleDown->Fill( MR, t1Rsq, commonW*sf_facScaleDown*N_events/N_facScale[1] );
-	    
-	      h2p_renScaleUp->Fill( MR, t1Rsq, commonW*sf_renScaleUp*N_events/N_facScale[2] );
-	      h2p_renScaleDown->Fill( MR, t1Rsq, commonW*sf_renScaleDown*N_events/N_facScale[3] );
+      //btagging
+      h2p_btagUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_btagUp );
+      h2p_btagDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_btagDown );
 	      
-	      h2p_facRenScaleUp->Fill( MR, t1Rsq, commonW*sf_facRenScaleUp*N_events/N_facScale[4] );
-	      h2p_facRenScaleDown->Fill( MR, t1Rsq, commonW*sf_facRenScaleDown*N_events/N_facScale[5] );
-	      //std::cout << "before pdf--> " << pdfWeights->size() << std::endl;
-	      //PDF
-	      if ( sf_pdf->size() != 60 ) continue;
-	      for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
-		{
-		  //protect against missing pdf vector
-		  if (ipdf < sf_pdf->size() ) {
-		    h2p_Pdf[ipdf]->Fill( MR, t1Rsq, commonW*sf_pdf->at(ipdf)*N_events/N_Pdf[ipdf] );
-		  } else {
-		    h2p_Pdf[ipdf]->Fill( MR, t1Rsq, commonW );
-		  }
-		}
-	      
-	      h2p_btagUp->Fill( MR, t1Rsq, commonW*sf_btagUp );
-	      h2p_btagDown->Fill( MR, t1Rsq, commonW*sf_btagDown );
-	      
-	      h2p_misstagUp->Fill( MR, t1Rsq, commonW*sf_bmistagUp );
-	      h2p_misstagDown->Fill( MR, t1Rsq, commonW*sf_bmistagDown );
-	      
+      h2p_misstagUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_bmistagUp );
+      h2p_misstagDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_bmistagDown );
+	            
+      //JES Up/Down
+      h2p_JesUp->Fill( MR_JESUp, fmin(t1Rsq_JESUp,0.999), commonW );
+      h2p_JesDown->Fill( MR_JESDown, fmin(t1Rsq_JESDown,0.99), commonW );
+    
+      //************************************************************
+      //Don't run theory systematics for signal for now.
+      //Signal samples don't have this information stored.
+      //************************************************************
+      if (this->processName != TString("signal")) {
+	h2p_facScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facScaleUp*N_events/N_facScale[0] );
+	h2p_facScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facScaleDown*N_events/N_facScale[1] );
+	
+	h2p_renScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_renScaleUp*N_events/N_facScale[2] );
+	h2p_renScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_renScaleDown*N_events/N_facScale[3] );
+	
+	h2p_facRenScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facRenScaleUp*N_events/N_facScale[4] );
+	h2p_facRenScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facRenScaleDown*N_events/N_facScale[5] );
+	
+	//std::cout << "before pdf--> " << pdfWeights->size() << std::endl;
+	//PDF
+	//if ( sf_pdf->size() != 60 ) continue;
+	for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
+	  {
+	    //protect against missing pdf vector
+	    if (ipdf < sf_pdf->size() ) {
+	      h2p_Pdf[ipdf]->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_pdf->at(ipdf)*N_events/N_Pdf[ipdf] );
+	    } else {
+	      h2p_Pdf[ipdf]->Fill( MR, fmin(t1Rsq,0.999), commonW );
 	    }
-	  else
-	    {
-	      h2p->Fill( MR, 0.999, commonW );
-	      h2p_Err->Fill( MR, 0.999, commonW*commonW );
-	      h2p_eff->Fill( MR, 0.999, 1./N_events );
-	      h2p_facScaleUp->Fill( MR, 0.999, commonW*sf_facScaleUp*N_events/N_facScale[0] );
-	      h2p_facScaleDown->Fill( MR, 0.999, commonW*sf_facScaleDown*N_events/N_facScale[1] );
-	      
-	      h2p_renScaleUp->Fill( MR, 0.999, commonW*sf_renScaleUp*N_events/N_facScale[2] );
-	      h2p_renScaleDown->Fill( MR, 0.999, commonW*sf_renScaleDown*N_events/N_facScale[3] );
-	      
-	      h2p_facRenScaleUp->Fill( MR, 0.999, commonW*sf_facRenScaleUp*N_events/N_facScale[4] );
-	      h2p_facRenScaleDown->Fill( MR, 0.999, commonW*sf_facRenScaleDown*N_events/N_facScale[5] );
-	      
-	      //PDF
-	      for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
-		{
-		  if (ipdf < sf_pdf->size() ) {
-		    h2p_Pdf[ipdf]->Fill( MR, 0.999, commonW*sf_pdf->at(ipdf)*N_events/N_Pdf[ipdf] );
-		  } else {
-		    h2p_Pdf[ipdf]->Fill( MR, 0.999, commonW );
-		  }
-		}
-	      
-	      h2p_btagUp->Fill( MR, 0.999, commonW*sf_btagUp );
-	      h2p_btagDown->Fill( MR, 0.999, commonW*sf_btagDown );
-	      
-	      h2p_misstagUp->Fill( MR, 0.999, commonW*sf_bmistagUp );
-	      h2p_misstagDown->Fill( MR, 0.999, commonW*sf_bmistagDown );
-	    }
+	  }
+      }
 	  
-	  //JES Up
-	  if ( t1Rsq_JESUp < 1.0 ) h2p_JesUp->Fill( MR_JESUp, t1Rsq_JESUp, commonW );
-	  else h2p_JesUp->Fill( MR_JESUp, 0.999, commonW );
-	  //JES Down
-	  if ( t1Rsq_JESDown < 1.0 ) h2p_JesDown->Fill( MR_JESDown, t1Rsq_JESDown, commonW );
-	  else h2p_JesDown->Fill( MR_JESDown, 0.999, commonW );
-	}
-    }
-  
+    } //loop over events
+    
+ 
   if ( _debug ) std::cout << "[DEBUG]: Finishing Loop" << std::endl;
 };
 
