@@ -197,6 +197,13 @@ int main( int argc, char* argv[] )
   nominalErr[2] = new TH2Poly("nominalErr_SMH_2", "", 150, 10000, 0, 1 );
   nominalErr[3] = new TH2Poly("nominalErr_SMH_3", "", 150, 10000, 0, 1 );
   
+  TH2Poly* totalErr[4];
+  totalErr[0] = new TH2Poly("totalErr_SMH_0", "", 150, 10000, 0, 1 );
+  totalErr[1] = new TH2Poly("totalErr_SMH_1", "", 150, 10000, 0, 1 );
+  totalErr[2] = new TH2Poly("totalErr_SMH_2", "", 150, 10000, 0, 1 );
+  totalErr[3] = new TH2Poly("totalErr_SMH_3", "", 150, 10000, 0, 1 );
+
+  
   TH2Poly* nominalS = new TH2Poly("nominal_Signal", "", 150, 10000, 0, 1 );
 
   TH2Poly* facScaleUp    = new TH2Poly("facScaleUp", "", 150, 10000, 0, 1 );
@@ -250,6 +257,11 @@ int main( int argc, char* argv[] )
       nominalErr[1]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       nominalErr[2]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       nominalErr[3]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+
+      totalErr[0]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+      totalErr[1]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+      totalErr[2]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+      totalErr[3]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       
       
       nominalS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
@@ -290,6 +302,7 @@ int main( int argc, char* argv[] )
 
   std::map< std::string, TH2Poly* > smhMapNominal;
   std::map< std::string, TH2Poly* > smhMapNominalErr;
+  std::map< std::string, TH2Poly* > smhMapTotalErr;
   std::string process, rootFileName;
   int ctr = 0;
   while ( ifs.good() )
@@ -372,41 +385,58 @@ int main( int argc, char* argv[] )
 	    }
 	  else
 	    {
+	      float nom = hggSys->GetNominalYield( tmp[0], tmp[1] );
 	      nominal[ctr]->SetBinContent( bin, hggSys->GetNominalYield( tmp[0], tmp[1] ) );
 	      nominalErr[ctr]->SetBinContent( bin, hggSys->GetNominalError( tmp[0], tmp[1] ) );
 	      //facScale
 	      std::pair<float, float> facSys = hggSys->GetFacScaleSystematic( tmp[0], tmp[1] );
 	      float maxSys = std::max( fabs(facSys.first) , fabs(facSys.second) );
+	      totalErr[ctr]->SetBinContent( bin,  sqrt( pow( totalErr[ctr]->GetBinContent(bin), 2 ) + pow( maxSys, 2 ) ) );
 	      facScaleUp->SetBinContent( bin, sqrt( pow( facScaleUp->GetBinContent(bin), 2 ) + pow( maxSys, 2 ) ) );
 	      facScaleDown->SetBinContent( bin, sqrt( pow( facScaleDown->GetBinContent(bin), 2 ) + pow( maxSys, 2 ) ) );
 	      //renScale
 	      facSys = hggSys->GetRenScaleSystematic( tmp[0], tmp[1] );
 	      maxSys = std::max( fabs(facSys.first) , fabs(facSys.second) );
+	      totalErr[ctr]->SetBinContent( bin,  sqrt( pow( totalErr[ctr]->GetBinContent(bin), 2 ) + pow( maxSys, 2 ) ) );
+
 	      renScaleUp->SetBinContent( bin, sqrt( pow( renScaleUp->GetBinContent(bin), 2 ) + pow( maxSys, 2) ) );
 	      renScaleDown->SetBinContent( bin, sqrt( pow( renScaleDown->GetBinContent(bin), 2 ) + pow( maxSys, 2 ) ) );
 	      //facRenScale
 	      facSys = hggSys->GetFacRenScaleSystematic( tmp[0], tmp[1] );
 	      maxSys = std::max( fabs(facSys.first) , fabs(facSys.second) );
+	      totalErr[ctr]->SetBinContent( bin,  sqrt( pow( totalErr[ctr]->GetBinContent(bin), 2 ) + pow( maxSys, 2 ) ) );
 	      facRenScaleUp->SetBinContent( bin, sqrt( pow( facRenScaleUp->GetBinContent(bin), 2 ) + pow( maxSys, 2 ) ) );
 	      facRenScaleDown->SetBinContent( bin, sqrt( pow( facRenScaleDown->GetBinContent(bin), 2 ) + pow( maxSys, 2 ) ) );
 	      //JES
 	      facSys = hggSys->GetJesSystematic( tmp[0], tmp[1] );
+	      maxSys = std::max( fabs(facSys.first) , fabs(facSys.second) );
+	      totalErr[ctr]->SetBinContent( bin,  sqrt( pow( totalErr[ctr]->GetBinContent(bin), 2 ) + pow( maxSys, 2 ) ) );
 	      JesUp->SetBinContent( bin, JesUp->GetBinContent(bin) + facSys.first );
 	      JesDown->SetBinContent( bin, JesDown->GetBinContent(bin) + facSys.second );
 	      //btag
 	      facSys = hggSys->GetBtagSystematic( tmp[0], tmp[1] );
+	      maxSys = std::max( fabs(facSys.first) , fabs(facSys.second) );
+	      totalErr[ctr]->SetBinContent( bin,  sqrt( pow( totalErr[ctr]->GetBinContent(bin), 2 ) + pow( maxSys, 2 ) ) );
 	      btagUp->SetBinContent( bin, btagUp->GetBinContent(bin) + facSys.first );
 	      btagDown->SetBinContent( bin, btagDown->GetBinContent(bin) + facSys.second );
 	      //misstag
 	      facSys = hggSys->GetMisstagSystematic( tmp[0], tmp[1] );
+	      maxSys = std::max( fabs(facSys.first) , fabs(facSys.second) );
+	      totalErr[ctr]->SetBinContent( bin,  sqrt( pow( totalErr[ctr]->GetBinContent(bin), 2 ) + pow( maxSys, 2 ) ) );
 	      misstagUp->SetBinContent( bin, misstagUp->GetBinContent(bin) + facSys.first );
 	      misstagDown->SetBinContent( bin, misstagDown->GetBinContent(bin) + facSys.second );
 	      //PDF
 	      for ( int ipdf = 0; ipdf < 60; ipdf++ )
 		{
 		  pdf[ipdf]->SetBinContent( bin, sqrt( pow( pdf[ipdf]->GetBinContent(bin), 2 ) + pow( hggSys->GetPdfSystematic( ipdf, tmp[0], tmp[1] ), 2 ) ) );
-		  //std::cout << "mr: " << tmp[0] << " rsq: " << tmp[1] << "; pdf: " << hggSys->GetPdfSystematic( ipdf, tmp[0], tmp[1] ) << std::endl;
+		  totalErr[ctr]->SetBinContent( bin,  sqrt( pow( totalErr[ctr]->GetBinContent(bin), 2 ) + pow( hggSys->GetPdfSystematic( ipdf, tmp[0], tmp[1] ), 2 ) ) );
+	      //std::cout << "mr: " << tmp[0] << " rsq: " << tmp[1] << "; pdf: " << hggSys->GetPdfSystematic( ipdf, tmp[0], tmp[1] ) << std::endl;
 		}
+	      //totalErr[ctr]->SetBinContent( bin,  sqrt( pow( totalErr[ctr]->GetBinContent(bin), 2 ) + pow( nom*0.04, 2 ) ) );//lumi
+	      //totalErr[ctr]->SetBinContent( bin,  sqrt( pow( totalErr[ctr]->GetBinContent(bin), 2 ) + pow( nom*0.05, 2 ) ) );//photon selection
+	      //totalErr[ctr]->SetBinContent( bin,  sqrt( pow( totalErr[ctr]->GetBinContent(bin), 2 ) + pow( nom*0.067, 2 ) ) );//scale variation
+	      //totalErr[ctr]->SetBinContent( bin,  sqrt( pow( totalErr[ctr]->GetBinContent(bin), 2 ) + pow( nom*0.057, 2 ) ) );//PDF uncertainty
+	      //if ( categoryMode == "hzbb" )  totalErr[ctr]->SetBinContent( bin,  sqrt( pow( totalErr[ctr]->GetBinContent(bin), 2 ) + pow( nom*0.04, 2 ) ) );//btag
 	    }     
 	}
 
@@ -415,6 +445,7 @@ int main( int argc, char* argv[] )
 	{
 	  smhMapNominal[process] = nominal[ctr];
 	  smhMapNominalErr[process] = nominalErr[ctr];
+	  smhMapTotalErr[process] = totalErr[ctr];
 	  if(ctr < 3 )ctr++;
 	}
       
@@ -447,16 +478,14 @@ int main( int argc, char* argv[] )
       float nom_vH_U = sqrt(smhMapNominalErr["vH"]->GetBinContent( bin ));
       float nom_s_U  = nominalS->GetBinError( bin );
       
+      //----------------------------
+      //Key string to find bin
+      //----------------------------
       std::stringstream ss;
       ss << categoryMode << "_" << tmp[0] << "-" << tmp[2] << "_" << tmp[1] << "-" << tmp[3]; 
-      //std::cout << mybin.bin << " " << mybin.box << " " << mybin.x1 << " " << mybin.x2 << " " << mybin.y1 << " " << mybin.y2 << " " << myMap[mybin] << std::endl;
       std::stringstream ss_fn;
-      /*ss_fn << "/Users/cmorgoth/Work/git/RazorEWKSUSYAnalysis/HggRazor/PlottingAndSystematic/dustinPlots/combineFits_7July/mlfit_bin"
-	<< myMap2[ss.str()].bin << ".root";*/
-      //std::cout << "bin--> " << myMap2[ss.str()].bin << std::endl;
       if ( categoryMode ==  "lowres" ) myMap2[ss.str()].bin = myMap2[ss.str()].bin - 5;
-      
-	ss_fn << "/afs/cern.ch/work/c/cpena/public/combineDiphotonHM/CMSSW_7_4_7/src/HiggsAnalysis/CombinedLimit/HggRazor/testNewCode/dustin/HggRazor_July11_sb300_lsp1_6p3ifb/mlfit_bin" << myMap2[ss.str()].bin << ".root";
+      ss_fn << "/afs/cern.ch/work/c/cpena/public/combineDiphotonHM/CMSSW_7_4_7/src/HiggsAnalysis/CombinedLimit/HggRazor/testNewCode/dustin/HggRazor_July11_sb300_lsp1_6p3ifb/mlfit_bin" << myMap2[ss.str()].bin << ".root";
       
       float Ns = GetNs( ss_fn.str(),  myMap2[ss.str()].bin, categoryMode );
       float NsErr = GetNsErr( ss_fn.str(),  myMap2[ss.str()].bin, categoryMode );
@@ -465,14 +494,58 @@ int main( int argc, char* argv[] )
       
       TString line = Form("%0.f-%0.f $\\otimes$ %.3f-%.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f \\\\",
 			  tmp[0], tmp[2], tmp[1], tmp[3], nom_ggH, nom_ggH_U, nom_ttH, nom_ttH_U, nom_vbfH, nom_vbfH_U, nom_vH, nom_vH_U, Nbkg, NbkgErr, Ns, NsErr);
-
-      
       std::cout << line << std::endl;
     }
   
   std::cout << "\\hline\n\\end{tabular}\n\\end{center}\n\\end{table*}" << std::endl;
 
      
+  std::cout << "\\begin{table*}[htb]\n\\footnotesize\n\\begin{center}\n\\caption{";
+  std::cout << categoryMode << " category binning. SM Higgs, and signal expected yields for an integrated luminosity correspondint to 6.3~$\\mathrm{fb}^{-1}$";
+  std::cout << "\\label{tab:binning-highpt}}\n\\def\\arraystretch{1.5}\n\\begin{tabular}{|c|c|c|c|}\n\\hline\n$\\mathrm{M_{R}} (GeV)\\otimes\\mathrm{R^{2}}$";
+  std::cout << " & higgs & non-resonant & Signal\\\\" << std::endl;
+  std::cout << "\\hline" << std::endl;
+  for ( auto tmp: myVectBinning )
+    {
+      int bin   = smhMapNominal["ggH"]->FindBin( tmp[0]+10, tmp[1]+0.0001 );
+      float nom_ggH = smhMapNominal["ggH"]->GetBinContent( bin );
+      float nom_ttH = smhMapNominal["ttH"]->GetBinContent( bin );
+      float nom_vbfH = smhMapNominal["vbfH"]->GetBinContent( bin );
+      float nom_vH = smhMapNominal["vH"]->GetBinContent( bin );
+      float nom_s  = nominalS->GetBinContent( bin );
+      
+      float totalsmh =  nom_ggH + nom_ttH + nom_vbfH + nom_vH;
+
+      float nom_ggH_U  = smhMapTotalErr["ggH"]->GetBinContent( bin );
+      float nom_ttH_U  = smhMapTotalErr["ttH"]->GetBinContent( bin );
+      float nom_vbfH_U = smhMapTotalErr["vbfH"]->GetBinContent( bin );
+      float nom_vH_U   = smhMapTotalErr["vH"]->GetBinContent( bin );
+      float nom_s_U    = nominalS->GetBinError( bin );
+      
+      float totalUn = sqrt( pow(nom_ggH_U,2) + pow(nom_ttH_U,2) + pow(nom_vbfH_U,2) + pow(nom_vH_U,2) );
+      totalUn = sqrt(pow(totalUn,2) + pow(totalsmh*0.04,2) + pow(totalsmh*0.05,2) + pow(totalsmh*0.067,2) + pow(totalsmh*0.057,2));
+      
+      //----------------------------
+      //Key string to find bin
+      //----------------------------
+      std::stringstream ss;
+      ss << categoryMode << "_" << tmp[0] << "-" << tmp[2] << "_" << tmp[1] << "-" << tmp[3]; 
+      std::stringstream ss_fn;
+      if ( categoryMode ==  "lowres" ) myMap2[ss.str()].bin = myMap2[ss.str()].bin - 5;
+      ss_fn << "/afs/cern.ch/work/c/cpena/public/combineDiphotonHM/CMSSW_7_4_7/src/HiggsAnalysis/CombinedLimit/HggRazor/testNewCode/dustin/HggRazor_July11_sb300_lsp1_6p3ifb/mlfit_bin" << myMap2[ss.str()].bin << ".root";
+      
+      float Ns = GetNs( ss_fn.str(),  myMap2[ss.str()].bin, categoryMode );
+      float NsErr = GetNsErr( ss_fn.str(),  myMap2[ss.str()].bin, categoryMode );
+      float Nbkg = GetNbkg( ss_fn.str(),  myMap2[ss.str()].f1, myMap2[ss.str()].bin, false, categoryMode );
+      float NbkgErr = GetNbkg( ss_fn.str(),  myMap2[ss.str()].f1, myMap2[ss.str()].bin, true, categoryMode );
+      
+      TString line = Form("%0.f-%0.f $\\otimes$ %.3f-%.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f \\\\",
+			  tmp[0], tmp[2], tmp[1], tmp[3], totalsmh, totalUn, Nbkg, NbkgErr, Ns, NsErr);
+      std::cout << line << std::endl;
+    }
+  
+  std::cout << "\\hline\n\\end{tabular}\n\\end{center}\n\\end{table*}" << std::endl;
+
   TFile* sF = new TFile( "fullSys.root", "recreate" );
   nominal[0]->Write("SMH_nominal_0");
   nominal[1]->Write("SMH_nominal_1");
