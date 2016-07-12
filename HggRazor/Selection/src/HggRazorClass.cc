@@ -1,4 +1,4 @@
-//C++ INCLUDES
+1;95;0c//C++ INCLUDES
 #include <iostream>
 #include <fstream>
 #include <math.h>
@@ -509,6 +509,7 @@ void HggRazorClass::Loop()
 	{ 
 	  w = weight*pileupWeight*triggerEffWeight;
 	  //w = weight;
+	  std::cout << " " << std::end;
 	}
 
       total_in += w;

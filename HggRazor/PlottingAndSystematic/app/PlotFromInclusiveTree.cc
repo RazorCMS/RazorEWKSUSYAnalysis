@@ -316,7 +316,8 @@ int main ( int argc, char* argv[] )
       exit( EXIT_FAILURE );
     }
   const int nplots = 4;
-  double k_f = 1.37;//Difference in data/mc normalization
+  //double k_f = 1.37;//Difference in data/mc normalization
+  double k_f = 1.3291653769;
   const double lumi_frac = 1.0; // (5./19.8)
   const double lumi = 4000.0;
   const int mod = 0; 
@@ -425,7 +426,8 @@ int main ( int argc, char* argv[] )
 	      else if ( histos[i].process != Process::signal )
 		{
 		  h_s->Scale( lumi );
-		  if ( _useKF && (histos[i].process == Process::diphoton || histos[i].process == Process::gammaJet) ) h_s->Scale( k_f );
+		  //if ( _useKF && (histos[i].process == Process::diphoton || histos[i].process == Process::gammaJet) ) h_s->Scale( k_f );
+		  if ( _useKF  ) h_s->Scale( k_f );
 		  std::cout << "stacking " << GetProcessString( histos[i].process ) << std::endl;
 		  if ( mc == NULL || _isFirstMC )
 		    {
@@ -460,7 +462,8 @@ int main ( int argc, char* argv[] )
 	      TH1F* tmp_h = new TH1F( histos[i].GetHisto( htmp ) );
 	      TH1D* h_s = GetStyledHisto( (TH1D*)tmp_h, histos[i].process );
 	      h_s->Scale( lumi );
-	      if ( _useKF && (histos[i].process == Process::diphoton || histos[i].process == Process::gammaJet) ) h_s->Scale( k_f );
+	      //if ( _useKF && (histos[i].process == Process::diphoton || histos[i].process == Process::gammaJet) ) h_s->Scale( k_f );
+	      if ( _useKF ) h_s->Scale( k_f );
 	      if ( _shapeOnly ) h_s->Scale(1.0/NormFactor);
 	      if ( histos[i].process != Process::data && histos[i].process != Process::signal ) stack->Add( h_s, "histo" );
 	    }
