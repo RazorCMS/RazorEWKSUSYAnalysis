@@ -507,7 +507,7 @@ int main( int argc, char* argv[] )
 	 {
 	   pdf[ipdf]->SetBinContent( bin, pdf[ipdf]->GetBinContent( bin )/nom );
 	   outf << pdf[ipdf]->GetBinContent( bin ) << "\t";
-	   totalFractionalUncertaintySqr += pow( pdf[ipdf]->GetBinContent( bin )/nom ,2);
+	   totalFractionalUncertaintySqr += pow( pdf[ipdf]->GetBinContent( bin ) ,2);
 	 }
 
        //add total cross section uncertainties
