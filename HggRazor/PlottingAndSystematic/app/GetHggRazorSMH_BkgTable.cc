@@ -472,12 +472,23 @@ int main( int argc, char* argv[] )
       float nom_vH = smhMapNominal["vH"]->GetBinContent( bin );
       float nom_s  = nominalS->GetBinContent( bin );
 
-      float nom_ggH_U = sqrt(smhMapNominalErr["ggH"]->GetBinContent( bin ));
-      float nom_ttH_U = sqrt(smhMapNominalErr["ttH"]->GetBinContent( bin ));
-      float nom_vbfH_U = sqrt(smhMapNominalErr["vbfH"]->GetBinContent( bin ));
-      float nom_vH_U = sqrt(smhMapNominalErr["vH"]->GetBinContent( bin ));
+      /*
+      //Adding systematic uncertainties
+      float nom_ggH_U = sqrt( pow(smhMapTotalErr["ggH"]->GetBinContent( bin ),2) + pow(nom_ggH*0.04, 2) + pow(nom_ggH*0.05,2) + pow(nom_ggH*0.079,2) + pow(nom_ggH*0.071,2) );
+      if ( categoryMode == "hzbb" ) nom_ggH_U = sqrt( pow(nom_ggH_U,2) + pow(nom_ggH*0.04,2) );
+      float nom_ttH_U = sqrt( pow(smhMapTotalErr["ttH"]->GetBinContent( bin ),2) + pow(nom_ttH*0.04, 2) + pow(nom_ttH*0.05,2) + pow(nom_ttH*0.093,2) + pow(nom_ttH*0.088,2) );
+      if ( categoryMode == "hzbb" ) nom_ttH_U = sqrt( pow(nom_ttH_U,2) + pow(nom_ttH*0.04,2) );
+      float nom_vbfH_U = sqrt( pow(smhMapTotalErr["vbfH"]->GetBinContent( bin ),2) + pow(nom_vbfH*0.04, 2) + pow(nom_vbfH*0.05,2) + pow(nom_vbfH*0.007,2) + pow(nom_vbfH*0.032,2) );
+      if ( categoryMode == "hzbb" ) nom_vbfH_U = sqrt( pow(nom_vbfH_U,2) + pow(nom_vbfH*0.04,2) );
+      float nom_vH_U = sqrt( pow(smhMapTotalErr["vH"]->GetBinContent( bin ),2) + pow(nom_vH*0.04, 2) + pow(nom_vH*0.05,2) + pow(nom_vH*0.038,2) + pow(nom_vH*0.022,2) );
+      if ( categoryMode == "hzbb" ) nom_vH_U = sqrt( pow(nom_vH_U,2) + pow(nom_vH*0.04,2) );
       float nom_s_U  = nominalS->GetBinError( bin );
-      
+      */
+      float nom_ggH_U = sqrt( smhMapNominalErr["ggH"]->GetBinContent( bin ) );
+      float nom_ttH_U = sqrt( smhMapNominalErr["ttH"]->GetBinContent( bin ) );
+      float nom_vbfH_U = sqrt( smhMapNominalErr["vbfH"]->GetBinContent( bin ) );
+      float nom_vH_U = sqrt( smhMapNominalErr["vH"]->GetBinContent( bin ) );
+      float nom_s_U  = nominalS->GetBinError( bin );
       //----------------------------
       //Key string to find bin
       //----------------------------
@@ -524,6 +535,7 @@ int main( int argc, char* argv[] )
       
       float totalUn = sqrt( pow(nom_ggH_U,2) + pow(nom_ttH_U,2) + pow(nom_vbfH_U,2) + pow(nom_vH_U,2) );
       totalUn = sqrt(pow(totalUn,2) + pow(totalsmh*0.04,2) + pow(totalsmh*0.05,2) + pow(totalsmh*0.067,2) + pow(totalsmh*0.057,2));
+      if ( categoryMode == "hzbb" ) totalUn = sqrt( pow(totalUn,2) + pow(totalsmh*0.04,2) );
       
       //----------------------------
       //Key string to find bin
@@ -531,7 +543,6 @@ int main( int argc, char* argv[] )
       std::stringstream ss;
       ss << categoryMode << "_" << tmp[0] << "-" << tmp[2] << "_" << tmp[1] << "-" << tmp[3]; 
       std::stringstream ss_fn;
-      if ( categoryMode ==  "lowres" ) myMap2[ss.str()].bin = myMap2[ss.str()].bin - 5;
       ss_fn << "/afs/cern.ch/work/c/cpena/public/combineDiphotonHM/CMSSW_7_4_7/src/HiggsAnalysis/CombinedLimit/HggRazor/testNewCode/dustin/HggRazor_July11_sb300_lsp1_6p3ifb/mlfit_bin" << myMap2[ss.str()].bin << ".root";
       
       float Ns = GetNs( ss_fn.str(),  myMap2[ss.str()].bin, categoryMode );
