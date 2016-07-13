@@ -509,6 +509,7 @@ void HggRazorClass::Loop()
 	{ 
 	  w = weight*pileupWeight*triggerEffWeight;
 	  //w = weight;
+	  //std::cout << " " << std::endl;
 	}
 
       total_in += w;

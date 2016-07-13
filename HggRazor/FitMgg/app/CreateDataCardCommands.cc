@@ -196,42 +196,46 @@ int main( int argc, char* argv[] )
 	}
       if ( ifs.eof() ) break;
 
+      //---------------------------------------------------
       // if available, get line from secondary input source
-      if ( secondInputCF != "" ) {
-	if ( ifs2.good() ) {
-	  std::string category2, SMH2, Signal2;
-	  float MR_l2, MR_h2, Rsq_l2, Rsq_h2;
-	  int binNumber2;
-	  ifs2 >> binNumber2 >> category2 >> MR_l2 >> MR_h2 >> Rsq_l2 >> Rsq_h2 >> SMH2;
-	  // make sure input is sane and warn if not
-	  if ( !(category == category2 && MR_l == MR_l2 && MR_h == MR_h2 && Rsq_l == Rsq_l2 
-		 && Rsq_h == Rsq_h2) ) {
-	    std::cerr << "WARNING: bin definition is not the same in the two input files!\n"
-		      << "File 1: " << category << " " << MR_l << " " << MR_h << " " << Rsq_l 
-		      << " " << Rsq_h << std::endl
-		      << "File 2: " << category2 << " " << MR_l2 << " " << MR_h2 << " " 
-		      << Rsq_l2 << " " << Rsq_h2 << std::endl;
-	  }
-
-	  std::string tmp2;
-	  // ignore the systematics values from this input file
-	  for ( int i = 0; i < 68; i++ ) ifs2 >> tmp2;
-	  // get the signal yield
-	  ifs2 >> Signal2;
-	  // ignore the systematics values from this input file
-	  for ( int i = 0; i < 68; i++ ) ifs2 >> tmp2;
-
-	  // add the SM Higgs yields together
-	  SMH = std::to_string( atof(SMH.c_str()) + atof(SMH2.c_str()) );
-	  // add the signal yields together
-	  Signal = std::to_string( atof(Signal.c_str()) + atof(Signal2.c_str()) );
+      //---------------------------------------------------
+      if ( secondInputCF != "" )
+	{
+	  if ( ifs2.good() )
+	    {
+	      std::string category2, SMH2, Signal2;
+	      float MR_l2, MR_h2, Rsq_l2, Rsq_h2;
+	      int binNumber2;
+	      ifs2 >> binNumber2 >> category2 >> MR_l2 >> MR_h2 >> Rsq_l2 >> Rsq_h2 >> SMH2;
+	      // make sure input is sane and warn if not
+	      if ( !(category == category2 && MR_l == MR_l2 && MR_h == MR_h2 && Rsq_l == Rsq_l2 && Rsq_h == Rsq_h2) )
+		{
+		  std::cerr << "WARNING: bin definition is not the same in the two input files!\n"
+			    << "File 1: " << category << " " << MR_l << " " << MR_h << " " << Rsq_l 
+			    << " " << Rsq_h << std::endl
+			    << "File 2: " << category2 << " " << MR_l2 << " " << MR_h2 << " " 
+			    << Rsq_l2 << " " << Rsq_h2
+			    << std::endl;
+		}
+	      
+	      std::string tmp2;
+	      // ignore the systematics values from this input file
+	      for ( int i = 0; i < 68; i++ ) ifs2 >> tmp2;
+	      // get the signal yield
+	      ifs2 >> Signal2;
+	      // ignore the systematics values from this input file
+	      for ( int i = 0; i < 68; i++ ) ifs2 >> tmp2;
+	      // add the SM Higgs yields together
+	      SMH = std::to_string( atof(SMH.c_str()) + atof(SMH2.c_str()) );
+	      // add the signal yields together
+	      Signal = std::to_string( atof(Signal.c_str()) + atof(Signal2.c_str()) );
+	    }
+	  else
+	    {
+	      std::cerr << "WARNING: secondary input file " << secondInputCF << " is out of input!" << std::endl;
+	    }
 	}
-	else {
-	  std::cerr << "WARNING: secondary input file " << secondInputCF 
-		    << " is out of input!" << std::endl;
-	}
-      }
-	 
+      
       Bkg_f1 = "singleExp";
       Bkg_f1 = mapBinNumberToBin[binNumber].f1;
 
@@ -254,28 +258,28 @@ int main( int argc, char* argv[] )
 	   << " --Signal_Yield=" << Signal << " --Signal_CL=" << Signal_sys.str()
 	   << " --sModel=" << sModel
 	   << " --binNumber=" << binNumber << " --detector=ebeb";
-      if ( usePtGammaGamma ) {
-	outf << " --usePtGammaGamma=yes";
-      }
-      if ( sOnly ) {
-	outf << " --sOnly=yes" << std::endl;
-      }
-      else {
-	outf << std::endl;
-      }
+
+      //------------------
+      //finalizing command
+      //------------------
+      if ( usePtGammaGamma ) outf << " --usePtGammaGamma=yes";
+      
+      if ( sOnly ) outf << " --sOnly=yes" << std::endl;
+      else outf << std::endl;
+      
     }
  
 
   //Do Combine DataCard step
   outf << "\n\n";
   outf << "cd HggRazorDataCards/" << sModel << "\n"; 
-
+  
   //count number of high res bins
   int NBinsHighRes = 0;
   for (int i=0; i<binVector.size(); i++) {
     if (binVector[i].box == "highres") NBinsHighRes++;
   }
-
+  
   for (int i=0; i<binVector.size(); i++) {
     if (binVector[i].box == "highpt" || binVector[i].box == "hzbb" ) {
       outf << "mv HggRazorCard_bin" << binVector[i].bin << ".txt" << " "
