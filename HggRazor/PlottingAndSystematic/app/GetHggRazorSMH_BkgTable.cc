@@ -131,6 +131,17 @@ int main( int argc, char* argv[] )
   lumi = float(atoi(lumiString.c_str()));
   std::cout << "[INFO] : Using Luminosity = " << lumi << "\n";
 
+  //------------------------
+  //fit result directory
+  //------------------------
+  std::string fitResultDir = ParseCommandLine( argc, argv, "-fitResultDir=" );
+  if (  fitResultDir == "" )
+    {
+      std::cerr << "[ERROR]: please provide a fit result directory. For example, use --fitResultDir=/afs/cern.ch/work/c/cpena/public/CMSSW_7_6_3/src/RazorEWKSUSYAnalysis/HggRazor/PlottingAndSystematic" << std::endl;
+      return -1;
+    }
+  std::cout << "[INFO] : Using fitResultDir = " << fitResultDir << "\n";
+
   //-----------------
   //Analysis Tag
   //-----------------
@@ -496,7 +507,7 @@ int main( int argc, char* argv[] )
       ss << categoryMode << "_" << tmp[0] << "-" << tmp[2] << "_" << tmp[1] << "-" << tmp[3]; 
       std::stringstream ss_fn;
       if ( categoryMode ==  "lowres" ) myMap2[ss.str()].bin = myMap2[ss.str()].bin - 5;
-      ss_fn << "/afs/cern.ch/work/c/cpena/public/combineDiphotonHM/CMSSW_7_4_7/src/HiggsAnalysis/CombinedLimit/HggRazor/testNewCode/dustin/HggRazor_July11_sb300_lsp1_6p3ifb/mlfit_bin" << myMap2[ss.str()].bin << ".root";
+      ss_fn << fitResultDir << "/mlfit_bin" << myMap2[ss.str()].bin << ".root";
       
       float Ns = GetNs( ss_fn.str(),  myMap2[ss.str()].bin, categoryMode );
       float NsErr = GetNsErr( ss_fn.str(),  myMap2[ss.str()].bin, categoryMode );
@@ -543,7 +554,7 @@ int main( int argc, char* argv[] )
       std::stringstream ss;
       ss << categoryMode << "_" << tmp[0] << "-" << tmp[2] << "_" << tmp[1] << "-" << tmp[3]; 
       std::stringstream ss_fn;
-      ss_fn << "/afs/cern.ch/work/c/cpena/public/combineDiphotonHM/CMSSW_7_4_7/src/HiggsAnalysis/CombinedLimit/HggRazor/testNewCode/dustin/HggRazor_July11_sb300_lsp1_6p3ifb/mlfit_bin" << myMap2[ss.str()].bin << ".root";
+      ss_fn << fitResultDir << "/mlfit_bin" << myMap2[ss.str()].bin << ".root";
       
       float Ns = GetNs( ss_fn.str(),  myMap2[ss.str()].bin, categoryMode );
       float NsErr = GetNsErr( ss_fn.str(),  myMap2[ss.str()].bin, categoryMode );
