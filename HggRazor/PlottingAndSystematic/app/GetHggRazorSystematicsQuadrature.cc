@@ -48,7 +48,7 @@ int   HggRazorSystematics::n_PdfSys = 60;
 
 int main( int argc, char* argv[] )
 {
-
+  srand(time(NULL));
   //RooFit::PrintLevel(5);
   //RooMsgService::instance().setGlobalKillBelow(RooFit::FATAL);
   gROOT->Reset();
@@ -319,7 +319,8 @@ int main( int argc, char* argv[] )
       TH1F* SumPdfWeights   = (TH1F*)fin->Get("SumPdfWeights");
       if ( process != "signal" ) assert( SumPdfWeights );     
  
-      TFile* tmp = new TFile("tmp.root", "RECREATE");
+      TString tmpName = Form("tmp_%d.root", rand());
+      TFile* tmp = new TFile( tmpName , "RECREATE");
       TTree* cutTree = tree->CopyTree( cut );
       TString currentProcess = process.c_str();
 
@@ -424,10 +425,11 @@ int main( int argc, char* argv[] )
 	    }     
 	}
       
-      hggSys->WriteOutput( "histoMR_Rsq" );
+      hggSys->WriteOutput( Form("histoMR_Rsq_%d", rand()) );
       delete hggSys;
       if ( _debug ) std::cout << "deleted hggSys" << std::endl;
       //delete tmp;
+      system ( "rm " + tmpName );
       if ( _debug ) std::cout << "deleted tmp File" << std::endl;
     }
 
@@ -543,7 +545,7 @@ int main( int argc, char* argv[] )
    outf.close();
    
    
-   TFile* sF = new TFile( "fullSys.root", "recreate" );
+   TFile* sF = new TFile( Form("fullSys_%d.root", rand()), "recreate" );
    nominal->Write("SMH_nominal");
    facScaleUp->Write("facScaleUp");
    facScaleDown->Write("facScaleDown");
