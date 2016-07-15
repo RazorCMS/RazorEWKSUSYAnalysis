@@ -1438,7 +1438,8 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
 
 
   ws->var( f1 + "_fullsb_fit_Nbkg")->setVal( npoints );
-  bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+  //bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+  bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("full") );//do FT for lxplus
   bres->SetName("BkgOnlyFitResult");
   ws->import( *bres );
   
@@ -1758,7 +1759,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   //Importing dataset
   //-----------------------
   //combine_ws->import( *data_toys );
-  combine_ws->import( data );
+  combine_ws->import( data );//import real data
   
   combine_ws->Write("combineWS");
   ftmp->cd();
