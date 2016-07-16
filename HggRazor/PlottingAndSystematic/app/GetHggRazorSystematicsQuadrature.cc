@@ -165,22 +165,27 @@ int main( int argc, char* argv[] )
   else if (categoryMode == "highpthighres") categoryCutString = " && pTGammaGamma >= 110 && sigmaMoverM < 0.0085";
   else if (categoryMode == "highptlowres") categoryCutString = " && pTGammaGamma >= 110 && sigmaMoverM >= 0.0085";
 
-  //TString triggerCut = " && ( HLTDecision[82] || HLTDecision[83] || HLTDecision[93] ) ";
+  TString triggerCut = " && ( HLTDecision[82] || HLTDecision[83] || HLTDecision[93] ) ";
   // TString metFilterCut = " && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1)";
   TString metFilterCut = " && (Flag_HBHENoiseFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1)";
-  TString triggerCut = "";
+  //TString triggerCut = "";
   //TString metFilterCut = "";
 
 
-  if ( analysisTag == "Razor2015_76X" ) {
-    cut = cut + categoryCutString + triggerCut+ metFilterCut;  
-  } else if ( analysisTag == "Razor2016_80X" ) {
-    //for 80X MC, trigger table doesn't exist. so don't apply triggers.
-    cut = cut + categoryCutString + metFilterCut;
-  } else {
-    std::cerr << "Analysis Tag " << analysisTag << " not recognized. Error!\n";
-    return -1;
-  }
+  if ( analysisTag == "Razor2015_76X" ) 
+    {
+      cut = cut + categoryCutString + triggerCut+ metFilterCut;  
+    } 
+  else if ( analysisTag == "Razor2016_80X" ) 
+    {
+      //for 80X MC, trigger table doesn't exist. so don't apply triggers.
+      cut = cut + categoryCutString + metFilterCut;
+    } 
+  else 
+    {
+      std::cerr << "Analysis Tag " << analysisTag << " not recognized. Error!\n";
+      return -1;
+    }
   std::cerr << "[INFO] : Using Analysis Tag: " << analysisTag  << "\n";
 
   std::cerr << "===========================================================================" << std::endl;

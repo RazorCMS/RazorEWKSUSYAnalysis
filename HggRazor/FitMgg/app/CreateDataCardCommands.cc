@@ -63,6 +63,13 @@ int main( int argc, char* argv[] )
       return -1;
     }
 
+  std::string currentDir = ParseCommandLine( argc, argv, "-currentDir=" );
+  if (  currentDir == "" )
+    {
+      std::cerr << "[ERROR]: please provide the current directory --currentDir=<mycurrentDir>" << std::endl;
+      return -1;
+    }
+  
   bool sOnly = false;
   std::string sOnlyOpt = ParseCommandLine( argc, argv, "-sOnly=" );
   if ( sOnlyOpt == "yes" )
@@ -149,6 +156,7 @@ int main( int argc, char* argv[] )
   int binNumber;
   Bkg_f1 = "singleExp";
   std::cerr << "[INFO]: opening configDataCard: "<< inputCF << std::endl;
+  outf << "#! /bin/bash\ncd " << currentDir << "\ncmsenv\n";
   while( ifs.good() )
     {
       std::stringstream SMH_sys;
@@ -295,7 +303,9 @@ int main( int argc, char* argv[] )
     }		  
   }
 
-  outf << "cd - \n";
+  outf << "combineCards.py HggRazorCombinedCard_bin*.txt > combineAll.txt\n"
+       << "combine -M Asymptotic combineAll.txt --minimizerStrategy=2 -n _combineAll"
+       << "\ncd - \n";
 
   //close files
   ifs.close();  
