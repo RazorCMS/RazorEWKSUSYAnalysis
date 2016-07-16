@@ -1,0 +1,5 @@
+ggH	/afs/cern.ch/work/c/cpena/public/CMSSW_7_6_3/src/RazorAnalyzer/V2p4_RegularSelectionSequence/HggRazor_GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8_1pb_weighted.root
+vbfH	/afs/cern.ch/work/c/cpena/public/CMSSW_7_6_3/src/RazorAnalyzer/V2p4_RegularSelectionSequence/HggRazor_VBFHToGG_M125_13TeV_amcatnlo_pythia8_1pb_weighted.root
+vH	/afs/cern.ch/work/c/cpena/public/CMSSW_7_6_3/src/RazorAnalyzer/V2p4_RegularSelectionSequence/HggRazor_VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_1pb_weighted.root
+ttH	/afs/cern.ch/work/c/cpena/public/CMSSW_7_6_3/src/RazorAnalyzer/V2p4_RegularSelectionSequence/HggRazor_ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2_1pb_weighted.root
+signal	/afs/cern.ch/work/c/cpena/public/CMSSW_7_6_3/src/RazorAnalyzer/V2p4_RegularSelectionSequence/HggRazor_SMS-T2bH_mSbottom-400_mLSP-150_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_1pb_weighted.root
