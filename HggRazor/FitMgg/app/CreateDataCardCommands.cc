@@ -156,7 +156,7 @@ int main( int argc, char* argv[] )
   int binNumber;
   Bkg_f1 = "singleExp";
   std::cerr << "[INFO]: opening configDataCard: "<< inputCF << std::endl;
-  outf << "#! /bin/bash\ncd " << currentDir << "\ncmsenv\n";
+  outf << "#! /bin/bash\ncd " << currentDir << "\neval `scramv1 run -sh`;\n";
   while( ifs.good() )
     {
       std::stringstream SMH_sys;
@@ -189,6 +189,7 @@ int main( int argc, char* argv[] )
       for ( int i = 0; i < 68; i++ )
 	{
 	  ifs >> tmp1;
+	  if ( tmp1 == "nan" || tmp1 == "-nan" || tmp1 == "inf"  || tmp1 == "-inf" ) tmp1 = "0";
 	  if ( i < 67 ) SMH_sys << tmp1 << " ";
 	  else SMH_sys << tmp1 << "\"";
 	}
@@ -199,6 +200,7 @@ int main( int argc, char* argv[] )
       for ( int i = 0; i < 68; i++ )
 	{
 	  ifs >> tmp1;
+	  if ( tmp1 == "nan" || tmp1 == "-nan" || tmp1 == "inf"  || tmp1 == "-inf" ) tmp1 = "0";
 	  if ( i < 67 ) Signal_sys << tmp1 << " ";
 	  else Signal_sys << tmp1 << "\"";
 	}
@@ -255,7 +257,8 @@ int main( int argc, char* argv[] )
       /*std::cout << category << "\t" << MR_l << "\t" << MR_h << "\t" << Rsq_l << "\t" << Rsq_h << "\t" << SMH << "\t" << SMH_sys.str()
 	<< "\t" << Signal << "\t"  << Signal_sys.str() << std::endl; 
       */
-	  
+      
+      Signal = std::to_string( 10.0*atof(Signal.c_str()) );//scaling signal by 10
       outf << "./MakeFitRun2 " 
 	   << "--inputFile=" << dataFile
 	   << " --inputFileSignal=" << signalFile
