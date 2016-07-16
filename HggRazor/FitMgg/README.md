@@ -2,11 +2,11 @@
 
 cd include
 
-make
+make clean;make
 
 cd ..
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PWD/include
 
-make
+make clean;make
 
