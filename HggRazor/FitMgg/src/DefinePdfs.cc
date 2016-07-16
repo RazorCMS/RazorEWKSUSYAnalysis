@@ -732,9 +732,16 @@ TString MakeDoublePowN1N2(TString tag, RooRealVar& mgg,RooWorkspace& w)
 
 TString MakePoly2(TString tag, RooRealVar& mgg,RooWorkspace& w)
 {
-  RooRealVar *pC = new RooRealVar(tag+"_pC","C",0.5, 0,1);
-  RooRealVar *p0 = new RooRealVar(tag+"_p0","p_0",0.3, 0,1);
-  RooRealVar *p1 = new RooRealVar(tag+"_p1","p_1",0.27, 0,1);
+  //RooRealVar *pC = new RooRealVar(tag+"_pC","C",0.5, -10,10);
+  //RooRealVar *p0 = new RooRealVar(tag+"_p0","p_0",0.3, -10,10);
+  //RooRealVar *p1 = new RooRealVar(tag+"_p1","p_1",0.27, -10,10);
+  RooRealVar *pC = new RooRealVar(tag+"_pC","C",0.5,""); 
+  pC->setConstant(kFALSE);
+  RooRealVar *p0 = new RooRealVar(tag+"_p0","p_0",0.3,"");
+  p0->setConstant(kFALSE);
+  RooRealVar *p1 = new RooRealVar(tag+"_p1","p_1",0.27,"");
+  p1->setConstant(kFALSE);
+  
   RooRealVar *Nbkg   = new RooRealVar(tag+"_Nbkg","N_{bkg}",10,"events");
   Nbkg->setConstant(kFALSE);
   
@@ -751,9 +758,17 @@ TString MakePoly2(TString tag, RooRealVar& mgg,RooWorkspace& w)
 
 TString MakePoly2NE(TString tag, RooRealVar& mgg,RooWorkspace& w)
 {
+  /*
   RooRealVar *pC = new RooRealVar(tag+"_pol2_pC","C",0.5, 0,1);
   RooRealVar *p0 = new RooRealVar(tag+"_pol2_p0","p_0",0.3, 0,1);
   RooRealVar *p1 = new RooRealVar(tag+"_pol2_p1","p_1",0.27, 0,1);
+  */
+  RooRealVar *pC = new RooRealVar(tag+"_pol2_pC","C",0.5,"");
+  pC->setConstant(kFALSE);
+  RooRealVar *p0 = new RooRealVar(tag+"_pol2_p0","p_0",0.3,"");
+  p0->setConstant(kFALSE);
+  RooRealVar *p1 = new RooRealVar(tag+"_pol2_p1","p_1",0.27,"");
+  p1->setConstant(kFALSE);
   RooRealVar *Nbkg   = new RooRealVar(tag+"_pol2_Nbkg","N_{bkg}",10,"events");
   Nbkg->setConstant(kFALSE);
   
