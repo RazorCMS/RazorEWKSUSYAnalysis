@@ -1553,6 +1553,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   //
   //data.plotOn(fmgg);
   dataCut->plotOn(fmgg);
+  data.plotOn(fmgg,RooFit::Invisible());
   ws->pdf( tag_bkg )->plotOn(fmgg,RooFit::LineColor(kBlue));
   //ws->pdf( tag_bkg )->plotOn(fmgg,RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed) );
   //ws->pdf( tag_bkg )->plotOn(fmgg,RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("full"));

@@ -13,6 +13,7 @@
 
 int main( int argc, char* argv[])
 {
+  srand(time(NULL));
   gROOT->Reset();
   std::string inputFile = ParseCommandLine( argc, argv, "-inputFile=" );
   if (  inputFile == "" )
@@ -572,7 +573,7 @@ int main( int argc, char* argv[])
   TFile* fout = 0;
   if (outputfilename == "")
     {
-      fout = new TFile( "test_out.root", "recreate" );
+      fout = new TFile( Form("test_out_%d.root",rand()), "recreate" );
     }
   else
     {
