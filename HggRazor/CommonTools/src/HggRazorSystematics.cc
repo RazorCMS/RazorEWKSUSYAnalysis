@@ -339,17 +339,16 @@ void HggRazorSystematics::Loop()
       h2p_JesDown->Fill( MR_JESDown, fmin(t1Rsq_JESDown,0.99), commonW );
     
       //************************************************************
-      //Don't run theory systematics for signal for now.
-      //Signal samples don't have this information stored.
+      //Do not renormalize scale weights to the nominal cross section
       //************************************************************
-      h2p_facScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facScaleUp*N_events/N_facScale[0] );
-      h2p_facScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facScaleDown*N_events/N_facScale[1] );
+      h2p_facScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facScaleUp );
+      h2p_facScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facScaleDown );
 	
-      h2p_renScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_renScaleUp*N_events/N_facScale[2] );
-      h2p_renScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_renScaleDown*N_events/N_facScale[3] );
+      h2p_renScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_renScaleUp );
+      h2p_renScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_renScaleDown );
 	
-      h2p_facRenScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facRenScaleUp*N_events/N_facScale[4] );
-      h2p_facRenScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facRenScaleDown*N_events/N_facScale[5] );
+      h2p_facRenScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facRenScaleUp );
+      h2p_facRenScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facRenScaleDown );
 	
       for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
 	{
