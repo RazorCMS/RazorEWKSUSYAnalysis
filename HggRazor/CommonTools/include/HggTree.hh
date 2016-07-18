@@ -146,14 +146,14 @@ public :
    Int_t           n_Jets_JESDown;
    Bool_t          HLTDecision[300];
    Int_t           nGenParticle;
-   Int_t           gParticleMotherId[38];   //[nGenParticle]
-   Int_t           gParticleMotherIndex[38];   //[nGenParticle]
-   Int_t           gParticleId[38];   //[nGenParticle]
-   Int_t           gParticleStatus[38];   //[nGenParticle]
-   Float_t         gParticleE[38];   //[nGenParticle]
-   Float_t         gParticlePt[38];   //[nGenParticle]
-   Float_t         gParticlePhi[38];   //[nGenParticle]
-   Float_t         gParticleEta[38];   //[nGenParticle]
+   Int_t           gParticleMotherId[500];   //[nGenParticle]
+   Int_t           gParticleMotherIndex[500];   //[nGenParticle]
+   Int_t           gParticleId[500];   //[nGenParticle]
+   Int_t           gParticleStatus[500];   //[nGenParticle]
+   Float_t         gParticleE[500];   //[nGenParticle]
+   Float_t         gParticlePt[500];   //[nGenParticle]
+   Float_t         gParticlePhi[500];   //[nGenParticle]
+   Float_t         gParticleEta[500];   //[nGenParticle]
 
    // List of branches
    TBranch        *b_weight;   //!
