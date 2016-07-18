@@ -258,7 +258,7 @@ int main( int argc, char* argv[] )
 	<< "\t" << Signal << "\t"  << Signal_sys.str() << std::endl; 
       */
       
-      Signal = std::to_string( 10.0*atof(Signal.c_str()) );//scaling signal by 10
+      Signal = std::to_string( 5.0*atof(Signal.c_str()) );//scaling signal by 10
       outf << "./MakeFitRun2 " 
 	   << "--inputFile=" << dataFile
 	   << " --inputFileSignal=" << signalFile
