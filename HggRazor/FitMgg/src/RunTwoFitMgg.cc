@@ -368,7 +368,7 @@ double GetIntegral( RooWorkspace& w, TString pdfName, TString mggName )
   return fIntegral2->getVal();
 };
 
-RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeSMH, TString mggName, bool isHighMass )
+RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeSMH, TString mggName, bool isHighMass, TString name )
 {
   //------------------------------------------------
   // C r e a t e   s i g n a l  s h a p e from TTree
@@ -610,9 +610,14 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
 
   RooRealVar NsModel("NsModel","",0.0);
   NsModel.setConstant( kFALSE );
-  NsModel.setRange(0, 1000.);
-  
+  NsModel.setRange(-10, 1000.);
+
+  //---------------------
+  //Create s+b model
+  //---------------------
   RooAddPdf* model = new RooAddPdf( "model", "model", RooArgSet( *ws->pdf( tag_bkg2 ), *ws->pdf( tag_sDCB ) ), RooArgSet(NbkgModel, NsModel) ) ;
+
+  
   if ( isHighMass )
     {
       RooAddPdf* modelHM = new RooAddPdf( "modelHM", "modelHM", RooArgSet( *ws->pdf( tag_bkg3 ), *ws->pdf( tag_sDCB ) ), RooArgSet(NbkgModel, NsModel) ) ;
@@ -729,20 +734,64 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   //ws->import( *r2 );
   //ws->import( *r3 );
 
-
+  //---------------------------
+  //Getting signal estimation
+  //---------------------------
+  float sVal = NsModel.getVal();
+  float sErr = NsModel.getError();
   //-----------------------------
   //S + B   p l o t t i n g
   //-----------------------------
+  TCanvas* c = new TCanvas( "c", "c", 2119, 33, 800, 700 );
+  c->SetHighLightColor(2);
+  c->SetFillColor(0);
+  c->SetBorderMode(0);
+  c->SetBorderSize(2);
+  c->SetLeftMargin( leftMargin );
+  c->SetRightMargin( rightMargin );
+  c->SetTopMargin( topMargin );
+  c->SetBottomMargin( bottomMargin );
+  c->SetFrameBorderMode(0);
+  c->SetFrameBorderMode(0);
+  //create frame
   RooPlot *fmgg;
   if ( isHighMass ) fmgg = mgg.frame( 230, 1230, 50);
-  else fmgg = mgg.frame( 103, 160, 57);
+  //else fmgg = mgg.frame( 103, 160, 57);
+  else fmgg = mgg.frame( 103, 160, 38 );
+    
   data.plotOn(fmgg);
-  //data_toys->plotOn(fmgg);
-  model->plotOn(fmgg, RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("Full"));
-  model->plotOn(fmgg, RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
+  model->plotOn( fmgg, RooFit::LineStyle(kDashed), RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("Full"), RooFit::Components(tag_bkg2) );
+  model->plotOn( fmgg, RooFit::LineColor(kBlue), RooFit::Range("Full"), RooFit::NormRange("Full"));
   fmgg->SetName( "sb_fit_frame" );
   ws->import( *fmgg );
+
+  float maxC = fmgg->GetMaximum();
+  fmgg->GetXaxis()->SetTitleSize( axisTitleSize );
+  fmgg->GetXaxis()->SetTitleOffset( axisTitleOffset );
+  fmgg->GetYaxis()->SetTitleSize( axisTitleSize );
+  fmgg->GetYaxis()->SetTitleOffset( axisTitleOffset );
+  //fmgg->SetAxisRange(0.1, maxC, "Y");
+  fmgg->Draw();
   
+  c->Update();
+  fmgg->SetTitle("");
+  /*
+  TBox* box = new TBox(120, 0.105, 135, maxC-0.1);
+  box->SetFillColor(kRed-9);
+  box->SetFillStyle(3344);
+  box->Draw("same");
+  */
+  TString signalYield = Form("N_{s} = %.2f #pm %.2f", sVal, sErr );
+  TLatex latex;
+  latex.SetNDC();
+  latex.SetTextAngle(0);
+  latex.SetTextColor(kBlack);    
+  latex.SetTextFont(42);
+  latex.SetTextAlign(31); 
+  latex.SetTextSize(0.05);    
+  latex.DrawLatex( 0.89, 0.87, signalYield );
+  latex.Draw();
+  c->SaveAs( name + ".pdf" );
   
   //---------------------------------
   //S M - H i g g s   p l o t t i n g
@@ -772,12 +821,11 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   //--------------------------------------
   // l i k e l i h o o d   p l o t t i n g
   //--------------------------------------
-  float sVal = NsModel.getVal();
-  float sErr = NsModel.getError();
+  
   //RooPlot* fns = ws->var("DG_Signal_DG_Ns")->frame( RooFit::Range(0, 30, true) );
   //RooPlot* fns = ws->var("Signal_SG_Ns")->frame( RooFit::Range(-10, 10, true) );
   //RooPlot* fns = NsModel.frame( RooFit::Range(-10, 10, true) );
-  RooPlot* fns = NsModel.frame( RooFit::Range(sVal-5.*sErr, sVal+5.*sErr, true) );
+  RooPlot* fns = NsModel.frame( RooFit::Range(sVal-2.*sErr, sVal+2.*sErr, true) );
   //RooPlot* fns = ws->var("DG_Signal_DG_Ns")->frame( RooFit::Range( sVal-5.*sErr, sVal+5.*sErr, true) );
   fns->SetMinimum(0);
   fns->SetMaximum(12);
@@ -1043,8 +1091,8 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
       _fout->Close();
       
       TString dataCardName;
-      if ( isEBEB ) dataCardName = Form("HggRazorCombinedCard_EBEB_m%.0f.txt", _mass);
-      else dataCardName = Form("HggRazorCombinedCard_EBEE_m%.0f.txt", _mass);
+      if ( isEBEB ) dataCardName = Form("HggRazorCard_EBEB_m%.0f.txt", _mass);
+      else dataCardName = Form("HggRazorCard_EBEE_m%.0f.txt", _mass);
       
       std::ofstream ofs( dataCardName , std::ofstream::out );
       TString det;
@@ -1390,7 +1438,8 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
 
 
   ws->var( f1 + "_fullsb_fit_Nbkg")->setVal( npoints );
-  bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+  //bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("low,high") );
+  bres = ws->pdf( tag_bkg )->fitTo( data, RooFit::Strategy(2), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("full") );//do FT for lxplus
   bres->SetName("BkgOnlyFitResult");
   ws->import( *bres );
   
@@ -1504,6 +1553,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   //
   //data.plotOn(fmgg);
   dataCut->plotOn(fmgg);
+  data.plotOn(fmgg,RooFit::Invisible());
   ws->pdf( tag_bkg )->plotOn(fmgg,RooFit::LineColor(kBlue));
   //ws->pdf( tag_bkg )->plotOn(fmgg,RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed) );
   //ws->pdf( tag_bkg )->plotOn(fmgg,RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("full"));
@@ -1612,7 +1662,8 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   combine_ws->var( combineSignal+"_n1")->setVal( DCB_n1_s );
   combine_ws->var( combineSignal+"_alpha2")->setVal( DCB_a2_s );
   combine_ws->var( combineSignal+"_n2")->setVal( DCB_n1_s );
-  if ( binNumber.Atof() == 17 || binNumber.Atof() == 19 || binNumber.Atof() == 20 )
+  //if ( binNumber.Atof() == 17 || binNumber.Atof() == 19 || binNumber.Atof() == 20 )
+  if ( binNumber.Atof() >= 0 )
     {
       //USE SMH SHAPE!!
       combine_ws->var( combineSignal+"_muCB")->setVal( DCB_mu_smh );
@@ -1709,7 +1760,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   //Importing dataset
   //-----------------------
   //combine_ws->import( *data_toys );
-  combine_ws->import( data );
+  combine_ws->import( data );//import real data
   
   combine_ws->Write("combineWS");
   ftmp->cd();
@@ -1718,7 +1769,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   std::cout << "[INFO]: Creating combine datacard" << std::endl;
   //std::string bNumber( binNumber );//TString to std::string
   combinedRootFileName = "HggRazorWorkspace_bin" + binNumber + ".root";
-  TString dataCardName = "HggRazorDataCards/" + sModel + "/HggRazorCombinedCard_bin" + binNumber + ".txt";
+  TString dataCardName = "HggRazorDataCards/" + sModel + "/HggRazorCard_bin" + binNumber + ".txt";
   std::ofstream ofs( dataCardName , std::ofstream::out );
 
   if ( !_signalOnly )
@@ -1742,6 +1793,13 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
       ofs << "Photon_Trigger\t\t\tlnN\t\t1.05\t\t1.05\t\t-\n";
       ofs << "ScaleNorm\t\t\tlnN\t\t-\t\t0.931/1.065\t\t-\n";
       ofs << "PdfNorm\t\t\t\tlnN\t\t-\t\t0.948/1.062\t\t-\n";
+      
+      if ( category == "highres" ) {
+	ofs << "SigmaMoverMEfficiency\t\t\t\tlnN\t\t0.947/1.053\t\t0.947/1.053\t\t-\n";
+      } else if (category == "lowres" ) {
+	ofs << "SigmaMoverMEfficiency\t\t\t\tlnN\t\t1.167/0.833\t\t1.167/0.833\t\t-\n";
+      }
+
       int totalSys = smh_sys.size();
       int ctr = 0;
       for( int isys = 0; isys < totalSys; isys++ )

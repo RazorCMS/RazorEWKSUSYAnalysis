@@ -41,7 +41,7 @@ float  lowresRSQedges3[2] = {0,1.0};
 //----------------
 //Static Variables
 //----------------
-float HggRazorSystematics::Lumi  = 2300.0;
+//float HggRazorSystematics::Lumi  = 2300.0;
 float HggRazorSystematics::NR_kf = 1.37;
 int HggRazorSystematics::n_PdfSys = 60;
 
@@ -244,7 +244,7 @@ int main( int argc, char* argv[] )
   //---------------------------
   //Create HggSystematic object
   //---------------------------
-  HggRazorSystematics* hggSys = new HggRazorSystematics( cutBkgTree, "NR", categoryMode, true, true );
+  HggRazorSystematics* hggSys = new HggRazorSystematics( cutBkgTree, "NR", categoryMode, "", true, true );
   hggSys->SetBinningVector( myBinningVect );
   hggSys->InitMrRsqTH2Poly( 1 );
   hggSys->PrintBinning();
@@ -252,14 +252,14 @@ int main( int argc, char* argv[] )
   hggSys->WriteOutput( "histoMR_Rsq" );
 
 
-  HggRazorSystematics* hggSMH = new HggRazorSystematics( cutSMHTree, "SMH", categoryMode, true, true );
+  HggRazorSystematics* hggSMH = new HggRazorSystematics( cutSMHTree, "SMH", categoryMode, "",true, true );
   hggSMH->SetBinningVector( myBinningVect );
   hggSMH->InitMrRsqTH2Poly( 1 );
   hggSMH->PrintBinning();
   hggSMH->LoopNominal();
   hggSMH->WriteOutput( "histoMR_Rsq" );
 
-  HggRazorSystematics* hggSignal = new HggRazorSystematics( cutSTree, "signal", categoryMode, true, true );
+  HggRazorSystematics* hggSignal = new HggRazorSystematics( cutSTree, "signal", categoryMode, "", true, true );
   hggSignal->SetBinningVector( myBinningVect );
   hggSignal->InitMrRsqTH2Poly( 1 );
   hggSignal->PrintBinning();

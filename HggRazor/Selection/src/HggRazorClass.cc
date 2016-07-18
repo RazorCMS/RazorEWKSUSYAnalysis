@@ -452,7 +452,7 @@ void HggRazorClass::Loop()
   if (fChain == 0) return;
   if ( h_mgg == NULL || h_ptgg == NULL )
     {
-      std::cerr << "[ERROR]: Histograms are nor initialized" << std::endl;
+      std::cerr << "[ERROR]: Histograms are not initialized" << std::endl;
       return;
     }
   Long64_t nentries = fChain->GetEntriesFast();
@@ -509,6 +509,7 @@ void HggRazorClass::Loop()
 	{ 
 	  w = weight*pileupWeight*triggerEffWeight;
 	  //w = weight;
+	  //std::cout << " " << std::endl;
 	}
 
       total_in += w;
