@@ -1791,7 +1791,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
       ofs << "----------------------------------------------------------------------------------------\n";
       ofs << "CMS_Lumi\t\t\tlnN\t\t1.04\t\t1.04\t\t-\n";
       ofs << "Photon_Trigger\t\t\tlnN\t\t1.05\t\t1.05\t\t-\n";
-      ofs << "ScaleNorm\t\t\tlnN\t\t-\t\t0.931/1.065\t\t-\n";
+      //ofs << "ScaleNorm\t\t\tlnN\t\t-\t\t0.931/1.065\t\t-\n"; //instead allow scale variations to change xsection
       ofs << "PdfNorm\t\t\t\tlnN\t\t-\t\t0.948/1.062\t\t-\n";
       
       if ( category == "highres" ) {
@@ -1810,15 +1810,15 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
 	    }
 	  else if ( isys == 2 )
 	    {
-	      ofs << "SMH_facScale\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	      ofs << "SMH_facScale_bin" << binNumber << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
 	    }
 	  else if ( isys == 4 )
 	    {
-	      ofs << "SMH_renScale\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	      ofs << "SMH_renScale_bin" << binNumber << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
 	    }
 	  else if ( isys == 6 )
 	    {
-	      ofs << "SMH_facRenScale\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	      ofs << "SMH_facRenScale_bin" << binNumber << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
 	    }
 	  else if ( isys > 7 )
 	    {
@@ -1846,15 +1846,15 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
 	    }
 	  else if ( isys == 2 )
 	    {
-	      ofs << "Signal_facScale\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	      ofs << "Signal_facScale_bin" << binNumber << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
 	    }
 	  else if ( isys == 4 )
 	    {
-	      ofs << "Signal_renScale\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	      ofs << "Signal_renScale_bin" << binNumber << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
 	    }
 	  else if ( isys == 6 )
 	    {
-	      ofs << "Signal_facRenScale\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	      ofs << "Signal_facRenScale_bin" << binNumber << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
 	    }
 	  else if ( isys > 7 )
 	    {
