@@ -521,7 +521,7 @@ int main( int argc, char* argv[] )
        totalFractionalUncertaintySqr += 
 	 pow( 0.04 ,2)  //lumi
 	 + pow( 0.05 ,2)  //photon selection
-	 + pow( 0.067 ,2)  //scale variation
+	 //+ pow( 0.067 ,2)  //scale variation
 	 + pow( 0.057 ,2)  //PDF
 	 ;
 
