@@ -50,7 +50,7 @@ int main( int argc, char* argv[] )
   FillCrossSectionMap( xsecFile );
 
   TFile* fout = new TFile("test_limit.root", "recreate");
-  TH2F* h2_limit = new TH2F("h2_limit", "", 15, 0, 750, 15, 0, 750);
+  TH2F* h2_limit = new TH2F("h2_limit", "", 15, -25, 725, 15, -25, 725);
     
   std::ifstream ifs( inputList.c_str(), std::fstream::in );
   if ( ifs.is_open() )
