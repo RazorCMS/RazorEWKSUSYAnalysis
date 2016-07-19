@@ -31,5 +31,8 @@ if __name__ == "__main__":
 				treeName = "HighPt"
 			if bin_array[0]=="lowres":
 				treeName = "LowRes"
-			
-			env_script_f.write("./MakeFitRun2 --inputFile="+inputFile+" --treeName="+treeName+" --LowMRcut="+bin_array[1]+" --HighMRcut="+bin_array[2]+" --LowRSQcut="+bin_array[3]+" --HighRSQcut="+bin_array[4]+" --dataMode=data+signal --category="+bin_array[0]+" --detector=ebeb --fitMode=sb --runPeriod=run1 --inputFileSignal="+inputFileSignal+" --inputFileSMH="+inputFileSMH+" --outputFile="+outputDir+bin_array[0]+ "_" +bin_array[1]+"_"+bin_array[3]+".root \n")
+			if bin_array[0]=="hbb":
+				treeName = "Hbb"
+			if bin_array[0]=="zbb":
+				treeName = "Zbb"
+			env_script_f.write("./MakeFitRun2 --inputFile="+inputFile+" --treeName="+treeName+" --LowMRcut="+bin_array[1]+" --HighMRcut="+bin_array[2]+" --LowRSQcut="+bin_array[3]+" --HighRSQcut="+bin_array[4]+" --dataMode=data+signal --category="+bin_array[0]+" --detector=ebeb --fitMode=sb --runPeriod=run1 --inputFileSignal="+inputFileSignal+" --inputFileSMH="+inputFileSMH+" --outputFile="+outputDir+bin_array[5]+"_"+bin_array[0]+ "_" +bin_array[1]+"_"+bin_array[3]+".root \n")

@@ -792,6 +792,7 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   latex.DrawLatex( 0.89, 0.87, signalYield );
   latex.Draw();
   c->SaveAs( name + ".pdf" );
+  c->SaveAs( name + ".png" );
   
   //---------------------------------
   //S M - H i g g s   p l o t t i n g
