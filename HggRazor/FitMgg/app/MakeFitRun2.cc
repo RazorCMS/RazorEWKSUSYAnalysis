@@ -344,7 +344,8 @@ int main( int argc, char* argv[])
       assert ( tree );
       fs = new TFile( inputFileSignal.c_str() , "READ");
       assert ( fs );
-      treeSignal = (TTree*)fs->Get( treeName.c_str() );
+      //treeSignal = (TTree*)fs->Get( treeName.c_str() );
+      treeSignal = (TTree*)fs->Get( "HggRazor" );
       assert ( treeSignal );
       fsmh = new TFile( inputFileSMH.c_str() , "READ");
       assert ( fsmh );
