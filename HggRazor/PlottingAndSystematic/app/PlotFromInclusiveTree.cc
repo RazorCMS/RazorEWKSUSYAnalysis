@@ -16,9 +16,9 @@
 // D e f i n e  B i n n i n g
 //---------------------------
 //H
-//int HggRazorClass::n_mgg   = 38;
-//float HggRazorClass::mgg_l = 103.;
-//float HggRazorClass::mgg_h = 160.;
+int HggRazorClass::n_mgg   = 38;
+float HggRazorClass::mgg_l = 103.;
+float HggRazorClass::mgg_h = 160.;
 
 //HighMass Diphotons
 //int HggRazorClass::n_mgg   = 50;
@@ -26,9 +26,9 @@
 //float HggRazorClass::mgg_h = 1230.;
 
 //Z
-int HggRazorClass::n_mgg = 60;
-float HggRazorClass::mgg_l = 60.;
-float HggRazorClass::mgg_h = 120.;
+//int HggRazorClass::n_mgg = 60;
+//float HggRazorClass::mgg_l = 60.;
+//float HggRazorClass::mgg_h = 120.;
 
 int HggRazorClass::n_ptgg   = 52;
 float HggRazorClass::ptgg_l = 0.;
@@ -176,7 +176,7 @@ float lres_k[2] = { 1.0, 1.0};
 
 //DATA
 //GammaGamma
-TString cut = "MR > 0 && t1Rsq > 0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1";
+TString cut = "abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1 && pho1SigmaIetaIeta < 0.01 && pho2SigmaIetaIeta < 0.01";
 //MGammaGamma HighMass
 //TString cut = "abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>0 && mGammaGamma>230 && mGammaGamma<1230 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1";
 
@@ -196,7 +196,7 @@ TString cut = "MR > 0 && t1Rsq > 0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 
 
 //MC
 //GammaGamma
-TString cut_mc = "MR > 0.0 && t1Rsq > 0.0 && abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1";
+TString cut_mc = "abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>20 && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1 && && pho1SigmaIetaIeta < 0.01 && pho2SigmaIetaIeta < 0.01";
 //GammaGamma HighMass
 //TString cut_mc = "abs( pho1Eta ) < 1.48 && abs( pho2Eta ) < 1.48 && pho1Pt > 25. && pho2Pt> 25. && pTGammaGamma>0 && mGammaGamma>230 && mGammaGamma<1230 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1";
 
@@ -316,8 +316,8 @@ int main ( int argc, char* argv[] )
       exit( EXIT_FAILURE );
     }
   const int nplots = 4;
-  //double k_f = 1.37;//Difference in data/mc normalization
-  double k_f = 1.3291653769;
+  double k_f = 1.37;//Difference in data/mc normalization
+  //double k_f = 1.3291653769;
   const double lumi_frac = 1.0; // (5./19.8)
   const double lumi = 4000.0;
   const int mod = 0; 
@@ -390,7 +390,7 @@ int main ( int argc, char* argv[] )
 	  //-----------------------------
 	  //Assigning Histograms to Array
 	  //-----------------------------
-	  std::cout << "DEB3" << std::endl;
+	  //std::cout << "DEB3" << std::endl;
 	  for ( const auto& htmp : HistoTypes() )
 	    {
 	      std::cout << GetHistoTypesString( htmp ) << std::endl;
@@ -398,7 +398,7 @@ int main ( int argc, char* argv[] )
 	      //if ( run == "run2" ) h_scale.Scale( k_f ); 
 	      histos[ctr].AssignHisto( htmp, h_scale );
 	    }
-	  std::cout << "DEB4" << std::endl;
+	  //std::cout << "DEB4" << std::endl;
 	  ctr++;
 	  delete hggclass;
 	}
