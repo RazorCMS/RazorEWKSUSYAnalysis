@@ -151,7 +151,8 @@ int main( int argc, char* argv[] )
 
   std::string configCardName;
 
-  std::string category, SMH, Signal, Bkg_f1;
+  std::string category, Bkg_f1;
+  float SMH, Signal;
   float MR_l, MR_h, Rsq_l, Rsq_h;
   int binNumber;
   Bkg_f1 = "singleExp";
@@ -159,6 +160,9 @@ int main( int argc, char* argv[] )
   outf << "#! /bin/bash\ncd " << currentDir << "\neval `scramv1 run -sh`;\n";
   while( ifs.good() )
     {
+      std::vector<float> smh_sys;
+      std::vector<float> sig_sys;
+
       std::stringstream SMH_sys;
       std::stringstream Signal_sys;
       // first 6 items are: category, MR range, Rsq range, SM Higgs yield
@@ -184,25 +188,28 @@ int main( int argc, char* argv[] )
 
       if ( category.find("#") != std::string::npos ) continue;
       std::string tmp1;
-      SMH_sys << "\"";
+      float ftmp1;
       // the next 68 items are the systematics on SM Higgs (put in quotes, separated by spaces)
       for ( int i = 0; i < 68; i++ )
 	{
 	  ifs >> tmp1;
-	  if ( tmp1 == "nan" || tmp1 == "-nan" || tmp1 == "inf"  || tmp1 == "-inf" ) tmp1 = "0";
-	  if ( i < 67 ) SMH_sys << tmp1 << " ";
-	  else SMH_sys << tmp1 << "\"";
+	  if ( tmp1 == "nan" || tmp1 == "-nan" || tmp1 == "inf"  || tmp1 == "-inf" ) ftmp1 = 0;
+	  else ftmp1=atof(tmp1.c_str());
+	  
+	  smh_sys.push_back(ftmp1);
 	}
+      std::cout << std::endl;
       // next is the signal yield
       ifs >> Signal;
-      Signal_sys << "\"";
+
       // the next 68 items are the systematics on the signal (put in quotes, separated by spaces)
       for ( int i = 0; i < 68; i++ )
 	{
 	  ifs >> tmp1;
-	  if ( tmp1 == "nan" || tmp1 == "-nan" || tmp1 == "inf"  || tmp1 == "-inf" ) tmp1 = "0";
-	  if ( i < 67 ) Signal_sys << tmp1 << " ";
-	  else Signal_sys << tmp1 << "\"";
+	  if ( tmp1 == "nan" || tmp1 == "-nan" || tmp1 == "inf"  || tmp1 == "-inf" ) ftmp1 = 0;
+	  else ftmp1=atof(tmp1.c_str());
+
+	  sig_sys.push_back(ftmp1);
 	}
       if ( ifs.eof() ) break;
 
@@ -213,7 +220,8 @@ int main( int argc, char* argv[] )
 	{
 	  if ( ifs2.good() )
 	    {
-	      std::string category2, SMH2, Signal2;
+	      std::string category2;
+	      float SMH2, Signal2;
 	      float MR_l2, MR_h2, Rsq_l2, Rsq_h2;
 	      int binNumber2;
 	      ifs2 >> binNumber2 >> category2 >> MR_l2 >> MR_h2 >> Rsq_l2 >> Rsq_h2 >> SMH2;
@@ -229,22 +237,49 @@ int main( int argc, char* argv[] )
 		}
 	      
 	      std::string tmp2;
-	      // ignore the systematics values from this input file
-	      for ( int i = 0; i < 68; i++ ) ifs2 >> tmp2;
+	      float ftmp2;
+	      // the next 68 items are the systematics on the standard model Higgs (put in quotes, separated by spaces)
+	      for ( int i = 0; i < 68; i++ ) {
+		ifs2 >> tmp2;
+		if ( tmp2 == "nan" || tmp2 == "-nan" || tmp2 == "inf"  || tmp2 == "-inf" ) ftmp2 = 0;
+		else ftmp2=atof(tmp2.c_str());
+		
+		smh_sys[i] = (ftmp2*SMH2+smh_sys[i]*SMH)/(SMH2+SMH);
+	      }
+
 	      // get the signal yield
 	      ifs2 >> Signal2;
-	      // ignore the systematics values from this input file
-	      for ( int i = 0; i < 68; i++ ) ifs2 >> tmp2;
+
+	      // the next 68 items are the systematics on the signal (put in quotes, separated by spaces)
+	      for ( int i = 0; i < 68; i++ ) {
+		if ( tmp2 == "nan" || tmp2 == "-nan" || tmp2 == "inf"  || tmp2 == "-inf" ) ftmp2 = 0;
+		else ftmp2=atof(tmp2.c_str());
+		
+		sig_sys[i] = (ftmp2*Signal2+sig_sys[i]*Signal)/(Signal2+Signal);
+	      }
+
 	      // add the SM Higgs yields together
-	      SMH = std::to_string( atof(SMH.c_str()) + atof(SMH2.c_str()) );
+	      SMH = SMH +SMH2;
 	      // add the signal yields together
-	      Signal = std::to_string( atof(Signal.c_str()) + atof(Signal2.c_str()) );
+	      Signal = Signal + Signal2;
 	    }
 	  else
 	    {
 	      std::cerr << "WARNING: secondary input file " << secondInputCF << " is out of input!" << std::endl;
 	    }
 	}
+
+      SMH_sys << "\"";
+      for (int i=0; i<smh_sys.size()-1; i++) {
+	SMH_sys << smh_sys[i] << " ";
+      }
+      SMH_sys << smh_sys[smh_sys.size()-1] << "\"";
+
+      Signal_sys << "\"";
+      for (int i=0; i<sig_sys.size()-1; i++) {
+	Signal_sys << sig_sys[i] << " ";
+      }
+      Signal_sys << sig_sys[smh_sys.size()-1] << "\"";
       
       Bkg_f1 = "singleExp";
       Bkg_f1 = mapBinNumberToBin[binNumber].f1;
@@ -258,7 +293,7 @@ int main( int argc, char* argv[] )
 	<< "\t" << Signal << "\t"  << Signal_sys.str() << std::endl; 
       */
       
-      Signal = std::to_string( 5.0*atof(Signal.c_str()) );//scaling signal by 10
+      Signal =5.0*Signal; //scaling signal by 10
       outf << "./MakeFitRun2 " 
 	   << "--inputFile=" << dataFile
 	   << " --inputFileSignal=" << signalFile
@@ -277,6 +312,9 @@ int main( int argc, char* argv[] )
       
       if ( sOnly ) outf << " --sOnly=yes" << std::endl;
       else outf << std::endl;
+
+      //SMH_sys.str(std::string());
+      //Signal_sys.str(std::string());
       
     }
  
