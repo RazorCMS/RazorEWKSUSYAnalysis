@@ -19,7 +19,7 @@ void plotMRRsq(string category = "highpt") {
   // TFile *fileData = new TFile("/afs/cern.ch/user/s/sixie/eos/cms/store/group/phys_susy/razor/Run2Analysis/HggRazor/2016/V3p3_PhotonCorrJune16/HggRazor_DoubleEG_2015+2016_GoodLumiGolden6p3ifb_MR150Skim.root","READ");
 
   //File with photon ID applied
-  TFile *fileData = new TFile("/afs/cern.ch/user/j/jlawhorn/eos/cms/store/group/phys_susy/razor/Run2Analysis/HggRazor/2016/V3p4_PhotonCorrJuly8_RegularSelectionSequence/HggRazor_SMS-T2bH_mSbottom-300_mLSP-1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_MiniAODv1_1pb_weighted.root","READ");
+  TFile *fileData = new TFile("/afs/cern.ch/work/j/jmao/razorRun1/CMSSW_7_6_3/src/RazorEWKSUSYAnalysis/HggRazor/FitMgg/eos/cms/store/group/phys_susy/razor/Run2Analysis/HggRazor/2016/V3p4_PhotonCorrJuly8_RegularSelectionSequence/HggRazor_SMS-T2bH_mSbottom-300_mLSP-1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_MiniAODv1_1pb_weighted.root","READ");
   TTree *tree = (TTree*)fileData->Get("HggRazor");
 
   string categoryCutString = "";
@@ -244,16 +244,196 @@ void plotMRRsq(string category = "highpt") {
    }*/
 
 
-   TPaveText *bin0 = new TPaveText(650,0.28,700,0.29);
+ if (category == "highpt") {
+   TPaveText *bin0 = new TPaveText(620,0.28,670,0.29);
    bin0->SetFillColor(0);
    bin0->SetShadowColor(0);
    bin0->SetLineColor(0);
    //bin0->SetNDC();
-   //bin0->SetTextSize(0.05);
+   bin0->SetTextSize(0.05);
    //bin0->SetTextFont(42);
    //bin0->SetTextColor(kBlack);
    bin0->AddText("0");
    bin0->Draw();
+
+   TPaveText *bin1 = new TPaveText(170,0.28,220,0.29);
+   bin1->SetFillColor(0);
+   bin1->SetShadowColor(0);
+   bin1->SetLineColor(0);
+   //bin1->SetNDC();
+   bin1->SetTextSize(0.05);
+   //bin1->SetTextFont(42);
+   //bin1->SetTextColor(kBlack);
+   bin1->AddText("1");
+   bin1->Draw();
+
+   TPaveText *bin2 = new TPaveText(1260,0.01,1310,0.02);
+   bin2->SetFillColor(0);
+   bin2->SetFillStyle(0);
+   bin2->SetShadowColor(0);
+   bin2->SetBorderSize(0);
+   bin2->SetLineColorAlpha(0,0.0);
+   //bin2->SetLineColor(0);
+   //bin2->SetLineStyle(0);
+   //bin2->SetNDC();
+   bin2->SetTextSize(0.05);
+   //bin2->SetTextFont(42);
+   //bin2->SetTextColor(kBlack);
+   bin2->AddText("2");
+   bin2->Draw();
+
+   TPaveText *bin3 = new TPaveText(170,0.115,220,0.125);
+   bin3->SetFillColor(0);
+   bin3->SetFillStyle(0);
+   bin3->SetShadowColor(0);
+   bin3->SetBorderSize(0);
+   bin3->SetLineColorAlpha(0,0.0);
+   //bin3->SetLineColor(0);
+   //bin3->SetLineStyle(0);
+   //bin3->SetNDC();
+   bin3->SetTextSize(0.05);
+   //bin3->SetTextFont(42);
+   //bin3->SetTextColor(kBlack);
+   bin3->AddText("3");
+   bin3->Draw();
+
+   TPaveText *bin4 = new TPaveText(540,0.002,590,0.012);
+   bin4->SetFillColor(0);
+   bin4->SetFillStyle(0);
+   bin4->SetShadowColor(0);
+   bin4->SetBorderSize(0);
+   bin4->SetLineColorAlpha(0,0.0);
+   //bin4->SetLineColor(0);
+   //bin4->SetLineStyle(0);
+   //bin4->SetNDC();
+   bin4->SetTextSize(0.05);
+   //bin4->SetTextFont(42);
+   //bin4->SetTextColor(kBlack);
+   bin4->AddText("4");
+   bin4->Draw();
+
+   TPaveText *bin5 = new TPaveText(460,0.115,510,0.125);
+   bin5->SetFillColor(0);
+   bin5->SetFillStyle(0);
+   bin5->SetShadowColor(0);
+   bin5->SetBorderSize(0);
+   bin5->SetLineColorAlpha(0,0.0);
+   //bin5->SetLineColor(0);
+   //bin5->SetLineStyle(0);
+   //bin5->SetNDC();
+   bin5->SetTextSize(0.05);
+   //bin5->SetTextFont(42);
+   //bin5->SetTextColor(kBlack);
+   bin5->AddText("5");
+   bin5->Draw();
+
+   TPaveText *bin6 = new TPaveText(610,0.002,660,0.012);
+   bin6->SetFillColor(0);
+   bin6->SetFillStyle(0);
+   bin6->SetShadowColor(0);
+   bin6->SetBorderSize(0);
+   bin6->SetLineColorAlpha(0,0.0);
+   //bin6->SetLineColor(0);
+   //bin6->SetLineStyle(0);
+   //bin6->SetNDC();
+   bin6->SetTextSize(0.05);
+   //bin6->SetTextFont(42);
+   //bin6->SetTextColor(kBlack);
+   bin6->AddText("6");
+   bin6->Draw();
+
+   TPaveText *bin7 = new TPaveText(1190,0.015,1240,0.025);
+   bin7->SetFillColor(0);
+   bin7->SetFillStyle(0);
+   bin7->SetShadowColor(0);
+   bin7->SetBorderSize(0);
+   bin7->SetLineColorAlpha(0,0.0);
+   //bin7->SetLineColor(0);
+   //bin7->SetLineStyle(0);
+   //bin7->SetNDC();
+   bin7->SetTextSize(0.05);
+   //bin7->SetTextFont(42);
+   //bin7->SetTextColor(kBlack);
+   bin7->AddText("7");
+   bin7->Draw();
+}
+
+ if (category == "highres" || category == "lowres") {
+   TPaveText *bin9 = new TPaveText(160,0.16,220,0.17);
+   bin9->SetFillColor(0);
+   bin9->SetFillStyle(0);
+   bin9->SetShadowColor(0);
+   bin9->SetBorderSize(0);
+   bin9->SetLineColorAlpha(0,0.0);
+   //bin9->SetLineColor(0);
+   //bin9->SetLineStyle(0);
+   //bin9->SetNDC();
+   bin9->SetTextSize(0.05);
+   //bin9->SetTextFont(42);
+   //bin9->SetTextColor(kBlack);
+   bin9->AddText("9");
+   bin9->Draw();
+
+   TPaveText *bin10 = new TPaveText(160,0.28,220,0.29);
+   bin10->SetFillColor(0);
+   bin10->SetFillStyle(0);
+   bin10->SetShadowColor(0);
+   bin10->SetBorderSize(0);
+   bin10->SetLineColorAlpha(0,0.0);
+   //bin10->SetLineColor(0);
+   //bin10->SetLineStyle(0);
+   //bin10->SetNDC();
+   bin10->SetTextSize(0.05);
+   //bin10->SetTextFont(42);
+   //bin10->SetTextColor(kBlack);
+   bin10->AddText("10");
+   bin10->Draw();
+
+   TPaveText *bin11 = new TPaveText(270,0.28,320,0.29);
+   bin11->SetFillColor(0);
+   bin11->SetFillStyle(0);
+   bin11->SetShadowColor(0);
+   bin11->SetBorderSize(0);
+   bin11->SetLineColorAlpha(0,0.0);
+   //bin11->SetLineColor(0);
+   //bin11->SetLineStyle(0);
+   //bin11->SetNDC();
+   bin11->SetTextSize(0.05);
+   //bin11->SetTextFont(42);
+   //bin11->SetTextColor(kBlack);
+   bin11->AddText("11");
+   bin11->Draw();
+
+   TPaveText *bin12 = new TPaveText(270,0.03,320,0.04);
+   bin12->SetFillColor(0);
+   bin12->SetFillStyle(0);
+   bin12->SetShadowColor(0);
+   bin12->SetBorderSize(0);
+   bin12->SetLineColorAlpha(0,0.0);
+   //bin12->SetLineColor(0);
+   //bin12->SetLineStyle(0);
+   //bin12->SetNDC();
+   bin12->SetTextSize(0.05);
+   //bin12->SetTextFont(42);
+   //bin12->SetTextColor(kBlack);
+   bin12->AddText("12");
+   bin12->Draw();
+
+   TPaveText *bin13 = new TPaveText(1430,0.03,1480,0.04);
+   bin13->SetFillColor(0);
+   bin13->SetFillStyle(0);
+   bin13->SetShadowColor(0);
+   bin13->SetBorderSize(0);
+   bin13->SetLineColorAlpha(0,0.0);
+   //bin13->SetLineColor(0);
+   //bin13->SetLineStyle(0);
+   //bin13->SetNDC();
+   bin13->SetTextSize(0.05);
+   //bin13->SetTextFont(42);
+   //bin13->SetTextColor(kBlack);
+   bin13->AddText("13");
+   bin13->Draw();
+}
 
  //MRRsqSignal->Draw("scat,same");
 
