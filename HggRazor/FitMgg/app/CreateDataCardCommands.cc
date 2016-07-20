@@ -167,7 +167,6 @@ int main( int argc, char* argv[] )
       std::stringstream Signal_sys;
       // first 6 items are: category, MR range, Rsq range, SM Higgs yield
       ifs >> binNumber >> category >> MR_l >> MR_h >> Rsq_l >> Rsq_h >> SMH;
-
       //check for consistency
       if (!(
 	    mapBinNumberToBin[binNumber].x1 == MR_l &&
@@ -198,7 +197,6 @@ int main( int argc, char* argv[] )
 	  
 	  smh_sys.push_back(ftmp1);
 	}
-      std::cout << std::endl;
       // next is the signal yield
       ifs >> Signal;
 
@@ -212,7 +210,7 @@ int main( int argc, char* argv[] )
 	  sig_sys.push_back(ftmp1);
 	}
       if ( ifs.eof() ) break;
-
+    
       //---------------------------------------------------
       // if available, get line from secondary input source
       //---------------------------------------------------
@@ -225,6 +223,7 @@ int main( int argc, char* argv[] )
 	      float MR_l2, MR_h2, Rsq_l2, Rsq_h2;
 	      int binNumber2;
 	      ifs2 >> binNumber2 >> category2 >> MR_l2 >> MR_h2 >> Rsq_l2 >> Rsq_h2 >> SMH2;
+
 	      // make sure input is sane and warn if not
 	      if ( !(category == category2 && MR_l == MR_l2 && MR_h == MR_h2 && Rsq_l == Rsq_l2 && Rsq_h == Rsq_h2) )
 		{
@@ -252,12 +251,13 @@ int main( int argc, char* argv[] )
 
 	      // the next 68 items are the systematics on the signal (put in quotes, separated by spaces)
 	      for ( int i = 0; i < 68; i++ ) {
+		ifs2 >> tmp2;
 		if ( tmp2 == "nan" || tmp2 == "-nan" || tmp2 == "inf"  || tmp2 == "-inf" ) ftmp2 = 0;
 		else ftmp2=atof(tmp2.c_str());
 		
 		sig_sys[i] = (ftmp2*Signal2+sig_sys[i]*Signal)/(Signal2+Signal);
 	      }
-
+	      
 	      // add the SM Higgs yields together
 	      SMH = SMH +SMH2;
 	      // add the signal yields together
