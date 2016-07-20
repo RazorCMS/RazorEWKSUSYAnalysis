@@ -21,10 +21,15 @@ int main( int argc, char* argv[] )
     }
   // secondary input file -- will take yields from here and add them to the primary input file yields
   std::string secondInputCF = ParseCommandLine( argc, argv, "-secondInputCF=" );
-  if ( secondInputCF != "" ) {
+  if ( secondInputCF != "" ) 
+    {
       std::cerr << "[INFO]: secondary input config file provided: " << secondInputCF << std::endl;
-  }
-
+    }
+  else
+    {
+      std::cerr << "[INFO]: you have NOT provided a secondary input config file, ARE YOU SURE? to provide a secondary file, please use: --secondInputCF=<path_to_second_file>" << std::endl;
+    }
+  
   //-----------------
   //Output file TString
   //-----------------
