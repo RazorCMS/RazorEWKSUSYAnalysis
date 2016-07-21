@@ -327,6 +327,7 @@ int main( int argc, char* argv[] )
       TString tmpName = Form("tmp_%d.root", rand());
       TFile* tmp = new TFile( tmpName , "RECREATE");
       TTree* cutTree = tree->CopyTree( cut );
+      assert( cutTree );
       TString currentProcess = process.c_str();
 
       //---------------------------
