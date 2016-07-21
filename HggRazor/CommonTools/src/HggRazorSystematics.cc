@@ -339,36 +339,49 @@ void HggRazorSystematics::Loop()
       h2p_JesDown->Fill( MR_JESDown, fmin(t1Rsq_JESDown,0.99), commonW );
     
       if( this->processName == "signal" ) {
-          //************************************************************
-          //Renormalize scale weights to the nominal cross section
-          //************************************************************
-          h2p_facScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facScaleUp*N_events/N_facScale[0] );
-          h2p_facScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facScaleDown*N_events/N_facScale[1] );
+	//************************************************************
+	//Renormalize scale weights to the nominal cross section
+	// Protect against samples without theory uncertainty info.
+	// If they are missing just make them 0.
+	//************************************************************
+	if( fabs(N_facScale[0]) > 0) h2p_facScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facScaleUp*N_events/N_facScale[0] );
+	else h2p_facScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW );
+	  
+	if( fabs(N_facScale[1]) > 0) h2p_facScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facScaleDown*N_events/N_facScale[1] );
+	else h2p_facScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW );
+	  
+	if( fabs(N_facScale[2]) > 0) h2p_renScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_renScaleUp*N_events/N_facScale[2] );
+	else h2p_renScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW );
+	  
+	if( fabs(N_facScale[3]) > 0 ) h2p_renScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_renScaleDown*N_events/N_facScale[3] );
+	else h2p_renScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW );
+	  
+	if( fabs(N_facScale[4]) > 0 ) h2p_facRenScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facRenScaleUp*N_events/N_facScale[4] );
+	else h2p_facRenScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW );
+	  
+	if( fabs(N_facScale[5]) > 0 ) h2p_facRenScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facRenScaleDown*N_events/N_facScale[5] );
+	else h2p_facRenScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW );
+	  
 
-          h2p_renScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_renScaleUp*N_events/N_facScale[2] );
-          h2p_renScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_renScaleDown*N_events/N_facScale[3] );
-
-          h2p_facRenScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facRenScaleUp*N_events/N_facScale[4] );
-          h2p_facRenScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facRenScaleDown*N_events/N_facScale[5] );
       }
       else {
-          //************************************************************
-          //Do not renormalize scale weights to the nominal cross section
-          //************************************************************
-          h2p_facScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facScaleUp );
-          h2p_facScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facScaleDown );
+	//************************************************************
+	//Do not renormalize scale weights to the nominal cross section
+	//************************************************************
+	h2p_facScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facScaleUp );
+	h2p_facScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facScaleDown );
 
-          h2p_renScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_renScaleUp );
-          h2p_renScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_renScaleDown );
+	h2p_renScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_renScaleUp );
+	h2p_renScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_renScaleDown );
 
-          h2p_facRenScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facRenScaleUp );
-          h2p_facRenScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facRenScaleDown );
+	h2p_facRenScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facRenScaleUp );
+	h2p_facRenScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facRenScaleDown );
       }
 	
       for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
 	{
 	  //protect against missing pdf vector
-	  if (ipdf < sf_pdf->size() ) {
+	  if (ipdf < sf_pdf->size() && fabs(N_Pdf[ipdf]) > 0 ) {
 	    h2p_Pdf[ipdf]->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_pdf->at(ipdf)*N_events/N_Pdf[ipdf] );
 	  } else {
 	    h2p_Pdf[ipdf]->Fill( MR, fmin(t1Rsq,0.999), commonW );
