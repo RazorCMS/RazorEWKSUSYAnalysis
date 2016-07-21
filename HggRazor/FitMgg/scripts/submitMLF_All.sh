@@ -1,6 +1,6 @@
 #! /bin/bash
 
-for i in `seq 0 20`;
+for i in `seq 0 13`;
 do
     echo "#!/bin/sh " > submit/bash_submit_bin$i.sh
     echo cd $PWD >> submit/bash_submit_bin$i.sh

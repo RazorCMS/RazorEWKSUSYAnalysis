@@ -264,7 +264,7 @@ int main( int argc, char* argv[] )
 	      }
 	      
 	      // add the SM Higgs yields together
-	      SMH = SMH +SMH2;
+	      SMH = SMH + SMH2;
 	      // add the signal yields together
 	      Signal = Signal + Signal2;
 	    }
@@ -279,7 +279,7 @@ int main( int argc, char* argv[] )
 	SMH_sys << smh_sys[i] << " ";
       }
       SMH_sys << smh_sys[smh_sys.size()-1] << "\"";
-
+      
       Signal_sys << "\"";
       for (int i=0; i<sig_sys.size()-1; i++) {
 	Signal_sys << sig_sys[i] << " ";
@@ -288,7 +288,7 @@ int main( int argc, char* argv[] )
       
       Bkg_f1 = "singleExp";
       Bkg_f1 = mapBinNumberToBin[binNumber].f1;
-
+      
       // if ( binNumber == 3 || binNumber == 5 ) Bkg_f1 = "poly2";
       // if ( binNumber == 9 || binNumber == 14 ) Bkg_f1 = "poly3"; //modify to synchronize LowRes and HighRes binning
       // //if ( binNumber == 9 || binNumber == 16 ) Bkg_f1 = "poly3"; //old LowRes binning
@@ -298,7 +298,7 @@ int main( int argc, char* argv[] )
 	<< "\t" << Signal << "\t"  << Signal_sys.str() << std::endl; 
       */
       
-      Signal =5.0*Signal; //scaling signal by 10
+      Signal =5.0*Signal; //scaling signal by 5
       outf << "./MakeFitRun2 " 
 	   << "--inputFile=" << dataFile
 	   << " --inputFileSignal=" << signalFile
