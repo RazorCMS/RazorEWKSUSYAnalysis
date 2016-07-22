@@ -14,8 +14,22 @@
 #include "HggAux.hh"
 #include "AssortedFunctions.hh"
 
+//-------------------------
+//Observed limits
+//-------------------------
+//observe limit
 std::map<float, float> maxLimit;
 std::map<float, float, std::greater<float> > minLimit;
+//observe limitUp
+std::map<float, float> maxLimitUp;
+std::map<float, float, std::greater<float> > minLimitUp;
+//observe limitDown
+std::map<float, float> maxLimitD;
+std::map<float, float, std::greater<float> > minLimitD;
+
+//-------------------------
+//Expected limits
+//-------------------------
 
 //Expected
 std::map<float, float> maxExp;
@@ -50,8 +64,9 @@ int main( int argc, char* argv[] )
   FillCrossSectionMap( xsecFile );
 
   TFile* fout = new TFile("test_limit.root", "recreate");
-  TH2F* h2_limit = new TH2F("h2_limit", "", 15, -25, 725, 15, -25, 725);
-    
+  TH2F* h2_limit     = new TH2F("h2_limit", "", 15, -25, 725, 15, -25, 725);
+  TH2F* h2_limit_exp = new TH2F("h2_limit_exp", "", 15, -25, 725, 15, -25, 725);
+  
   std::ifstream ifs( inputList.c_str(), std::fstream::in );
   if ( ifs.is_open() )
     {
@@ -61,10 +76,15 @@ int main( int argc, char* argv[] )
 	  ifs >> fname;
 	  if ( ifs.eof() ) break;
 	  std::cout << "[INFO]: fname-> " << fname << std::endl;
+	  //nominal observed
 	  Limit myLimit;
 	  GetLimit( myLimit, fname, 5.0 );
+	  
+	  //Filling observed limit TH2F
 	  h2_limit->Fill(myLimit.msb, myLimit.mlsp, myLimit.xsecL );
-
+	  //-------------------------------------------
+	  //N o m i n a l   o b s e r v e d   l i m i t
+	  //-------------------------------------------
 	  //Find Max msb for an excluded point
 	  if ( maxLimit.find(myLimit.mlsp) == maxLimit.end() && myLimit.obs < 1.0 )
 	    {
@@ -74,7 +94,6 @@ int main( int argc, char* argv[] )
 	    {
 	      maxLimit[myLimit.mlsp] = myLimit.msb; 
 	    }
-
 	  //Find min smb for an excluded point
 	  if ( minLimit.find(myLimit.mlsp) == minLimit.end() && myLimit.obs < 1.0 )
 	    {
@@ -85,6 +104,48 @@ int main( int argc, char* argv[] )
 	      minLimit[myLimit.mlsp] = myLimit.msb; 
 	    }
 
+	  //-------------------------------------------
+	  //+1Sigma   o b s e r v e d   l i m i t
+	  //-------------------------------------------
+	  //Find Max msb for an excluded point
+	  if ( maxLimitUp.find(myLimit.mlsp) == maxLimitUp.end() && myLimit.obs < (1.0+myLimit.xsecUn) )
+	    {
+	      maxLimitUp[myLimit.mlsp] = myLimit.msb;
+	    }
+	  else if ( myLimit.obs < (1.0+myLimit.xsecUn) && myLimit.msb > maxLimitUp[myLimit.mlsp])
+	    {
+	      maxLimitUp[myLimit.mlsp] = myLimit.msb; 
+	    }
+	  //Find min smb for an excluded point
+	  if ( minLimitUp.find(myLimit.mlsp) == minLimitUp.end() && myLimit.obs < (1.0+myLimit.xsecUn) )
+	    {
+	      minLimitUp[myLimit.mlsp] = myLimit.msb;
+	    }
+	  else if ( myLimit.obs < (1.0+myLimit.xsecUn) && myLimit.msb < minLimitUp[myLimit.mlsp])
+	    {
+	      minLimitUp[myLimit.mlsp] = myLimit.msb; 
+	    }
+	  //-------------------------------------------
+	  //-1Sigma   o b s e r v e d   l i m i t
+	  //-------------------------------------------
+	  //Find Max msb for an excluded point
+	  if ( maxLimitD.find(myLimit.mlsp) == maxLimitD.end() && myLimit.obs < (1.0-myLimit.xsecUn) )
+	    {
+	      maxLimitD[myLimit.mlsp] = myLimit.msb;
+	    }
+	  else if ( myLimit.obs < (1.0-myLimit.xsecUn) && myLimit.msb > maxLimitD[myLimit.mlsp])
+	    {
+	      maxLimitD[myLimit.mlsp] = myLimit.msb; 
+	    }
+	  //Find min smb for an excluded point
+	  if ( minLimitD.find(myLimit.mlsp) == minLimitD.end() && myLimit.obs < (1.0-myLimit.xsecUn) )
+	    {
+	      minLimitD[myLimit.mlsp] = myLimit.msb;
+	    }
+	  else if ( myLimit.obs < (1.0-myLimit.xsecUn) && myLimit.msb < minLimitD[myLimit.mlsp])
+	    {
+	      minLimitD[myLimit.mlsp] = myLimit.msb; 
+	    }
 	  //---------------------------------------------------
 	  //Find Max msb for an excluded point (Expected Limit)
 	  //---------------------------------------------------
@@ -162,7 +223,13 @@ int main( int argc, char* argv[] )
   //  auto sortMapUp = [] (std::map<float,float> a, std::map<float,float> b){ } 
   for ( auto tmp : maxLimit ) std::cout << tmp.first << " " << tmp.second << std::endl;
   for ( auto tmp : minLimit ) std::cout << tmp.first << " " << tmp.second << std::endl;
-  std::cout << "---------------------" << std::endl;
+  std::cout << "-----------ObsUp----------" << std::endl;
+  for ( auto tmp : maxLimitUp ) std::cout << tmp.first << " " << tmp.second << std::endl;
+  for ( auto tmp : minLimitUp ) std::cout << tmp.first << " " << tmp.second << std::endl;
+  std::cout << "-----------ObsDown----------" << std::endl;
+  for ( auto tmp : maxLimitD ) std::cout << tmp.first << " " << tmp.second << std::endl;
+  for ( auto tmp : minLimitD ) std::cout << tmp.first << " " << tmp.second << std::endl;
+  std::cout << "-----------Exp----------" << std::endl;
   for ( auto tmp : maxExp ) std::cout << tmp.first << " " << tmp.second << std::endl;
   for ( auto tmp : minExp ) std::cout << tmp.first << " " << tmp.second << std::endl;
   std::cout << "---------------------" << std::endl;
@@ -188,8 +255,52 @@ int main( int argc, char* argv[] )
       _mlsp[ctr] = tmp.first;
       ctr++;
     }
-  TGraph* contour = new TGraph( npoints, _msb, _mlsp );
-  
+  TGraph* obs = new TGraph( npoints, _msb, _mlsp );
+  //---------------
+  //ObsUp
+  //---------------
+  const int nObsUp = maxLimitUp.size() + minLimitUp.size();
+  float _msbUp[nObsUp];
+  float _mlspUp[nObsUp];
+  ctr = 0;
+  for ( auto tmp : maxLimitUp )
+    {
+      _msbUp[ctr]  = tmp.second;
+      _mlspUp[ctr] = tmp.first;
+      ctr++;
+    }
+  for ( auto tmp : minLimitUp )
+    {
+      _msbUp[ctr]  = tmp.second;
+      _mlspUp[ctr] = tmp.first;
+      ctr++;
+    }
+  TGraph* obsUp = new TGraph( nObsUp, _msbUp, _mlspUp );
+
+  //---------------
+  //ObsD
+  //---------------
+  const int nObsD = maxLimitD.size() + minLimitD.size();
+  float _msbD[nObsD];
+  float _mlspD[nObsD];
+  ctr = 0;
+  for ( auto tmp : maxLimitD )
+    {
+      _msbD[ctr]  = tmp.second;
+      _mlspD[ctr] = tmp.first;
+      ctr++;
+    }
+  for ( auto tmp : minLimitD )
+    {
+      _msbD[ctr]  = tmp.second;
+      _mlspD[ctr] = tmp.first;
+      ctr++;
+    }
+  TGraph* obsD = new TGraph( nObsD, _msbD, _mlspD );
+
+  //----
+  //Exp
+  //----
   const int nExp = maxExp.size() + minExp.size();
   float _msbExp[nExp];
   float _mlspExp[nExp];
@@ -250,7 +361,11 @@ int main( int argc, char* argv[] )
   
   fout->cd();
   h2_limit->Write("limit");
-  contour->Write("contour");
+  //Obs
+  obs->Write("obs");
+  obsUp->Write("obsUp");
+  obsD->Write("obsD");
+  //Exp
   expL->Write("expL");
   psigma->Write("psigma");
   msigma->Write("msigma");

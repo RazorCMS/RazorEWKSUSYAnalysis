@@ -6,8 +6,7 @@
 #include "AssortedFunctions.hh"
 
 std::map<float, float> xsecMap;
-std::map<float, float> xsecMapUp;
-std::map<float, float> xsecMapDown;
+std::map<float, float> xsecMapUn;
  
 void GetLimit(Limit &limit, std::string fname, float ssFactor )
 {
@@ -33,7 +32,8 @@ void GetLimit(Limit &limit, std::string fname, float ssFactor )
   std::pair<float, float> massPair = GetMasses( fname );
   limit.msb  = massPair.first;
   limit.mlsp = massPair.second;
-  limit.xsecL = GetCrossSectionLimit( limit.obs, limit.msb);
+  limit.xsecL  = GetCrossSectionLimit( limit.obs, limit.msb);
+  limit.xsecUn = GetCrossSectionUn( limit.msb );
 };
 std::pair<float, float> GetMasses(std::string fname)
 {
@@ -60,8 +60,7 @@ void FillCrossSectionMap( std::string xsecfname )
 	  if ( mass.find("#") != std::string::npos ) continue;
 	  float _mass = atof(mass.c_str());
 	  if ( xsecMap.find(_mass) == xsecMap.end() ) xsecMap[_mass] = atof( xsec.c_str() );
-	  if ( xsecMapUp.find(_mass) == xsecMapUp.end() ) xsecMapUp[_mass] = atof( xsec.c_str() )*( 1 + atof( xsecUn.c_str() ) );
-	  if ( xsecMapDown.find(_mass) == xsecMapDown.end() ) xsecMapDown[_mass] = atof( xsec.c_str() )*( 1 - atof( xsecUn.c_str() ) );
+	  if ( xsecMapUn.find(_mass) == xsecMapUn.end() ) xsecMapUn[_mass] = atof( xsecUn.c_str() )/100.;
 	  //std::cout << "[INFO]: mass - xsec " << mass << "-" << strtof(xsec.c_str(),NULL) << std::endl;
 	  //std::cout << "[INFO]: mass - xsec " << _mass << "-" << xsecMap[_mass] << std::endl;
 	}
@@ -87,4 +86,21 @@ float GetCrossSectionLimit( float ssLimit, float msb )
     }
   
   return xsecMap[msb]*ssLimit;
+};
+
+float GetCrossSectionUn( float msb )
+{
+  if ( xsecMapUn.size() == 0 )
+    {
+      std::cerr << "[ERROR]: xsec map is empty; make sure you initialized the xsecMapUn using FillCrossSectionMap( std::string xsecfname )!" << std::endl;
+      return -1;
+    }
+  
+  if ( xsecMapUn.find(msb) == xsecMapUn.end() )
+    {
+      std::cerr << "[ERROR]: xsec uncertainty for mass " << msb <<" was not found; please check your xsec input file" << std::endl;
+      return -1;
+    }
+  
+  return xsecMapUn[msb];
 };

@@ -15,10 +15,13 @@ struct Limit
   float msb;
   float mlsp;
   float xsecL;
+  float xsecUn;
 };
 
 
 void GetLimit(Limit &limit, std::string fname, float ssFactor = 1.0 );
 std::pair<float, float> GetMasses(std::string fname);
 float GetCrossSectionLimit( float ssLimit, float msb );
+float GetCrossSectionUn( float msb );
+
 void FillCrossSectionMap( std::string xsecfname );
