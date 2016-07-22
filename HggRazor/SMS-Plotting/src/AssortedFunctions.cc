@@ -6,6 +6,8 @@
 #include "AssortedFunctions.hh"
 
 std::map<float, float> xsecMap;
+std::map<float, float> xsecMapUp;
+std::map<float, float> xsecMapDown;
  
 void GetLimit(Limit &limit, std::string fname, float ssFactor )
 {
@@ -50,14 +52,16 @@ void FillCrossSectionMap( std::string xsecfname )
   std::ifstream ifs( xsecfname.c_str(), std::fstream::in );
   if ( ifs.is_open() )
     {
-      std::string mass, xsec;
+      std::string mass, xsec, xsecUn;
       while ( ifs.good() )
 	{
-	  ifs >> mass >> xsec;
+	  ifs >> mass >> xsec >> xsecUn;
 	  if ( ifs.eof() ) break;
 	  if ( mass.find("#") != std::string::npos ) continue;
 	  float _mass = atof(mass.c_str());
-	  if ( xsecMap.find(_mass) == xsecMap.end() ) xsecMap[_mass] = atof( xsec.c_str() ); 
+	  if ( xsecMap.find(_mass) == xsecMap.end() ) xsecMap[_mass] = atof( xsec.c_str() );
+	  if ( xsecMapUp.find(_mass) == xsecMapUp.end() ) xsecMapUp[_mass] = atof( xsec.c_str() )*( 1 + atof( xsecUn.c_str() ) );
+	  if ( xsecMapDown.find(_mass) == xsecMapDown.end() ) xsecMapDown[_mass] = atof( xsec.c_str() )*( 1 - atof( xsecUn.c_str() ) );
 	  //std::cout << "[INFO]: mass - xsec " << mass << "-" << strtof(xsec.c_str(),NULL) << std::endl;
 	  //std::cout << "[INFO]: mass - xsec " << _mass << "-" << xsecMap[_mass] << std::endl;
 	}

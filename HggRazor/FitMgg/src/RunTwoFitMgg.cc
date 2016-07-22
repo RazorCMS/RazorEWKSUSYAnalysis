@@ -1117,7 +1117,7 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
 	  ofs << "process\t\t\t\t\t\t0\t\t1\n";
 	  ofs << "rate\t\t\t\t\t\t1\t\t1\n";
 	  ofs << "----------------------------------------------------------------------------------------\n";
-	  ofs << "CMS_Lumi\t\t\tlnN\t\t1.027\t\t-\n";
+	  ofs << "CMS_Lumi\t\t\tlnN\t\t1.057\t\t-\n";
 	  ofs << "Photon_Trigger_" << det << "\t\t\tlnN\t\t1.08\t\t-\n";
 	  ofs << "PdfNorm_" << det << "\t\t\t\tlnN\t\t1.06\t\t-\n";
 	  int totalSys = signal_sys.size();
@@ -1178,7 +1178,7 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
 	  ofs << "process\t\t\t\t0\t\t1\t\t2\n";
 	  ofs << "rate\t\t\t\t1\t\t1\t\t1\n";
 	  ofs << "----------------------------------------------------------------------------------------\n";
-	  ofs << "CMS_Lumi\t\tlnN\t1.027\t\t-\t\t-\n";
+	  ofs << "CMS_Lumi\t\tlnN\t1.057\t\t-\t\t-\n";
 	  ofs << "Photon_Trigger_Eff" << "\tlnN\t1.08\t\t-\t\t-\n";
 	  ofs << "PdfNorm" << "\t\t\tlnN\t1.06\t\t-\t\t-\n";
 	  int totalSys = signal_sys.size();
@@ -1789,7 +1789,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
       ofs << "process\t\t\t\t\t\t0\t\t1\t\t2\n";
       ofs << "rate\t\t\t\t\t\t1\t\t1\t\t1\n";
       ofs << "----------------------------------------------------------------------------------------\n";
-      ofs << "CMS_Lumi\t\t\tlnN\t\t1.04\t\t1.04\t\t-\n";
+      ofs << "CMS_Lumi\t\t\tlnN\t\t1.057\t\t1.057\t\t-\n";
       ofs << "Photon_Trigger\t\t\tlnN\t\t1.05\t\t1.05\t\t-\n";
       //ofs << "ScaleNorm\t\t\tlnN\t\t-\t\t0.931/1.065\t\t-\n"; //instead allow scale variations to change xsection
       ofs << "PdfNorm\t\t\t\tlnN\t\t-\t\t0.948/1.062\t\t-\n";
@@ -1888,7 +1888,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
       ofs << "process\t\t\t\t\t\t0\t\t1\n";
       ofs << "rate\t\t\t\t\t\t1\t\t1\n";
       ofs << "----------------------------------------------------------------------------------------\n";
-      ofs << "CMS_Lumi\t\t\tlnN\t\t1.04\t\t-\n";
+      ofs << "CMS_Lumi\t\t\tlnN\t\t1.057\t\t-\n";
       ofs << "Photon_Trigger\t\t\tlnN\t\t1.05\t\t-\n";
       int totalSys = smh_sys.size();
       int ctr = 0;
