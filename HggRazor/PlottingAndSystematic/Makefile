@@ -25,6 +25,7 @@ TARGET8 = GetHggRazorSMH_BkgTableVar
 #TARGETA = CalStyleRemix
 #TARGETB = CompareHggMC
 TARGET9 = CompareHggVariables
+TARGET10 = GetHggRazorSystematicsQuadratureRun1 
 
 SRC = app/PlotCustomMrRsq.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc $(Aux)/src/TChainTools.cc $(Aux)/src/PlotCosmetics.cc
 SRC2 = app/PlotFromTree.cc $(CommonTools)/src/HggTree.cc $(Selection)/src/HggRazorClass.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc $(Aux)/src/TChainTools.cc $(Aux)/src/PlotCosmetics.cc
@@ -37,6 +38,7 @@ SRC8 = app/GetHggRazorSMH_BkgTableVar.cc $(CommonTools)/src/HggRazorSystematics.
 #SRCA =src/CalStyleRemix.cc
 #SRCB =src/CompareHggMC.cc src/CalStyleRemix.cc
 SRC9 = app/CompareHggVariables.cc src/CompareHggMC.cc src/CalStyleRemix.cc
+SRC10 = app/GetHggRazorSystematicsQuadratureRun1.cc $(CommonTools)/src/HggRazorSystematics.cc $(CommonTools)/src/HggTree.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc
 
 OBJ  = $(SRC:.cc=.o)
 OBJ2 = $(SRC2:.cc=.o)
@@ -49,8 +51,9 @@ OBJ8 = $(SRC8:.cc=.o)
 #OBJA = $(SRCA:.cc=.o) 
 #OBJB = $(SRCB:.cc=.o) 
 OBJ9 = $(SRC9:.cc=.o) 
+OBJ10 = $(SRC10:.cc=.o) 
 
-all : $(TARGET) $(TARGET2) $(TARGET3) $(TARGET4) $(TARGET5) $(TARGET6) $(TARGET7) $(TARGET8) $(TARGETA) $(TARGETB) $(TARGET9)
+all : $(TARGET) $(TARGET2) $(TARGET3) $(TARGET4) $(TARGET5) $(TARGET6) $(TARGET7) $(TARGET8) $(TARGETA) $(TARGETB) $(TARGET9) $(TARGET10)
 
 #comp : $(TARGETA) $(TARGETB) $(TARGET9)
 comp : $(TARGET9)
@@ -122,9 +125,15 @@ $(TARGET9) : $(OBJ9)
 	@echo $<
 	@echo $^
 
+$(TARGET10) : $(OBJ10) 
+	$(LD) $(CPPFLAGS) -o $(TARGET10) $(OBJ10) $(LDFLAGS)
+	@echo $@
+	@echo $<
+	@echo $^
+
 %.o : %.cc
 	$(CXX) $(CPPFLAGS) -o $@ -c $<
 	@echo $@
 	@echo $<
 clean :
-	rm -f *.o app/*.o src/*.o $(Selection)/src/*.o $(CommonTools)/src/*.o $(Aux)/src/*.o $(TARGET) $(TARGET2) $(TARGET3) $(TARGET4) $(TARGET5) $(TARGET6) $(TARGET7) $(TARGET8) $(TARGET9) $(TARGETA) $(TARGETB) *~
+	rm -f *.o app/*.o src/*.o $(Selection)/src/*.o $(CommonTools)/src/*.o $(Aux)/src/*.o $(TARGET) $(TARGET2) $(TARGET3) $(TARGET4) $(TARGET5) $(TARGET6) $(TARGET7) $(TARGET8) $(TARGET9) $(TARGET10) $(TARGETA) $(TARGETB) *~

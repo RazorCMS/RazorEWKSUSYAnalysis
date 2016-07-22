@@ -1,4 +1,4 @@
-ggH	/Users/cmorgoth/Work/data/HggRazor/2015_2016/HggRazor_GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8_1pb_weighted.root
-vbfH	/Users/cmorgoth/Work/data/HggRazor/2015_2016/HggRazor_VBFHToGG_M125_13TeV_amcatnlo_pythia8_1pb_weighted.root
-vH	/Users/cmorgoth/Work/data/HggRazor/2015_2016/HggRazor_VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_1pb_weighted.root
-ttH	/Users/cmorgoth/Work/data/HggRazor/2015_2016/HggRazor_ttHJetToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8_v2_1pb_weighted.root
+ggH     /afs/cern.ch/user/z/zhicaiz/eos/cms/store/group/phys_susy/razor/Run1Analysis/RazorHgg/MC/ggH_8TeV.root
+vbfH    /afs/cern.ch/user/z/zhicaiz/eos/cms/store/group/phys_susy/razor/Run1Analysis/RazorHgg/MC/vbfH_8TeV.root
+vH      /afs/cern.ch/user/z/zhicaiz/eos/cms/store/group/phys_susy/razor/Run1Analysis/RazorHgg/MC/vH_8TeV.root
+ttH     /afs/cern.ch/user/z/zhicaiz/eos/cms/store/group/phys_susy/razor/Run1Analysis/RazorHgg/MC/ttH_8TeV.root

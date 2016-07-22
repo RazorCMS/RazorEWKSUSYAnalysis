@@ -63,8 +63,8 @@ HggRazorSystematics::~HggRazorSystematics()
   if ( this->h2p_facRenScaleDown != NULL ) delete h2p_facRenScaleDown;
   
   if ( this->NEvents != NULL ) delete NEvents;
-  if ( this->SumScaleWeights != NULL ) delete SumScaleWeights;
-  if ( this->SumPdfWeights != NULL ) delete SumPdfWeights;
+ // if ( this->SumScaleWeights != NULL ) delete SumScaleWeights;
+ // if ( this->SumPdfWeights != NULL ) delete SumPdfWeights;
   
   if ( _debug ) std::cout << "[DEBUG]: Finishing Destructor" << std::endl;
 };
@@ -106,7 +106,7 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
       for( int i = 0; i < n_PdfSys; i++ )
 	{
 	  TString PdfSysName = Form(this->processName+"_PdfEigenVect_%d",i);
-	  h2p_Pdf[i] = new TH2Poly( PdfSysName, "", 150, 10000, 0, 1);
+	 // h2p_Pdf[i] = new TH2Poly( PdfSysName, "", 150, 10000, 0, 1);
 	}
       //btag
       h2p_btagUp   = new TH2Poly(this->processName+"_btagUp", "", 150, 10000, 0, 1);
@@ -131,7 +131,7 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
 	      h2p_facRenScaleDown->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
 	      h2p_JesUp->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
 	      h2p_JesDown->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
-	      for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ ) h2p_Pdf[ipdf]->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
+//	      for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ ) h2p_Pdf[ipdf]->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
 	      h2p_btagUp->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
 	      h2p_btagDown->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
 	      h2p_misstagUp->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
@@ -170,7 +170,7 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
       for( int i = 0; i < n_PdfSys; i++ )
 	{
 	  TString PdfSysName = Form(this->processName+"_PdfEigenVect_%d",i);
-	  h2p_Pdf[i] = new TH2Poly( PdfSysName, "", 150, 10000, 0, 1);
+	  //h2p_Pdf[i] = new TH2Poly( PdfSysName, "", 150, 10000, 0, 1);
 	}
       
       h2p_btagUp           = new TH2Poly(this->processName+"_btagUp", "", 150, 10000, 0, 1);
@@ -198,7 +198,7 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
 	  h2p_JesUp->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
 	  h2p_JesDown->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
 	  
-	  for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ ) h2p_Pdf[ipdf]->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
+//	  for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ ) h2p_Pdf[ipdf]->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
 
 	  h2p_btagUp->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
 	  h2p_btagDown->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
@@ -244,18 +244,21 @@ void HggRazorSystematics::Loop()
   float N_events;
   //factorization/renormalization 
   const int n_facScaleSys = 6;
-  float N_facScale[n_facScaleSys];
+  float N_facScale[n_facScaleSys] ={1.0};
   //PDF
-  float N_Pdf[n_PdfSys];
+  float N_Pdf[n_PdfSys] = {0.0};
 
   N_events = this->NEvents->GetBinContent(1);
+
+  /*
   for ( int i = 0; i < n_facScaleSys; i++ ) {
     N_facScale[i] = this->SumScaleWeights->GetBinContent( i+1 );
   }
   for ( int i = 0; i < n_PdfSys; i++ ) N_Pdf[i] = this->SumPdfWeights->GetBinContent( i+1 );
     
   if ( _debug ) std::cout << "[DEBUG]: Passed N_events, N_facScale, N_PDF" << std::endl;
-  
+  */
+
   //--------------------------------
   //Photon Trigger Efficiency
   //--------------------------------
@@ -377,17 +380,18 @@ void HggRazorSystematics::Loop()
 	h2p_facRenScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facRenScaleUp );
 	h2p_facRenScaleDown->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facRenScaleDown );
       }
-	
+
+/*	
       for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
 	{
 	  //protect against missing pdf vector
-	  if (ipdf < sf_pdf->size() && fabs(N_Pdf[ipdf]) > 0 ) {
-	    h2p_Pdf[ipdf]->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_pdf->at(ipdf)*N_events/N_Pdf[ipdf] );
-	  } else {
+	  //if (ipdf < sf_pdf->size() && fabs(N_Pdf[ipdf]) > 0 ) {
+	  //  h2p_Pdf[ipdf]->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_pdf->at(ipdf)*N_events/N_Pdf[ipdf] );
+	 // } else {
 	    h2p_Pdf[ipdf]->Fill( MR, fmin(t1Rsq,0.999), commonW );
-	  }
+	 // }
 	}
-    
+  */  
     } //loop over events
     
  
@@ -536,7 +540,7 @@ bool HggRazorSystematics::WriteOutput( TString outName )
   for ( int ipdf = 0; ipdf < n_PdfSys; ipdf++ )
     {
       TString PdfTH2PName = Form("histo_PdfEigenVector%d", ipdf );
-      if ( h2p_Pdf[ipdf] != NULL ) h2p_Pdf[ipdf]->Write( this->boxName + "_"  + PdfTH2PName );
+     // if ( h2p_Pdf[ipdf] != NULL ) h2p_Pdf[ipdf]->Write( this->boxName + "_"  + PdfTH2PName );
     }
   if ( h2p_JesUp != NULL ) h2p_btagUp->Write( this->boxName + "_histo_btagUp" );
   if ( h2p_JesDown != NULL ) h2p_btagDown->Write( this->boxName + "_histo_btagDown" );
