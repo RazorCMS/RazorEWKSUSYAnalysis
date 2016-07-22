@@ -1,13 +1,14 @@
 
 
-void MakeSignificancePlot( int option = 1) {
+void MakeSignificancePlot( int option = 0) {
 
-  int NBins = 20;
+  int NBins = 15;
+  if (option == 1) NBins = 20;
+
   Double_t x[NBins];  
   Double_t y[NBins];
   x[0] = -0.5;
   for (int i=1; i<NBins; ++i)  x[i] = i-1;
-
 
   if (option == 0) {
     //use significance computed from log likelihood
@@ -30,12 +31,7 @@ void MakeSignificancePlot( int option = 1) {
     y[12] = 0.8;
     y[13] = 1.7;
     y[14] = 0.7;
-    //low res category
-    y[15] = 0.0;
-    y[16] = 1.1;
-    y[17] = 0.8;
-    y[18] = 0.8;
-    y[19] = 0.7;
+
   } else if (option == 1) {
     //use fitted signal yield / uncertainty
     
@@ -68,7 +64,7 @@ void MakeSignificancePlot( int option = 1) {
 
   TCanvas *cv = new TCanvas("cv","cv",800,600);
   TH1F *hist = 0;
-  if (option == 0) hist = new TH1F("hist",";Bin Number; Observed Significance;", 19, -0.5, 18.5);
+  if (option == 0) hist = new TH1F("hist",";Bin Number; Observed Significance;", 14, -0.5, 13.5);
   else if (option == 1) hist = new TH1F("hist",";Bin Number; Fitted Signal Yield / Uncertainty;", 19, -0.5, 18.5);
   // else if (option == 1) hist = new TH1F("hist",";Bin Number; Fitted N_{signal} / #sigma_{N_{signal}};", 19, -0.5, 18.5);
   
@@ -99,17 +95,27 @@ void MakeSignificancePlot( int option = 1) {
   // gr->GetYaxis()->SetTitleOffset(0.8);
   // gr->GetYaxis()->SetRangeUser(-7,5);
 
-  TBox *TwoSigmaBand = new TBox(-0.48, -2, 18.5, 2);
+  TBox *TwoSigmaBand = 0;
+  TBox *OneSigmaBand = 0;
+  TLine *l = 0;
+
+  if (option == 0) {
+    TwoSigmaBand = new TBox(-0.48, -2, 13.5, 2);
+    OneSigmaBand = new TBox(-0.48, -1, 13.5, 1);
+    l = new TLine(-0.48,0,13.5,0);
+  } else if (option == 1) {
+    TwoSigmaBand = new TBox(-0.48, -2, 18.5, 2);
+    OneSigmaBand = new TBox(-0.48, -1, 18.5, 1);
+    l = new TLine(-0.48,0,18.5,0);
+  }
+
   TwoSigmaBand->SetFillColor(kGreen);
   //box->SetFillStyle(3001);
-  TwoSigmaBand->Draw("same");
-
-  TBox *OneSigmaBand = new TBox(-0.48, -1, 18.5, 1);
+  TwoSigmaBand->Draw("same");   
   OneSigmaBand->SetFillColor(kYellow);
   //box->SetFillStyle(3001);
   OneSigmaBand->Draw("same");
-
-  TLine *l = new TLine(-0.48,0,18.5,0);
+  
   l->SetLineWidth(2);
   l->SetLineColor(kBlue);
   l->Draw();
@@ -148,11 +154,13 @@ void MakeSignificancePlot( int option = 1) {
   l2->SetLineColor(kBlack);
   l2->Draw();
 
-   TLine *l3 = new TLine(13.5,-7,13.5,5);
-  l3->SetLineWidth(2);
-  l3->SetLineStyle(2);
-  l3->SetLineColor(kBlack);
-  l3->Draw();
+  if (option == 1) {
+    TLine *l3 = new TLine(13.5,-7,13.5,5);
+    l3->SetLineWidth(2);
+    l3->SetLineStyle(2);
+    l3->SetLineColor(kBlack);
+    l3->Draw();
+  }
 
   TLatex *HighPtLabel = new TLatex();
   HighPtLabel->SetNDC();
@@ -169,29 +177,41 @@ void MakeSignificancePlot( int option = 1) {
   HbbLabel->SetTextSize(0.035);
   HbbLabel->SetTextFont(42);
   HbbLabel->SetTextColor(kBlack);
-  HbbLabel->DrawLatex(0.465,0.13,"#bf{HZbb Category}");
+  if (option == 0) HbbLabel->DrawLatex(0.59,0.13,"#bf{HZbb Category}");
+  else if (option ==1) HbbLabel->DrawLatex(0.465,0.13,"#bf{HZbb Category}");
   HbbLabel->Draw();
 
-
-   TLatex *HighResLabel = new TLatex();
-  HighResLabel->SetNDC();
-  HighResLabel->SetTextAngle(90);
-  HighResLabel->SetTextSize(0.035);
-  HighResLabel->SetTextFont(42);
-  HighResLabel->SetTextColor(kBlack);
-  HighResLabel->DrawLatex(0.60,0.13,"#bf{HighRes Category}");
-  HighResLabel->Draw();
-
-   TLatex *LowResLabel = new TLatex();
-  LowResLabel->SetNDC();
-  LowResLabel->SetTextAngle(90);
-  LowResLabel->SetTextSize(0.035);
-  LowResLabel->SetTextFont(42);
-  LowResLabel->SetTextColor(kBlack);
-  LowResLabel->DrawLatex(0.80,0.13,"#bf{LowRes Category}");
-  LowResLabel->Draw();
-
- 
+  if (option == 0) {
+    TLatex *HighResLowResLabel = new TLatex();
+    HighResLowResLabel->SetNDC();
+    HighResLowResLabel->SetTextAngle(90);
+    HighResLowResLabel->SetTextSize(0.035);
+    HighResLowResLabel->SetTextFont(42);
+    HighResLowResLabel->SetTextColor(kBlack);
+    HighResLowResLabel->DrawLatex(0.750,0.13,"#bf{HighRes/LowRes}");
+    HighResLowResLabel->DrawLatex(0.780,0.20,"#bf{Category}");
+    HighResLowResLabel->Draw();
+  
+  } else if (option == 1) {
+    TLatex *HighResLabel = new TLatex();
+    HighResLabel->SetNDC();
+    HighResLabel->SetTextAngle(90);
+    HighResLabel->SetTextSize(0.035);
+    HighResLabel->SetTextFont(42);
+    HighResLabel->SetTextColor(kBlack);
+    HighResLabel->DrawLatex(0.60,0.13,"#bf{HighRes Category}");
+    HighResLabel->Draw();
+    
+    TLatex *LowResLabel = new TLatex();
+    LowResLabel->SetNDC();
+    LowResLabel->SetTextAngle(90);
+    LowResLabel->SetTextSize(0.035);
+    LowResLabel->SetTextFont(42);
+    LowResLabel->SetTextColor(kBlack);
+    LowResLabel->DrawLatex(0.80,0.13,"#bf{LowRes Category}");
+    LowResLabel->Draw();
+  }
+    
 
   cv->SaveAs("SignificanceVsBin.png");
   cv->SaveAs("SignificanceVsBin.pdf");
