@@ -67,7 +67,8 @@ int main( int argc, char* argv[] )
   std::map<std::string, Bin> myMap2;
   
   std::vector<Bin> binVector;
-  std::ifstream input( "data/HggRazor2016Binning.txt", std::fstream::in );
+  //std::ifstream input( "data/HggRazor2016Binning.txt", std::fstream::in );
+  std::ifstream input( "data/HggRazor2016Binning_ICHEP.txt", std::fstream::in );
   if ( input.is_open() )
     {
       float x1, x2, y1, y2;
