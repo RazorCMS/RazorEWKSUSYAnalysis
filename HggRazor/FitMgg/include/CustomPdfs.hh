@@ -163,6 +163,44 @@ private:
   ClassDef(RooIntepolateDSCB_W0p014_Spin0_EBEB,1)
 };
 
+//----------------------------
+//2016 interpolation EBEB
+//----------------------------
+class RooIntepolateDSCB_W0p014_Spin0_EBEB_2016 : public RooAbsPdf {
+public:
+  RooIntepolateDSCB_W0p014_Spin0_EBEB_2016();
+  RooIntepolateDSCB_W0p014_Spin0_EBEB_2016(const char *name, const char *title,
+			 RooAbsReal& _x,
+			 RooAbsReal& _mass
+			 );
+  RooIntepolateDSCB_W0p014_Spin0_EBEB_2016(const RooIntepolateDSCB_W0p014_Spin0_EBEB_2016& other, const char* name=0) ;
+  virtual TObject* clone(const char* newname) const { return new RooIntepolateDSCB_W0p014_Spin0_EBEB_2016(*this,newname); }
+  inline virtual ~RooIntepolateDSCB_W0p014_Spin0_EBEB_2016() { }
+  Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName=0) const ;
+  Double_t analyticalIntegral(Int_t code, const char* rangeName=0) const ;
+  Double_t getMean( Double_t m ) const;
+  Double_t getSigma( Double_t m ) const;
+  Double_t getN1( Double_t m) const;
+  Double_t getAlpha1( Double_t m ) const;
+  Double_t getN2( Double_t m ) const;
+  Double_t getAlpha2( Double_t m ) const;
+  
+  
+protected:
+
+  RooRealProxy x ;
+  RooRealProxy mass;
+  
+  Double_t evaluate() const ;
+  
+private:
+
+  ClassDef(RooIntepolateDSCB_W0p014_Spin0_EBEB_2016,1)
+};
+
+//-------------------------------------
+//2015 interpolation EBEE
+//-------------------------------------
 //RooIntepolateDSCB_W0p014_Spin0_EBEE
 class RooIntepolateDSCB_W0p014_Spin0_EBEE : public RooAbsPdf {
 public:
@@ -195,6 +233,42 @@ private:
 
   ClassDef(RooIntepolateDSCB_W0p014_Spin0_EBEE,1)
 };
+
+//-------------------------------------
+//2016 interpolation EBEE
+//-------------------------------------
+class RooIntepolateDSCB_W0p014_Spin0_EBEE_2016 : public RooAbsPdf {
+public:
+  RooIntepolateDSCB_W0p014_Spin0_EBEE_2016();
+  RooIntepolateDSCB_W0p014_Spin0_EBEE_2016(const char *name, const char *title,
+			 RooAbsReal& _x,
+			 RooAbsReal& _mass
+			 );
+  RooIntepolateDSCB_W0p014_Spin0_EBEE_2016(const RooIntepolateDSCB_W0p014_Spin0_EBEE_2016& other, const char* name=0) ;
+  virtual TObject* clone(const char* newname) const { return new RooIntepolateDSCB_W0p014_Spin0_EBEE_2016(*this,newname); }
+  inline virtual ~RooIntepolateDSCB_W0p014_Spin0_EBEE_2016() { }
+  Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName=0) const ;
+  Double_t analyticalIntegral(Int_t code, const char* rangeName=0) const ;
+  Double_t getMean( Double_t m ) const;
+  Double_t getSigma( Double_t m ) const;
+  Double_t getN1( Double_t m) const;
+  Double_t getAlpha1( Double_t m ) const;
+  Double_t getN2( Double_t m ) const;
+  Double_t getAlpha2( Double_t m ) const;
+  
+  
+protected:
+
+  RooRealProxy x ;
+  RooRealProxy mass;
+  
+  Double_t evaluate() const ;
+  
+private:
+
+  ClassDef(RooIntepolateDSCB_W0p014_Spin0_EBEE_2016,1)
+};
+
 //-------------------------------------
 
 class RooFermi : public RooAbsPdf {

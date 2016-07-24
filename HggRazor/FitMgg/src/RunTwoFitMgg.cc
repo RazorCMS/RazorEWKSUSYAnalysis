@@ -130,6 +130,9 @@ RooWorkspace* DoubleCBFit( TTree* tree, TString mggName, float muCB, float sigma
   RooDataSet data( "data", "", RooArgSet(mgg), RooFit::Import( *tree ) );
   int npoints = data.numEntries();
 
+  std::cout << "===========================================" << std::endl;
+  std::cout << "==============Nentries: " << npoints << "=============" << std::endl;
+  std::cout << "===========================================" << std::endl;
   //---------------------------------
   //C r e a t e  Double Crystall Ball
   //---------------------------------
@@ -165,7 +168,7 @@ RooWorkspace* DoubleCBFit( TTree* tree, TString mggName, float muCB, float sigma
     {
       mgg.setRange( "signal", muCB-50*sigmaCB, muCB+50*sigmaCB );
       frame = mgg.frame( muCB-50*sigmaCB, muCB+50*sigmaCB, 100 );
-      ws->var( tag + "_muCB")->setVal( muCB );
+      ws->var( tag + "_muCB")->setVal( 0.99*muCB );
       ws->var( tag + "_sigmaCB")->setVal( sigmaCB );
       ws->var( tag + "_alpha1")->setVal( 1.1 );
       ws->var( tag + "_alpha2")->setVal( 2.0 );
@@ -209,7 +212,7 @@ RooWorkspace* DoubleCBFit( TTree* tree, TString mggName, float muCB, float sigma
   frame->SetName( "SignalFitPlot" );
   ws->import( *frame );
 
-  TString tag2 = MakeDoubleCBInterpolateNE( "SignalInterpol", mgg, *ws );
+  //TString tag2 = MakeDoubleCBInterpolateNE( "SignalInterpol", mgg, *ws );
   
   return ws;
 };
@@ -842,7 +845,7 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
   return ws;
 }
 
-void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std::string Signal_CF, float mass, TString binNumber, TString category )
+void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std::string Signal_CF, float mass, TString binNumber, TString category, TString year )
 {
   std::cout << "entering datacard: " << Signal_Yield << std::endl;
   std::stringstream ss_signal;
@@ -868,13 +871,13 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
   TFile* ftmp = new TFile( combinedRootFileName, "recreate");
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
 
-  bool isEBEB = false;
+  bool isEBEB = true;
   
   if ( isEBEB ) mggName = "mGammaGamma_EBEB";
   else mggName = "mGammaGamma_EBEE";
 
-  //RooRealVar mgg( mggName, "m_{#gamma#gamma}", 230, 6000, "GeV" );//EBEBE
-  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 330, 6000, "GeV" );//EBEE
+  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 230, 6000, "GeV" );//EBEBE
+  //RooRealVar mgg( mggName, "m_{#gamma#gamma}", 330, 6000, "GeV" );//EBEE
 
   //RooRealVar mgg( mggName, "m_{#gamma#gamma}", 230, 10000, "GeV" );//EBEBE
   //RooRealVar mgg( mggName, "m_{#gamma#gamma}", 330, 10000, "GeV" );//EBEE
@@ -889,7 +892,8 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
     {
       //mgg.setBins(39080);//230-6000
       //mgg.setRange( "full", 230., 10000. );//EBEB
-      mgg.setBins(23080);//230-6000
+      //mgg.setBins(23080);//230-6000
+      mgg.setBins(288);
       mgg.setRange( "full", 230., 6000. );//EBEB
     }
   else
@@ -964,11 +968,23 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
       float _mass = 500. + (float)2*i;
       if ( isEBEB )
 	{
-	  Signal_Yield = SignaYieldOriginal*( 2.44392e-01+(3.40500e-04)*_mass-(1.42193e-07)*pow(_mass,2)+(3.08615e-11)*pow(_mass,3)-(2.75671e-15)*pow(_mass,4) );
+	  if ( year == "2015" ) Signal_Yield = SignaYieldOriginal*( 2.44392e-01+(3.40500e-04)*_mass-(1.42193e-07)*pow(_mass,2)+(3.08615e-11)*pow(_mass,3)-(2.75671e-15)*pow(_mass,4) );
+	  else if ( year == "2016" ) Signal_Yield = SignaYieldOriginal*( 2.44392e-01+(3.40500e-04)*_mass-(1.42193e-07)*pow(_mass,2)+(3.08615e-11)*pow(_mass,3)-(2.75671e-15)*pow(_mass,4) );
+	  else 
+	    {
+	      std::cerr <<  "year: " << year << "not defined, could not find eff*acc; TERMINATING!!" << std::endl;
+	      exit (EXIT_FAILURE);
+	    }
 	}
       else
 	{
-	  Signal_Yield = SignaYieldOriginal*( 1.61828e-01+(6.99351e-05)*_mass-(9.55028e-08)*pow(_mass,2)+(2.92184e-11)*pow(_mass,3)-(2.82880e-15)*pow(_mass,4) );
+	  if ( year == "2015" ) Signal_Yield = SignaYieldOriginal*( 1.61828e-01+(6.99351e-05)*_mass-(9.55028e-08)*pow(_mass,2)+(2.92184e-11)*pow(_mass,3)-(2.82880e-15)*pow(_mass,4) );
+	  else if ( year == "2016" ) Signal_Yield = SignaYieldOriginal*( 1.61828e-01+(6.99351e-05)*_mass-(9.55028e-08)*pow(_mass,2)+(2.92184e-11)*pow(_mass,3)-(2.82880e-15)*pow(_mass,4) );
+	  else 
+	    {
+	      std::cerr <<  "year: " << year << "not defined, could not find eff*acc; TERMINATING!!" << std::endl;
+	      exit (EXIT_FAILURE);
+	    }
 	}
       
       TString combineRootFile;
@@ -987,11 +1003,23 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
 	{
 	  if ( isEBEB )
 	    {
-	      tagSignalInterpol = MakeDoubleCBInterpolateNE( Form("SignalInterpol_EBEB_m%.0f", _mass) , mgg, *combine_ws, "EBEB" );
+	      if ( year == "2015" ) tagSignalInterpol = MakeDoubleCBInterpolateNE( Form("SignalInterpol_EBEB_m%.0f", _mass) , mgg, *combine_ws, "EBEB" );
+	      else if ( year == "2016" ) tagSignalInterpol = MakeDoubleCBInterpolateNE2016( Form("SignalInterpol_EBEB_m%.0f", _mass) , mgg, *combine_ws, "EBEB" );
+	      else 
+		{
+		  std::cerr <<  "year: " << year << "not defined, could not find appropiate signal mode; TERMINATING!!" << std::endl;
+		  exit (EXIT_FAILURE);
+		}
 	    }
 	  else
 	    {
-	      tagSignalInterpol = MakeDoubleCBInterpolateNE( Form("SignalInterpol_EBEE_m%.0f", _mass) , mgg, *combine_ws, "EBEE" );
+	      if ( year == "2015" ) tagSignalInterpol = MakeDoubleCBInterpolateNE( Form("SignalInterpol_EBEE_m%.0f", _mass) , mgg, *combine_ws, "EBEE" );
+	      else if ( year == "2016" ) tagSignalInterpol = MakeDoubleCBInterpolateNE2016( Form("SignalInterpol_EBEE_m%.0f", _mass) , mgg, *combine_ws, "EBEE" );
+	      else 
+		{
+		  std::cerr <<  "year: " << year << "not defined, could not find appropiate signal mode; TERMINATING!!" << std::endl;
+		  exit (EXIT_FAILURE);
+		}
 	    }
 	  combine_ws->var( tagSignalInterpol+"_mass" )->setVal( _mass );
 	  combine_ws->var( tagSignalInterpol+"_mass" )->setConstant(kTRUE);
@@ -1014,23 +1042,61 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
       double fwhm;
       if ( isEBEB )
 	{
-	  RooIntepolateDSCB_W0p014_Spin0_EBEB* myCB = new RooIntepolateDSCB_W0p014_Spin0_EBEB( "dummy" , "", mgg, *mymass );
-	  TF1* myTF1  = myCB->asTF( RooArgList(mgg), RooArgList( *mymass ) );
-	  double maxY = myTF1->GetMaximum();
-	  double maxX = myTF1->GetMaximumX();
-	  double _low = myTF1->GetX( 0.5*maxY , 0, maxX );
-	  double _high = myTF1->GetX( 0.5*maxY , maxX, 6000 );
-	  fwhm = _high - _low;
+	  if ( year == "2015" ) 
+	    {
+	      RooIntepolateDSCB_W0p014_Spin0_EBEB* myCB = new RooIntepolateDSCB_W0p014_Spin0_EBEB( "dummy" , "", mgg, *mymass );
+	      TF1* myTF1  = myCB->asTF( RooArgList(mgg), RooArgList( *mymass ) );
+	      double maxY = myTF1->GetMaximum();
+	      double maxX = myTF1->GetMaximumX();
+	      double _low = myTF1->GetX( 0.5*maxY , 0, maxX );
+	      double _high = myTF1->GetX( 0.5*maxY , maxX, 6000 );
+	      fwhm = _high - _low;
+	    }
+	  else if ( year == "2016" )
+	    {
+	      RooIntepolateDSCB_W0p014_Spin0_EBEB_2016* myCB2 = new RooIntepolateDSCB_W0p014_Spin0_EBEB_2016( "dummy" , "", mgg, *mymass );
+	      TF1* myTF1  = myCB2->asTF( RooArgList(mgg), RooArgList( *mymass ) );
+	      double maxY = myTF1->GetMaximum();
+	      double maxX = myTF1->GetMaximumX();
+	      double _low = myTF1->GetX( 0.5*maxY , 0, maxX );
+	      double _high = myTF1->GetX( 0.5*maxY , maxX, 6000 );
+	      fwhm = _high - _low;
+	    }
+	  else 
+	    {
+	      std::cerr <<  "year: " << year << "not defined, could not find appropiate signal mode; TERMINATING!!" << std::endl;
+	      exit (EXIT_FAILURE);
+	    }
+	  
 	}
       else
 	{
-	  RooIntepolateDSCB_W0p014_Spin0_EBEE* myCB = new RooIntepolateDSCB_W0p014_Spin0_EBEE( "dummy" , "", mgg, *mymass );
-	  TF1* myTF1  = myCB->asTF( RooArgList(mgg), RooArgList( *mymass ) );
-	  double maxY = myTF1->GetMaximum();
-	  double maxX = myTF1->GetMaximumX();
-	  double _low = myTF1->GetX( 0.5*maxY , 0, maxX );
-	  double _high = myTF1->GetX( 0.5*maxY , maxX, 6000 );
-	  fwhm = _high - _low;
+	  if ( year == "2015" )
+	    {
+	      RooIntepolateDSCB_W0p014_Spin0_EBEE* myCB3 = new RooIntepolateDSCB_W0p014_Spin0_EBEE( "dummy" , "", mgg, *mymass );
+	      TF1* myTF1  = myCB3->asTF( RooArgList(mgg), RooArgList( *mymass ) );
+	      double maxY = myTF1->GetMaximum();
+	      double maxX = myTF1->GetMaximumX();
+	      double _low = myTF1->GetX( 0.5*maxY , 0, maxX );
+	      double _high = myTF1->GetX( 0.5*maxY , maxX, 6000 );
+	      fwhm = _high - _low;
+	    }
+	  else if ( year == "2016" )
+	    {
+	      RooIntepolateDSCB_W0p014_Spin0_EBEE_2016* myCB4 = new RooIntepolateDSCB_W0p014_Spin0_EBEE_2016( "dummy" , "", mgg, *mymass );
+	      TF1* myTF1  = myCB4->asTF( RooArgList(mgg), RooArgList( *mymass ) );
+	      double maxY = myTF1->GetMaximum();
+	      double maxX = myTF1->GetMaximumX();
+	      double _low = myTF1->GetX( 0.5*maxY , 0, maxX );
+	      double _high = myTF1->GetX( 0.5*maxY , maxX, 6000 );
+	      fwhm = _high - _low;
+	    }
+	  else 
+	    {
+	      std::cerr <<  "year: " << year << "not defined, could not find appropiate signal mode; TERMINATING!!" << std::endl;
+	      exit (EXIT_FAILURE);
+	    }
+	 
 	}
 
       std::cout << "----> " << _mass << " " << fwhm << std::endl;
@@ -1128,13 +1194,23 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
 	  double biasYield;
 	  if ( isEBEB )
 	    {
-	      //biasYield = ( 0.06*pow( _mass/600. , -4.0 ) + 1e-6)*fwhm*SignaYieldOriginal/3.0;//2015
-	      biasYield = pow( _mass, 2.2-0.4*TMath::Log(_mass) )*fwhm*SignaYieldOriginal/10.;//2016
+	      if ( year == "2015" ) biasYield = ( 0.06*pow( _mass/600. , -4.0 ) + 1e-6)*fwhm*SignaYieldOriginal/3.0;//2015
+	      else if ( year == "2016" ) biasYield = pow( _mass, 2.2-0.4*TMath::Log(_mass) )*fwhm*SignaYieldOriginal/10.;//2016
+	      else
+		{
+		  std::cerr <<  "year: " << year << "not defined, could not find BIAS TERM; TERMINATING!!" << std::endl;
+		  exit (EXIT_FAILURE);
+		}
 	    }
 	  else
 	    {
-	      //biasYield = 0.1*pow( _mass/600. , -5.0 )*fwhm*SignaYieldOriginal/3.0;//2015
-	      biasYield = ( 0.10*pow(_mass/600.,-5.0 ) + 2e-5 )*fwhm*SignaYieldOriginal/10.;//2016
+	      if ( year == "2015" ) biasYield = 0.1*pow( _mass/600. , -5.0 )*fwhm*SignaYieldOriginal/3.0;//2015
+	      else if ( year == "2016" ) biasYield = ( 0.10*pow(_mass/600.,-5.0 ) + 2e-5 )*fwhm*SignaYieldOriginal/10.;//2016
+	      else
+		{
+		  std::cerr <<  "year: " << year << "not defined, could not find BIAS TERM; TERMINATING!!" << std::endl;
+		  exit (EXIT_FAILURE);
+		}
 	    }
 	  std::cout << "----------" << Signal_Yield << " " << " " << biasYield << " " << fwhm <<  std::endl;
 
@@ -1184,7 +1260,7 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
 	  int totalSys = signal_sys.size();
 	  ofs << "mu_Global_" << det << "\t\tparam\t\t 0 " <<  _mass*0.01 <<  "\n";
 	  ofs << "theta_" << det << "\t\tparam\t\t 0 1\n";
-	  ofs << "SignalNbias_" << det <<"\trateParam bin0 biasSignal (@0*" << biasYield <<") theta_" << det << "\n";
+	  ofs << "SignalNbias_" << det <<"\trateParam bin biasSignal (@0*" << biasYield <<") theta_" << det << "\n";
 	}
       ofs.close();
       //ws->Write();

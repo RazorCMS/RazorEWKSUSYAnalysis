@@ -336,7 +336,9 @@ TString MakeDoubleCBNE( TString tag, RooRealVar& mgg, RooWorkspace& w, bool _glo
   return pdf_name;
 };
 
-
+//----------------
+//
+//-----------------
 TString MakeDoubleCBInterpolate( TString tag, RooRealVar& mgg, RooWorkspace& w )
 {
    //------------------------------
@@ -363,6 +365,10 @@ TString MakeDoubleCBInterpolate( TString tag, RooRealVar& mgg, RooWorkspace& w )
   return ex_pdf_name;
 };
 
+
+//-------------------------
+//2015 Interpolation
+//-------------------------
 TString MakeDoubleCBInterpolateNE( TString tag, RooRealVar& mgg, RooWorkspace& w, TString category )
 {
   RooRealVar* mass     = new RooRealVar( tag + "_DCBI_mass", "#mass_{CB}", 750, "" );
@@ -392,6 +398,40 @@ TString MakeDoubleCBInterpolateNE( TString tag, RooRealVar& mgg, RooWorkspace& w
   exit (EXIT_FAILURE);
   return "";
 };
+
+//-------------------------
+//2016 Interpolation
+//-------------------------
+TString MakeDoubleCBInterpolateNE2016( TString tag, RooRealVar& mgg, RooWorkspace& w, TString category )
+{
+  RooRealVar* mass     = new RooRealVar( tag + "_DCBI_mass", "#mass_{CB}", 750, "" );
+  mass->setConstant(kFALSE);
+  
+  TString pdf_name = tag + "_DCBI";
+  
+  if ( category == "EBEB" )
+    {
+      RooRealVar* muGlobal = new RooRealVar( "mu_Global_EBEB", "#mu_{g}", 0, "" );
+      RooFormulaVar* mggp  = new RooFormulaVar( tag + "_DG_muG", "m_{gg} - #mu_{g}", "(@0-@1)", RooArgList(mgg, *muGlobal) );
+      RooIntepolateDSCB_W0p014_Spin0_EBEB_2016* dCB = new RooIntepolateDSCB_W0p014_Spin0_EBEB_2016( pdf_name , "", *mggp, *mass );
+      w.import( *dCB );
+      return pdf_name;
+    }
+  else if ( category == "EBEE" )
+    {
+      RooRealVar* muGlobal = new RooRealVar( "mu_Global_EBEE", "#mu_{g}", 0, "" );
+      RooFormulaVar* mggp  = new RooFormulaVar( tag + "_DG_muG", "m_{gg} - #mu_{g}", "(@0-@1)", RooArgList(mgg, *muGlobal) );
+      RooIntepolateDSCB_W0p014_Spin0_EBEE_2016* dCB = new RooIntepolateDSCB_W0p014_Spin0_EBEE_2016( pdf_name , "", *mggp, *mass );
+      w.import( *dCB );
+      
+      return pdf_name;
+    }
+  
+  std::cerr << "category: " <<  category << " NOT DEFINED for HM Analysis, terminating" << std::endl;
+  exit (EXIT_FAILURE);
+  return "";
+};
+
 
 TString MakeDoubleExp(TString tag, RooRealVar& mgg, RooWorkspace& w)
 {

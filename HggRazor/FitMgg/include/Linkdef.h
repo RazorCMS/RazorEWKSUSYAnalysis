@@ -19,6 +19,8 @@
 #pragma link C++ class RooDoubleCBInterpolate+;
 #pragma link C++ class RooIntepolateDSCB_W0p014_Spin0_EBEB+;
 #pragma link C++ class RooIntepolateDSCB_W0p014_Spin0_EBEE+;
+#pragma link C++ class RooIntepolateDSCB_W0p014_Spin0_EBEB_2016+;
+#pragma link C++ class RooIntepolateDSCB_W0p014_Spin0_EBEE_2016+;
 
 #endif
 
