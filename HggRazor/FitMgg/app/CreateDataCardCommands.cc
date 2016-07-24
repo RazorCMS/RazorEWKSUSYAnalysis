@@ -191,31 +191,39 @@ int main( int argc, char* argv[] )
       }
 
       if ( category.find("#") != std::string::npos ) continue;
-      std::string tmp1;
-      float ftmp1;
+      
+      //-------------------------------
+      //Getting all systematics for SMH
+      //-------------------------------
+      std::string SMH_SYS;
+      float SMH_SYS_F;
       // the next 68 items are the systematics on SM Higgs (put in quotes, separated by spaces)
       for ( int i = 0; i < 68; i++ )
 	{
-	  ifs >> tmp1;
-	  if ( tmp1 == "nan" || tmp1 == "-nan" || tmp1 == "inf"  || tmp1 == "-inf" ) ftmp1 = 0;
-	  else ftmp1=atof(tmp1.c_str());
+	  ifs >> SMH_SYS;
+	  if ( SMH_SYS == "nan" || SMH_SYS == "-nan" || SMH_SYS == "inf"  || SMH_SYS == "-inf" ) SMH_SYS_F = 0;
+	  else SMH_SYS_F = atof( SMH_SYS.c_str() );
 	  
-	  smh_sys.push_back(ftmp1);
+	  smh_sys.push_back( SMH_SYS_F );
 	}
+      //--------------------------------------------
+      //Getting all yield and systematics for SIGNAL
+      //--------------------------------------------
+      std::string SIGNAL_SYS;
+      float SIGNAL_SYS_F;
       // next is the signal yield
       ifs >> Signal;
-
       // the next 68 items are the systematics on the signal (put in quotes, separated by spaces)
       for ( int i = 0; i < 68; i++ )
 	{
-	  ifs >> tmp1;
-	  if ( tmp1 == "nan" || tmp1 == "-nan" || tmp1 == "inf"  || tmp1 == "-inf" ) ftmp1 = 0;
-	  else ftmp1=atof(tmp1.c_str());
-
-	  sig_sys.push_back(ftmp1);
+	  ifs >> SIGNAL_SYS;
+	  if ( SIGNAL_SYS == "nan" || SIGNAL_SYS == "-nan" || SIGNAL_SYS == "inf"  || SIGNAL_SYS == "-inf" ) SIGNAL_SYS_F = 0;
+	  else SIGNAL_SYS_F = atof( SIGNAL_SYS.c_str() );
+	  
+	  sig_sys.push_back( SIGNAL_SYS_F );
 	}
       if ( ifs.eof() ) break;
-    
+      
       //---------------------------------------------------
       // if available, get line from secondary input source
       //---------------------------------------------------
@@ -239,28 +247,35 @@ int main( int argc, char* argv[] )
 			    << Rsq_l2 << " " << Rsq_h2
 			    << std::endl;
 		}
+	     
 	      
-	      std::string tmp2;
-	      float ftmp2;
+	      //-----------------------------------
+	      //Getting SMH SYSTEMATIC for 2ND FILE
+	      //-----------------------------------
+	      std::string SMH_SYS;
+	      float SMH_SYS_F;
 	      // the next 68 items are the systematics on the standard model Higgs (put in quotes, separated by spaces)
 	      for ( int i = 0; i < 68; i++ ) {
-		ifs2 >> tmp2;
-		if ( tmp2 == "nan" || tmp2 == "-nan" || tmp2 == "inf"  || tmp2 == "-inf" ) ftmp2 = 0;
-		else ftmp2=atof(tmp2.c_str());
+		ifs2 >> SMH_SYS;
+		if ( SMH_SYS == "nan" || SMH_SYS == "-nan" || SMH_SYS == "inf"  || SMH_SYS == "-inf" ) SMH_SYS_F = 0;
+		else SMH_SYS_F = atof( SMH_SYS.c_str() );
 		
-		smh_sys[i] = (ftmp2*SMH2+smh_sys[i]*SMH)/(SMH2+SMH);
+		smh_sys[i] = ( SMH_SYS_F*SMH2 + smh_sys[i]*SMH )/( SMH2 + SMH );//RELATIVE UNCERTAINTY ADDED FULLY CORRELATED
 	      }
-
+	      //------------------------------------------------
+	      //Getting SIGNAL YIELD AND SYSTEMATIC for 2ND FILE
+	      //------------------------------------------------
+	      std::string SIGNAL_SYS;
+	      float SIGNAL_SYS_F;
 	      // get the signal yield
 	      ifs2 >> Signal2;
-
 	      // the next 68 items are the systematics on the signal (put in quotes, separated by spaces)
 	      for ( int i = 0; i < 68; i++ ) {
-		ifs2 >> tmp2;
-		if ( tmp2 == "nan" || tmp2 == "-nan" || tmp2 == "inf"  || tmp2 == "-inf" ) ftmp2 = 0;
-		else ftmp2=atof(tmp2.c_str());
+		ifs2 >> SIGNAL_SYS;
+		if ( SIGNAL_SYS == "nan" || SIGNAL_SYS == "-nan" || SIGNAL_SYS == "inf"  || SIGNAL_SYS == "-inf" ) SIGNAL_SYS_F = 0;
+		else SIGNAL_SYS_F = atof( SIGNAL_SYS.c_str() );
 		
-		sig_sys[i] = (ftmp2*Signal2+sig_sys[i]*Signal)/(Signal2+Signal);
+		sig_sys[i] = ( SIGNAL_SYS_F*Signal2+sig_sys[i]*Signal )/(Signal2+Signal);//RELATIVE UNCERTAINTY ADDED FULLY CORRELATED
 	      }
 	      
 	      // add the SM Higgs yields together
@@ -289,16 +304,7 @@ int main( int argc, char* argv[] )
       Bkg_f1 = "singleExp";
       Bkg_f1 = mapBinNumberToBin[binNumber].f1;
       
-      // if ( binNumber == 3 || binNumber == 5 ) Bkg_f1 = "poly2";
-      // if ( binNumber == 9 || binNumber == 14 ) Bkg_f1 = "poly3"; //modify to synchronize LowRes and HighRes binning
-      // //if ( binNumber == 9 || binNumber == 16 ) Bkg_f1 = "poly3"; //old LowRes binning
-      // //if ( binNumber == 15 ) Bkg_f1 = "modExp"; //old LowRes binning
-
-      /*std::cout << category << "\t" << MR_l << "\t" << MR_h << "\t" << Rsq_l << "\t" << Rsq_h << "\t" << SMH << "\t" << SMH_sys.str()
-	<< "\t" << Signal << "\t"  << Signal_sys.str() << std::endl; 
-      */
-      
-      Signal =5.0*Signal; //scaling signal by 5
+      Signal = 5.0*Signal; //scaling signal by 5
       outf << "./MakeFitRun2 " 
 	   << "--inputFile=" << dataFile
 	   << " --inputFileSignal=" << signalFile
