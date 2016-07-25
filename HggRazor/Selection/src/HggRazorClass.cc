@@ -73,8 +73,8 @@ HggRazorClass::HggRazorClass( TTree* tree, TString processName, TString boxName,
 HggRazorClass::~HggRazorClass()
 {
   if ( _debug ) std::cout << "[DEBUG]: Entering Destructor" << std::endl;
-  delete h_mgg;
-  delete h_ptgg;
+  if (h_mgg) delete h_mgg;
+  if (h_ptgg) delete h_ptgg;
   if ( _debug ) std::cout << "[DEBUG]: Finishing Destructor" << std::endl;
 };
 
@@ -435,19 +435,6 @@ bool HggRazorClass::IntUnrollHistos( )
 void HggRazorClass::Loop()
 {
 
-  //--------------------------------
-  //Photon Trigger Efficiency
-  //--------------------------------
-  TFile *photonTriggerEffFile_LeadingLeg = TFile::Open("root://eoscms:///eos/cms/store/group/phys_susy/razor/Run2Analysis/ScaleFactors/PhotonEfficiencies/2016_Golden_2p6ifb/PhoHLTLeadingLegEffDenominatorLoose.root");
-  TFile *photonTriggerEffFile_TrailingLeg = TFile::Open("root://eoscms:///eos/cms/store/group/phys_susy/razor/Run2Analysis/ScaleFactors/PhotonEfficiencies/2016_Golden_2p6ifb/PhoHLTTrailingLegEffDenominatorLoose.root");
-  TH2D *photonTriggerEffHist_LeadingLeg = (TH2D*)photonTriggerEffFile_LeadingLeg->Get("hEffEtaPt");
-  TH2D *photonTriggerEffHist_TrailingLeg = (TH2D*)photonTriggerEffFile_TrailingLeg->Get("hEffEtaPt");
-  if(!(photonTriggerEffHist_LeadingLeg && photonTriggerEffHist_TrailingLeg) ) {
-    std::cout << "Error: Trigger efficiency files not loaded.\n";
-    return;
-  }
-
-
   if ( _debug ) std::cout << "[DEBUG]: Entering Loop" << std::endl;
   if (fChain == 0) return;
   if ( h_mgg == NULL || h_ptgg == NULL )
@@ -467,37 +454,6 @@ void HggRazorClass::Loop()
       nb = fChain->GetEntry(jentry);   nbytes += nb;
 
       //**********************************************************
-      //compute trigger efficiency weight correction
-      //**********************************************************
-      double triggerEffWeight = 1.0;
-      double leadPhoPt=0;
-      double leadPhoEta=0;
-      double trailingPhoPt=0;
-      double trailingPhoEta=0;
-      if (pho1Pt > pho2Pt) {
-	leadPhoPt = pho1Pt;
-	leadPhoEta = pho1Eta;
-	trailingPhoPt = pho2Pt;
-	trailingPhoEta= pho2Eta;
-      } else {
-	leadPhoPt = pho2Pt;
-	leadPhoEta = pho2Eta;
-	trailingPhoPt = pho1Pt;
-	trailingPhoEta= pho1Eta;
-      }
-
-      double triggerEffLeadingLeg = 
-	photonTriggerEffHist_LeadingLeg->GetBinContent( photonTriggerEffHist_LeadingLeg->GetXaxis()->FindFixBin( fabs(leadPhoEta) ),
-							photonTriggerEffHist_LeadingLeg->GetYaxis()->FindFixBin( fmax( fmin(leadPhoPt,99.9), 20.01 ) )
-							);
-      double triggerEffTrailingLeg = 
-	photonTriggerEffHist_TrailingLeg->GetBinContent( photonTriggerEffHist_TrailingLeg->GetXaxis()->FindFixBin( fabs(trailingPhoEta) ),
-							 photonTriggerEffHist_TrailingLeg->GetYaxis()->FindFixBin( fmax( fmin(trailingPhoPt,99.9), 20.01 ) )
-							 );
-      triggerEffWeight = triggerEffLeadingLeg*triggerEffTrailingLeg;
-      
-
-      //**********************************************************
       //Calculate weights
       //**********************************************************
       double w;
@@ -505,11 +461,19 @@ void HggRazorClass::Loop()
 	{
 	  w = 1.0;
 	}
-      else
+      else if ( this->processName == "diphoton" || this->processName == "dy" )
+	{ 
+	  w = weight*pileupWeight*triggerEffWeight*photonEffSF;	 
+	  // std::cout <<  "process " << this->processName << " : " << w << " = " 
+	  // 	    << weight << " * " 
+	  // 	    << pileupWeight << " * " 
+	  // 	    << triggerEffWeight << " * " 
+	  // 	    << photonEffSF << "\n";
+	}
+      else 
 	{ 
 	  w = weight*pileupWeight*triggerEffWeight;
-	  //w = weight;
-	  //std::cout << " " << std::endl;
+	  //std::cout <<  "other use weight: " << photonEffSF << " " << w  << "\n";
 	}
 
       total_in += w;
@@ -543,9 +507,6 @@ void HggRazorClass::Loop()
 	}
 
       
-
-
-
       h_mgg->Fill( mGammaGamma, w );
       h_ptgg->Fill( pTGammaGamma, w );
       h_sigmaMoverM->Fill( sigmaMoverM, w );

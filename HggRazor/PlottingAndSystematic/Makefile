@@ -17,6 +17,7 @@ CPPFLAGS += -g -std=c++11
 TARGET  = PlotCustomMrRsq
 TARGET2 = PlotFromTree
 TARGET3 = PlotFromInclusiveTree
+TARGET10 = MakeZeeCRPlots
 TARGET4 = GetHggRazorSystematics
 TARGET5 = GetHggRazorSystematicsQuadrature 
 TARGET6 = GetHggRazorSMH_BkgTable 
@@ -29,6 +30,7 @@ TARGET9 = CompareHggVariables
 SRC = app/PlotCustomMrRsq.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc $(Aux)/src/TChainTools.cc $(Aux)/src/PlotCosmetics.cc
 SRC2 = app/PlotFromTree.cc $(CommonTools)/src/HggTree.cc $(Selection)/src/HggRazorClass.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc $(Aux)/src/TChainTools.cc $(Aux)/src/PlotCosmetics.cc
 SRC3 = app/PlotFromInclusiveTree.cc $(CommonTools)/src/HggTree.cc $(Selection)/src/HggRazorClass.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc $(Aux)/src/TChainTools.cc $(Aux)/src/PlotCosmetics.cc
+SRC10 = app/MakeZeeCRPlots.cc $(CommonTools)/src/HggTree.cc $(Selection)/src/HggRazorClass.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc $(Aux)/src/TChainTools.cc $(Aux)/src/PlotCosmetics.cc
 SRC4 = app/GetHggRazorSystematics.cc $(CommonTools)/src/HggRazorSystematics.cc $(CommonTools)/src/HggTree.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc
 SRC5 = app/GetHggRazorSystematicsQuadrature.cc $(CommonTools)/src/HggRazorSystematics.cc $(CommonTools)/src/HggTree.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc
 SRC6 = app/GetHggRazorSMH_BkgTable.cc $(CommonTools)/src/HggRazorSystematics.cc $(CommonTools)/src/HggTree.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc $(FitTools)/src/DefinePdfs.cc
@@ -41,6 +43,7 @@ SRC9 = app/CompareHggVariables.cc src/CompareHggMC.cc src/CalStyleRemix.cc
 OBJ  = $(SRC:.cc=.o)
 OBJ2 = $(SRC2:.cc=.o)
 OBJ3 = $(SRC3:.cc=.o)
+OBJ10 = $(SRC10:.cc=.o) 
 OBJ4 = $(SRC4:.cc=.o)
 OBJ5 = $(SRC5:.cc=.o)
 OBJ6 = $(SRC6:.cc=.o)
@@ -50,7 +53,7 @@ OBJ8 = $(SRC8:.cc=.o)
 #OBJB = $(SRCB:.cc=.o) 
 OBJ9 = $(SRC9:.cc=.o) 
 
-all : $(TARGET) $(TARGET2) $(TARGET3) $(TARGET4) $(TARGET5) $(TARGET6) $(TARGET7) $(TARGET8) $(TARGETA) $(TARGETB) $(TARGET9)
+all : $(TARGET) $(TARGET2) $(TARGET3) $(TARGET10) $(TARGET4) $(TARGET5) $(TARGET6) $(TARGET7) $(TARGET8) $(TARGETA) $(TARGETB) $(TARGET9) 
 
 #comp : $(TARGETA) $(TARGETB) $(TARGET9)
 comp : $(TARGET9)
@@ -70,6 +73,12 @@ $(TARGET2) : $(OBJ2)
 
 $(TARGET3) : $(OBJ3)
 	$(LD) $(CPPFLAGS) -o $(TARGET3) $(OBJ3) $(LDFLAGS)
+	@echo $@
+	@echo $<
+	@echo $^
+
+$(TARGET10) : $(OBJ10)
+	$(LD) $(CPPFLAGS) -o $(TARGET10) $(OBJ10) $(LDFLAGS)
 	@echo $@
 	@echo $<
 	@echo $^
@@ -122,9 +131,10 @@ $(TARGET9) : $(OBJ9)
 	@echo $<
 	@echo $^
 
+
 %.o : %.cc
 	$(CXX) $(CPPFLAGS) -o $@ -c $<
 	@echo $@
 	@echo $<
 clean :
-	rm -f *.o app/*.o src/*.o $(Selection)/src/*.o $(CommonTools)/src/*.o $(Aux)/src/*.o $(TARGET) $(TARGET2) $(TARGET3) $(TARGET4) $(TARGET5) $(TARGET6) $(TARGET7) $(TARGET8) $(TARGET9) $(TARGETA) $(TARGETB) *~
+	rm -f *.o app/*.o src/*.o $(Selection)/src/*.o $(CommonTools)/src/*.o $(Aux)/src/*.o $(TARGET) $(TARGET2) $(TARGET3) $(TARGET10) $(TARGET4) $(TARGET5) $(TARGET6) $(TARGET7) $(TARGET8) $(TARGET9) $(TARGETA) $(TARGETB) *~
