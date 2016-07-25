@@ -78,8 +78,9 @@ int main( int argc, char** argv )
 	{
 	  ifs >> fname;
 	  if ( ifs.eof() ) break;
-	  //std::cout << "fname: " << fname << std::endl;
+	  //	  std::cout << "fname: " << fname << std::endl;
 	  TFile* fin = new TFile( fname.c_str(), "READ" );
+	  if ( fin->IsZombie() ) continue;
 	  int low  = fname.find(".mH")+3;
 	  int high = fname.find(".root") - low;
 	  std::string mass = fname.substr( low, high );
@@ -89,17 +90,17 @@ int main( int argc, char** argv )
 	  Limit tmpLimit;
 	  tree->SetBranchAddress( "limit", &limit );
 	  tree->GetEntry(0);
-	  tmpLimit.exp0p025 = limit*1.;
+	  tmpLimit.exp0p025 = limit*10.;
 	  tree->GetEntry(1);
-	  tmpLimit.exp0p16 = limit*1.;
+	  tmpLimit.exp0p16 = limit*10.;
 	  tree->GetEntry(2);
-	  tmpLimit.exp0p5 = limit*1.;
+	  tmpLimit.exp0p5 = limit*10.;
 	  tree->GetEntry(3);
-	  tmpLimit.exp0p84 = limit*1.;
+	  tmpLimit.exp0p84 = limit*10.;
 	  tree->GetEntry(4);
-	  tmpLimit.exp0p975 = limit*1.;
+	  tmpLimit.exp0p975 = limit*10.;
 	  tree->GetEntry(5);
-	  tmpLimit.obs = limit*1.;
+	  tmpLimit.obs = limit*10.;
 	  //std::cout << "mass: " << mass << "-> " << exp0p025 << " " << exp0p16 << " " << exp0p5 << " " << exp0p84
 	  //<< " " << exp0p975 << " " << obs << std::endl;
 	  if ( mymap.find( _mass ) == mymap.end() )

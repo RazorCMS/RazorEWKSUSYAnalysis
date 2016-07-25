@@ -892,8 +892,10 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
     {
       //mgg.setBins(39080);//230-6000
       //mgg.setRange( "full", 230., 10000. );//EBEB
-      //mgg.setBins(23080);//230-6000
-      mgg.setBins(288);
+      
+
+      mgg.setBins(23080);//230-6000
+      //mgg.setBins(288);//only for visual fits
       mgg.setRange( "full", 230., 6000. );//EBEB
     }
   else
@@ -969,7 +971,7 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
       if ( isEBEB )
 	{
 	  if ( year == "2015" ) Signal_Yield = SignaYieldOriginal*( 2.44392e-01+(3.40500e-04)*_mass-(1.42193e-07)*pow(_mass,2)+(3.08615e-11)*pow(_mass,3)-(2.75671e-15)*pow(_mass,4) );
-	  else if ( year == "2016" ) Signal_Yield = SignaYieldOriginal*( 2.44392e-01+(3.40500e-04)*_mass-(1.42193e-07)*pow(_mass,2)+(3.08615e-11)*pow(_mass,3)-(2.75671e-15)*pow(_mass,4) );
+	  else if ( year == "2016" ) Signal_Yield = SignaYieldOriginal*( 2.52927e-01+(3.26565e-04)*_mass-(1.34127e-07)*pow(_mass,2)+(2.86419e-11)*pow(_mass,3)-(2.52305e-15)*pow(_mass,4) );
 	  else 
 	    {
 	      std::cerr <<  "year: " << year << "not defined, could not find eff*acc; TERMINATING!!" << std::endl;
@@ -979,7 +981,7 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
       else
 	{
 	  if ( year == "2015" ) Signal_Yield = SignaYieldOriginal*( 1.61828e-01+(6.99351e-05)*_mass-(9.55028e-08)*pow(_mass,2)+(2.92184e-11)*pow(_mass,3)-(2.82880e-15)*pow(_mass,4) );
-	  else if ( year == "2016" ) Signal_Yield = SignaYieldOriginal*( 1.61828e-01+(6.99351e-05)*_mass-(9.55028e-08)*pow(_mass,2)+(2.92184e-11)*pow(_mass,3)-(2.82880e-15)*pow(_mass,4) );
+	  else if ( year == "2016" ) Signal_Yield = SignaYieldOriginal*( 1.64433e-01+(5.87817e-05)*_mass-(8.72622e-08)*pow(_mass,2)+(2.69219e-11)*pow(_mass,3)-(2.60707e-15)*pow(_mass,4) );
 	  else 
 	    {
 	      std::cerr <<  "year: " << year << "not defined, could not find eff*acc; TERMINATING!!" << std::endl;
@@ -1341,6 +1343,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   //D e f i n e   s i g n a l   P D F
   //---------------------------------
   int npoints = dataSignal.numEntries();
+  int npoints_singal = dataSignal.numEntries();
   if( sameMu )
     {
       tagSignal = MakeDoubleGauss( "DG_signal", mgg, *ws );
@@ -1666,6 +1669,10 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   ws->pdf( tagSignal )->plotOn(fmgg2, RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("Full"));
   //ws->pdf( tagSignal )->plotOn(fmgg2, RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
   fmgg2->Draw();
+  TLatex* mytex = new TLatex();;
+  mytex->DrawLatex(0.8, 0.92, Form("N = %d", npoints_singal));
+  //mytex->Draw("same");
+  c->Update();
   c->SaveAs( "HggRazorDataCards/" + sModel + "/signalFit_bin" + binNumber + ".pdf" );
   fmgg2->SetName( "SignalFitPlot" );
   ws->import( *fmgg2 );

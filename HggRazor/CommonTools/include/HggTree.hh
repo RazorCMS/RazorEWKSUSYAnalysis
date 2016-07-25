@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Jul  6 22:29:46 2016 by ROOT version 6.06/02
-// from TTree HggRazor/Info on selected razor inclusive events
-// found on file: HggRazor_GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8_1pb_weighted.root
+// Mon Jul 25 01:48:58 2016 by ROOT version 5.34/36
+// from TTree HggTree/Info on selected razor inclusive events
+// found on file: HggTree_bbHToGG_M-125_4FS_yb2_and_ybyt_13TeV_amcatnlo_MiniAODv1_1pb_weighted.root
 //////////////////////////////////////////////////////////
 
 #ifndef HggTree_h
@@ -13,14 +13,14 @@
 #include <TFile.h>
 
 // Header file for the classes stored in the TTree if any.
-#include "vector"
+#include <vector>
+
+// Fixed size dimensions of array or collections stored in the TTree if any.
 
 class HggTree {
 public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
-
-// Fixed size dimensions of array or collections stored in the TTree if any.
 
    // Declaration of leaf types
    Float_t         weight;
@@ -28,6 +28,7 @@ public :
    Float_t         pileupWeightUp;
    Float_t         pileupWeightDown;
    Float_t         triggerEffWeight;
+   Float_t         photonEffSF;
    Float_t         ISRSystWeightUp;
    Float_t         ISRSystWeightDown;
    Float_t         btagCorrFactor;
@@ -41,8 +42,8 @@ public :
    Float_t         sf_renScaleDown;
    Float_t         sf_facRenScaleUp;
    Float_t         sf_facRenScaleDown;
-  std::vector<float>   *pdfWeights;
-  std::vector<float>   *sf_pdf;
+   std::vector<float>   *pdfWeights;
+   std::vector<float>   *sf_pdf;
    Bool_t          Flag_HBHENoiseFilter;
    Bool_t          Flag_HBHEIsoNoiseFilter;
    Bool_t          Flag_badChargedCandidateFilter;
@@ -135,16 +136,16 @@ public :
    Float_t         mbbZ_L;
    Float_t         mbbH_L;
    Int_t           n_Jets;
-   Float_t         jet_E[10];   //[n_Jets]
-   Float_t         jet_Pt[10];   //[n_Jets]
-   Float_t         jet_Eta[10];   //[n_Jets]
-   Float_t         jet_Phi[10];   //[n_Jets]
-   Bool_t          jetIsCSVL[10];   //[n_Jets]
-   Bool_t          jetIsCSVM[10];   //[n_Jets]
-   Bool_t          jetIsCSVT[10];   //[n_Jets]
+   Float_t         jet_E[50];   //[n_Jets]
+   Float_t         jet_Pt[50];   //[n_Jets]
+   Float_t         jet_Eta[50];   //[n_Jets]
+   Float_t         jet_Phi[50];   //[n_Jets]
+   Bool_t          jetIsCSVL[50];   //[n_Jets]
+   Bool_t          jetIsCSVM[50];   //[n_Jets]
+   Bool_t          jetIsCSVT[50];   //[n_Jets]
    Int_t           n_Jets_JESUp;
    Int_t           n_Jets_JESDown;
-   Bool_t          HLTDecision[300];
+   Bool_t          HLTDecision[500];
    Int_t           nGenParticle;
    Int_t           gParticleMotherId[500];   //[nGenParticle]
    Int_t           gParticleMotherIndex[500];   //[nGenParticle]
@@ -161,6 +162,7 @@ public :
    TBranch        *b_pileupWeightUp;   //!
    TBranch        *b_pileupWeightDown;   //!
    TBranch        *b_triggerEffWeight;   //!
+   TBranch        *b_photonEffSF;   //!
    TBranch        *b_ISRSystWeightUp;   //!
    TBranch        *b_ISRSystWeightDown;   //!
    TBranch        *b_btagCorrFactor;   //!
@@ -307,9 +309,9 @@ HggTree::HggTree(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("HggTree_GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8_1pb_weighted.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("HggTree_bbHToGG_M-125_4FS_yb2_and_ybyt_13TeV_amcatnlo_MiniAODv1_1pb_weighted.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("HggTree_GluGluHToGG_M125_13TeV_amcatnloFXFX_pythia8_1pb_weighted.root");
+         f = new TFile("HggTree_bbHToGG_M-125_4FS_yb2_and_ybyt_13TeV_amcatnlo_MiniAODv1_1pb_weighted.root");
       }
       f->GetObject("HggTree",tree);
 
@@ -366,6 +368,7 @@ void HggTree::Init(TTree *tree)
    fChain->SetBranchAddress("pileupWeightUp", &pileupWeightUp, &b_pileupWeightUp);
    fChain->SetBranchAddress("pileupWeightDown", &pileupWeightDown, &b_pileupWeightDown);
    fChain->SetBranchAddress("triggerEffWeight", &triggerEffWeight, &b_triggerEffWeight);
+   fChain->SetBranchAddress("photonEffSF", &photonEffSF, &b_photonEffSF);
    fChain->SetBranchAddress("ISRSystWeightUp", &ISRSystWeightUp, &b_ISRSystWeightUp);
    fChain->SetBranchAddress("ISRSystWeightDown", &ISRSystWeightDown, &b_ISRSystWeightDown);
    fChain->SetBranchAddress("btagCorrFactor", &btagCorrFactor, &b_btagCorrFactor);

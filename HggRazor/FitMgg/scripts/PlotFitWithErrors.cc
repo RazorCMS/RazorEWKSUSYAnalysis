@@ -49,7 +49,7 @@ const float bottomMargin = 0.12;
 TString CMSText = "CMS";
 TString extraText   = "Preliminary";
 //TString lumiText = "2.32 fb^{-1} (13 TeV)";
-TString lumiText = "2.69 fb^{-1} (13 TeV)";
+TString lumiText = "12.92 fb^{-1} (13 TeV)";
 
 bool AddCMS( TCanvas* C );
 
@@ -68,7 +68,7 @@ int main( int argc, char** argv )
       return -1;
     }
   
-  std::string detector = ParseCommandLine( argc, argv, "-det=" );
+  std::string detector = ParseCommandLine( argc, argv, "-detector=" );
   if (  detector == "ebeb" )
     {
       std::cout << "detector: ebeb" << std::endl;
@@ -81,7 +81,7 @@ int main( int argc, char** argv )
     }
   else
     {
-      std::cerr << "incorrect detector use <ebeb/ebee>" << std::endl;
+      std::cerr << "incorrect detector use <ebeb/ebee>, please use: --detector=<ebeb,ebee>" << std::endl;
       return -1;
     }
   
@@ -302,8 +302,8 @@ int main( int argc, char** argv )
   errfix->SetMarkerSize(1);
   
   gsigma2->SetTitle("");
-  if ( isEBEB ) gsigma2->GetYaxis()->SetRangeUser(0.1,600);
-  else gsigma2->GetYaxis()->SetRangeUser(0.1, 200);
+  if ( isEBEB ) gsigma2->GetYaxis()->SetRangeUser(0.1,2000);
+  else gsigma2->GetYaxis()->SetRangeUser(0.1, 1000);
   gsigma2->GetXaxis()->SetTitleSize(0.05);
   gsigma2->GetYaxis()->SetTitleSize(0.05);
   gsigma2->GetYaxis()->SetTitle("Events / ( 20 GeV )");

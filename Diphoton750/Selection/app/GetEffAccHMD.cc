@@ -155,7 +155,11 @@ int main( int argc, char** argv )
       ctr++;
     }
 
-  TString mFname = "AccEff_GluGlu_0p014_EBEE_FINAL";
+  //TString mFname = "AccEff_GluGlu_0p014_EBEB_FINAL";
+  //TString mFname = "AccEff_GluGlu_0p014_EBEE_FINAL";
+  //TString mFname = "AccEff_RSG_k0p001_EBEB_FINAL";
+  TString mFname = "AccEff_RSG_k0p001_EBEE_FINAL";
+
   TFile* out = new TFile(mFname+".root", "recreate");
   TGraph* gAccEff = new TGraph(npoints, x, AccEff);
 
