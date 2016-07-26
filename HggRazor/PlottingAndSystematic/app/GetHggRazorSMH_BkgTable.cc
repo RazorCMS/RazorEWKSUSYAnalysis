@@ -25,6 +25,9 @@ const bool _debug = false;
 
 float GetNs( std::string fname, int bin, std::string cat = "highpt" );
 float GetNsErr( std::string fname, int bin, std::string cat = "highpt" );
+//
+float GetSMH( std::string fname, int bin, std::string cat = "highpt" );
+float GetSMHErr( std::string fname, int bin, std::string cat = "highpt" );
 float GetNbkg( std::string fname, std::string f1, int bin, bool _err = false, std::string cat = "highpt" );
 
 //----------------------------------------------                                                                                                                             
@@ -568,11 +571,24 @@ int main( int argc, char* argv[] )
       
       float Ns = GetNs( ss_fn.str(),  myMap2[ss.str()].bin, categoryMode );
       float NsErr = GetNsErr( ss_fn.str(),  myMap2[ss.str()].bin, categoryMode );
+      
       float Nbkg = GetNbkg( ss_fn.str(),  myMap2[ss.str()].f1, myMap2[ss.str()].bin, false, categoryMode );
       float NbkgErr = GetNbkg( ss_fn.str(),  myMap2[ss.str()].f1, myMap2[ss.str()].bin, true, categoryMode );
-      
+
+      /*
+      //GET SMH from ntuples
       TString line = Form("%0.f-%0.f $\\otimes$ %.3f-%.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f \\\\",
 			  tmp[0], tmp[2], tmp[1], tmp[3], totalsmh, totalUn, Nbkg, NbkgErr, Ns, NsErr);
+      */
+      
+      //--------------------
+      //Get SMH from fit
+      //--------------------
+      float Nsmh = GetSMH( ss_fn.str(),  myMap2[ss.str()].bin, categoryMode );
+      float NsmhErr = GetSMHErr( ss_fn.str(),  myMap2[ss.str()].bin, categoryMode );
+      TString line = Form("%0.f-%0.f $\\otimes$ %.3f-%.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f \\\\",
+      tmp[0], tmp[2], tmp[1], tmp[3], Nsmh, NsmhErr, Nbkg, NbkgErr, Ns, NsErr);
+      
       std::cout << line << std::endl;
     }
   
@@ -624,6 +640,32 @@ float GetNsErr( std::string fname, int bin, std::string cat )
   if ( cat == "highres" ) ss << "highResBin" << bin << "/signal";
   else if ( cat == "lowres" ) ss << "lowResBin" << bin << "/signal";
   else ss << "bin" << bin << "/signal";
+  RooRealVar* ss2 = (RooRealVar*)norm_fit_s->find( ss.str().c_str() );
+  return ss2->getError();
+};
+
+
+float GetSMH( std::string fname, int bin, std::string cat )
+{
+  TFile* fin = TFile::Open( fname.c_str(), "READ");
+  RooArgSet* norm_fit_s = (RooArgSet*) fin->Get("norm_fit_s");
+
+  std::stringstream ss;
+  if ( cat == "highres" ) ss << "highResBin" << bin << "/SMH";
+  else if ( cat == "lowres" ) ss << "lowResBin" << bin << "/SMH";
+  else ss << "bin" << bin << "/SMH";
+  RooRealVar* ss2 = (RooRealVar*)norm_fit_s->find( ss.str().c_str() );
+  return ss2->getVal();
+};
+
+float GetSMHErr( std::string fname, int bin, std::string cat )
+{
+  TFile* fin = TFile::Open( fname.c_str(), "READ");
+  RooArgSet* norm_fit_s = (RooArgSet*) fin->Get("norm_fit_s");
+  std::stringstream ss;
+  if ( cat == "highres" ) ss << "highResBin" << bin << "/SMH";
+  else if ( cat == "lowres" ) ss << "lowResBin" << bin << "/SMH";
+  else ss << "bin" << bin << "/SMH";
   RooRealVar* ss2 = (RooRealVar*)norm_fit_s->find( ss.str().c_str() );
   return ss2->getError();
 };
