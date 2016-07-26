@@ -1343,7 +1343,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   //D e f i n e   s i g n a l   P D F
   //---------------------------------
   int npoints = dataSignal.numEntries();
-  int npoints_singal = dataSignal.numEntries();
+  int npoints_signal = dataSignal.numEntries();
   if( sameMu )
     {
       tagSignal = MakeDoubleGauss( "DG_signal", mgg, *ws );
@@ -1630,9 +1630,9 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   dataCut->append(*dataHigh);
   //data.plotOn(fmgg,RooFit::Invisible());
   //
-  //data.plotOn(fmgg);
-  dataCut->plotOn(fmgg);
-  data.plotOn(fmgg,RooFit::Invisible());
+  data.plotOn(fmgg);
+  //dataCut->plotOn(fmgg);
+  //data.plotOn(fmgg,RooFit::Invisible());
   ws->pdf( tag_bkg )->plotOn(fmgg,RooFit::LineColor(kBlue));
   //ws->pdf( tag_bkg )->plotOn(fmgg,RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed) );
   //ws->pdf( tag_bkg )->plotOn(fmgg,RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("full"));
@@ -1668,10 +1668,12 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   dataSignal.plotOn(fmgg2);
   ws->pdf( tagSignal )->plotOn(fmgg2, RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("Full"));
   //ws->pdf( tagSignal )->plotOn(fmgg2, RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
+  //fmgg2->SetStats();
   fmgg2->Draw();
   TLatex* mytex = new TLatex();;
-  mytex->DrawLatex(0.8, 0.92, Form("N = %d", npoints_singal));
-  //mytex->Draw("same");
+  mytex->SetNDC(kTRUE);
+  mytex->DrawLatex(0.8, 0.7, Form("N = %d", npoints_signal));
+  mytex->Draw("same");
   c->Update();
   c->SaveAs( "HggRazorDataCards/" + sModel + "/signalFit_bin" + binNumber + ".pdf" );
   fmgg2->SetName( "SignalFitPlot" );
@@ -1746,7 +1748,8 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   combine_ws->var( combineSignal+"_alpha2")->setVal( DCB_a2_s );
   combine_ws->var( combineSignal+"_n2")->setVal( DCB_n1_s );
   //if ( binNumber.Atof() == 17 || binNumber.Atof() == 19 || binNumber.Atof() == 20 )
-  if ( binNumber.Atof() >= 0 )
+  //if ( binNumber.Atof() >= 0 )
+  if ( npoints_signal < 300 )//number of signal events less than 300, use SMH shape
     {
       //USE SMH SHAPE!!
       combine_ws->var( combineSignal+"_muCB")->setVal( DCB_mu_smh );

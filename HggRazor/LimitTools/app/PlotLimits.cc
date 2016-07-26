@@ -49,7 +49,7 @@ const float bottomMargin = 0.12;
 TString CMSText = "CMS";
 TString extraText   = "Preliminary";
 //TString lumiText = "2.32 fb^{-1} (13 TeV)";
-TString lumiText = "2.55 fb^{-1} (13 TeV)";
+TString lumiText = "12.92 fb^{-1} (13 TeV)";
 
 bool AddCMS( TCanvas* C );
 
@@ -90,17 +90,17 @@ int main( int argc, char** argv )
 	  Limit tmpLimit;
 	  tree->SetBranchAddress( "limit", &limit );
 	  tree->GetEntry(0);
-	  tmpLimit.exp0p025 = limit*10.;
+	  tmpLimit.exp0p025 = limit*1.;
 	  tree->GetEntry(1);
-	  tmpLimit.exp0p16 = limit*10.;
+	  tmpLimit.exp0p16 = limit*1.;
 	  tree->GetEntry(2);
-	  tmpLimit.exp0p5 = limit*10.;
+	  tmpLimit.exp0p5 = limit*1.;
 	  tree->GetEntry(3);
-	  tmpLimit.exp0p84 = limit*10.;
+	  tmpLimit.exp0p84 = limit*1.;
 	  tree->GetEntry(4);
-	  tmpLimit.exp0p975 = limit*10.;
+	  tmpLimit.exp0p975 = limit*1.;
 	  tree->GetEntry(5);
-	  tmpLimit.obs = limit*10.;
+	  tmpLimit.obs = limit*1.;
 	  //std::cout << "mass: " << mass << "-> " << exp0p025 << " " << exp0p16 << " " << exp0p5 << " " << exp0p84
 	  //<< " " << exp0p975 << " " << obs << std::endl;
 	  if ( mymap.find( _mass ) == mymap.end() )
@@ -183,7 +183,8 @@ int main( int argc, char** argv )
   gTwoS->GetYaxis()->CenterTitle(kTRUE);
   gTwoS->GetYaxis()->SetTitle("95% C.L. limit #sigma(pp#rightarrowG#rightarrow#gamma#gamma) (fb)");
 
-  gTwoS->GetYaxis()->SetRangeUser(0,20.6);
+  //gTwoS->GetYaxis()->SetRangeUser(0,20.6);
+  gTwoS->GetYaxis()->SetRangeUser(0,10.6);
   gTwoS->GetXaxis()->SetRangeUser(450,3300);
   
   gTwoS->Draw("AFL");
