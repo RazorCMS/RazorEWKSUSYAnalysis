@@ -169,11 +169,11 @@ int main( int argc, char* argv[] )
   
   TString triggerCut = "";
   TString metFilterCut = "";
- if ( analysisTag == "Razor2015_76X" ) {
-   cut = cut + categoryCutString + triggerCut+ metFilterCut;  
+  if ( analysisTag == "Razor2015_76X" ) {
+    cut = cut + categoryCutString + triggerCut+ metFilterCut;  
   } else if ( analysisTag == "Razor2016_80X" ) {
     //for 80X MC, trigger table doesn't exist. so don't apply triggers.
-   cut = cut + categoryCutString + metFilterCut;
+    cut = cut + categoryCutString + metFilterCut;
   } else {
     std::cout << "Analysis Tag " << analysisTag << " not recognized. Error!\n";
     return -1;
@@ -197,23 +197,26 @@ int main( int argc, char* argv[] )
   std::vector<float*> myVectBinning;
   myVectBinning = SetBinning(binVector, categoryMode );
   
-  TH2Poly* nominal[4];
+  TH2Poly* nominal[5];
   nominal[0] = new TH2Poly("nominal_SMH_0", "", 150, 10000, 0, 1 );
   nominal[1] = new TH2Poly("nominal_SMH_1", "", 150, 10000, 0, 1 );
   nominal[2] = new TH2Poly("nominal_SMH_2", "", 150, 10000, 0, 1 );
   nominal[3] = new TH2Poly("nominal_SMH_3", "", 150, 10000, 0, 1 );
+  nominal[4] = new TH2Poly("nominal_SMH_4", "", 150, 10000, 0, 1 );
 
-  TH2Poly* nominalErr[4];
+  TH2Poly* nominalErr[5];
   nominalErr[0] = new TH2Poly("nominalErr_SMH_0", "", 150, 10000, 0, 1 );
   nominalErr[1] = new TH2Poly("nominalErr_SMH_1", "", 150, 10000, 0, 1 );
   nominalErr[2] = new TH2Poly("nominalErr_SMH_2", "", 150, 10000, 0, 1 );
   nominalErr[3] = new TH2Poly("nominalErr_SMH_3", "", 150, 10000, 0, 1 );
+  nominalErr[4] = new TH2Poly("nominalErr_SMH_4", "", 150, 10000, 0, 1 );
   
-  TH2Poly* totalErr[4];
+  TH2Poly* totalErr[5];
   totalErr[0] = new TH2Poly("totalErr_SMH_0", "", 150, 10000, 0, 1 );
   totalErr[1] = new TH2Poly("totalErr_SMH_1", "", 150, 10000, 0, 1 );
   totalErr[2] = new TH2Poly("totalErr_SMH_2", "", 150, 10000, 0, 1 );
   totalErr[3] = new TH2Poly("totalErr_SMH_3", "", 150, 10000, 0, 1 );
+  totalErr[4] = new TH2Poly("totalErr_SMH_4", "", 150, 10000, 0, 1 );
 
   
   TH2Poly* nominalS = new TH2Poly("nominal_Signal", "", 150, 10000, 0, 1 );
@@ -264,17 +267,19 @@ int main( int argc, char* argv[] )
       nominal[1]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       nominal[2]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       nominal[3]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+      nominal[4]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
 
       nominalErr[0]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       nominalErr[1]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       nominalErr[2]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       nominalErr[3]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+      nominalErr[4]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
 
       totalErr[0]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       totalErr[1]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       totalErr[2]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       totalErr[3]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
-      
+      totalErr[4]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       
       nominalS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       facScaleUp->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
@@ -458,7 +463,7 @@ int main( int argc, char* argv[] )
 	  smhMapNominal[process] = nominal[ctr];
 	  smhMapNominalErr[process] = nominalErr[ctr];
 	  smhMapTotalErr[process] = totalErr[ctr];
-	  if(ctr < 3 )ctr++;
+	  if(ctr < 4 )ctr++;
 	}
       
       hggSys->WriteOutput( "histoMR_Rsq" );
@@ -470,10 +475,10 @@ int main( int argc, char* argv[] )
 
 
 
-  std::cout << "\\begin{table*}[htb]\n\\footnotesize\n\\begin{center}\n\\caption{";
+  std::cout << "\\begin{table*}[htb]\n\\scriptsize\n\\begin{center}\n\\caption{";
   std::cout << categoryMode << " category binning. SM Higgs, and signal expected yields for an integrated luminosity correspondint to 6.3~$\\mathrm{fb}^{-1}$";
-  std::cout << "\\label{tab:binning-highpt}}\n\\def\\arraystretch{1.5}\n\\begin{tabular}{|c|c|c|c|c|c|c|}\n\\hline\n$\\mathrm{M_{R}} (GeV)\\otimes\\mathrm{R^{2}}$";
-  std::cout << " & ggH & ttH & vbfH & vH & non-resonant & Signal\\\\" << std::endl;
+  std::cout << "\\label{tab:binning-highpt}}\n\\def\\arraystretch{1.5}\n\\begin{tabular}{|c|c|c|c|c|c|c|c|}\n\\hline\n$\\mathrm{M_{R}} (GeV)\\otimes\\mathrm{R^{2}}$";
+  std::cout << " & ggH & ttH & vbfH & vH & bbH & non-resonant & Signal\\\\" << std::endl;
   std::cout << "\\hline" << std::endl;
   for ( auto tmp: myVectBinning )
     {
@@ -482,6 +487,7 @@ int main( int argc, char* argv[] )
       float nom_ttH = smhMapNominal["ttH"]->GetBinContent( bin );
       float nom_vbfH = smhMapNominal["vbfH"]->GetBinContent( bin );
       float nom_vH = smhMapNominal["vH"]->GetBinContent( bin );
+      float nom_bbH = smhMapNominal["bbH"]->GetBinContent( bin );
       float nom_s  = nominalS->GetBinContent( bin );
 
       /*
@@ -500,6 +506,7 @@ int main( int argc, char* argv[] )
       float nom_ttH_U = sqrt( smhMapNominalErr["ttH"]->GetBinContent( bin ) );
       float nom_vbfH_U = sqrt( smhMapNominalErr["vbfH"]->GetBinContent( bin ) );
       float nom_vH_U = sqrt( smhMapNominalErr["vH"]->GetBinContent( bin ) );
+      float nom_bbH_U = sqrt( smhMapNominalErr["bbH"]->GetBinContent( bin ) );
       float nom_s_U  = nominalS->GetBinError( bin );
       //----------------------------
       //Key string to find bin
@@ -515,8 +522,8 @@ int main( int argc, char* argv[] )
       float Nbkg = GetNbkg( ss_fn.str(),  myMap2[ss.str()].f1, myMap2[ss.str()].bin, false, categoryMode );
       float NbkgErr = GetNbkg( ss_fn.str(),  myMap2[ss.str()].f1, myMap2[ss.str()].bin, true, categoryMode );
       
-      TString line = Form("%0.f-%0.f $\\otimes$ %.3f-%.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f \\\\",
-			  tmp[0], tmp[2], tmp[1], tmp[3], nom_ggH, nom_ggH_U, nom_ttH, nom_ttH_U, nom_vbfH, nom_vbfH_U, nom_vH, nom_vH_U, Nbkg, NbkgErr, Ns, NsErr);
+      TString line = Form("%0.f-%0.f $\\otimes$ %.3f-%.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f \\\\",
+			  tmp[0], tmp[2], tmp[1], tmp[3], nom_ggH, nom_ggH_U, nom_ttH, nom_ttH_U, nom_vbfH, nom_vbfH_U, nom_vH, nom_vH_U, nom_bbH, nom_bbH_U, Nbkg, NbkgErr, Ns, NsErr);
       std::cout << line << std::endl;
     }
   
@@ -535,17 +542,19 @@ int main( int argc, char* argv[] )
       float nom_ttH = smhMapNominal["ttH"]->GetBinContent( bin );
       float nom_vbfH = smhMapNominal["vbfH"]->GetBinContent( bin );
       float nom_vH = smhMapNominal["vH"]->GetBinContent( bin );
+      float nom_bbH = smhMapNominal["bbH"]->GetBinContent( bin );
       float nom_s  = nominalS->GetBinContent( bin );
       
-      float totalsmh =  nom_ggH + nom_ttH + nom_vbfH + nom_vH;
-
+      float totalsmh =  nom_ggH + nom_ttH + nom_vbfH + nom_vH + nom_bbH;
+      
       float nom_ggH_U  = smhMapTotalErr["ggH"]->GetBinContent( bin );
       float nom_ttH_U  = smhMapTotalErr["ttH"]->GetBinContent( bin );
       float nom_vbfH_U = smhMapTotalErr["vbfH"]->GetBinContent( bin );
       float nom_vH_U   = smhMapTotalErr["vH"]->GetBinContent( bin );
+      float nom_bbH_U  = smhMapTotalErr["bbH"]->GetBinContent( bin );
       float nom_s_U    = nominalS->GetBinError( bin );
       
-      float totalUn = sqrt( pow(nom_ggH_U,2) + pow(nom_ttH_U,2) + pow(nom_vbfH_U,2) + pow(nom_vH_U,2) );
+      float totalUn = sqrt( pow(nom_ggH_U,2) + pow(nom_ttH_U,2) + pow(nom_vbfH_U,2) + pow(nom_vH_U,2) + pow(nom_bbH_U,2) );
       totalUn = sqrt(pow(totalUn,2) + pow(totalsmh*0.04,2) + pow(totalsmh*0.05,2) + pow(totalsmh*0.067,2) + pow(totalsmh*0.057,2));
       if ( categoryMode == "hzbb" ) totalUn = sqrt( pow(totalUn,2) + pow(totalsmh*0.04,2) );
       
