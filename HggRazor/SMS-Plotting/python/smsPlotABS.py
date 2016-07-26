@@ -238,14 +238,15 @@ class smsPlotABS(object):
         #textExp.Draw()
         self.c.textExp = textExp
 
-        LObs.Draw("LSAME")
-        LObsM.Draw("LSAME")
-        LObsP.Draw("LSAME")
-        #LExp.Draw("LSAME")
+        #LObs.Draw("LSAME")
+        #LObsM.Draw("LSAME")
+        #LObsP.Draw("LSAME")
+
+        LExp.Draw("LSAME")
         #LExpM2.Draw("LSAME")
         #LExpP2.Draw("LSAME")
-        #LExpM.Draw("LSAME")
-        #LExpP.Draw("LSAME")
+        LExpM.Draw("LSAME")
+        LExpP.Draw("LSAME")
         
         self.c.LObs = LObs
         self.c.LObsM = LObsM
@@ -333,10 +334,10 @@ class smsPlotABS(object):
         #self.OBS['plus'].Draw("LSAME")
         #self.OBS['nominal'].Draw("LSAME") 
 
-        #self.EXP['minus'].Draw("LSAME")
-        #self.EXP['nominal'].Draw("LSAME")
-        #self.EXP['plus'].Draw("LSAME")
+        self.EXP['minus'].Draw("LSAME")
+        self.EXP['nominal'].Draw("LSAME")
+        self.EXP['plus'].Draw("LSAME")
     
-        self.OBS['minus'].Draw("LSAME")
-        self.OBS['nominal'].Draw("LSAME")
-        self.OBS['plus'].Draw("LSAME")
+        #self.OBS['minus'].Draw("LSAME")
+        #self.OBS['nominal'].Draw("LSAME")
+        #self.OBS['plus'].Draw("LSAME")
