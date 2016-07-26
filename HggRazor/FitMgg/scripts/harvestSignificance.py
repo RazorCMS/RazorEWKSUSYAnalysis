@@ -1,3 +1,5 @@
+# Make a basic plot showing the fitted significance in each analysis bin
+
 import ROOT as rt
 
 rt.gROOT.SetBatch()
