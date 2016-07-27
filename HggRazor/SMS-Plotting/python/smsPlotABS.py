@@ -183,7 +183,7 @@ class smsPlotABS(object):
         textObs = rt.TLatex(self.model.Xmin+11*xRange/100, self.model.Ymax-1.50*yRange/100*10, "Observed #pm 1 #sigma_{theory}")
         textObs.SetTextFont(42)
         textObs.SetTextSize(0.040)
-        textObs.Draw()
+        #textObs.Draw()
         self.c.textObs = textObs
 
         LExpP = rt.TGraph(2)
@@ -235,17 +235,18 @@ class smsPlotABS(object):
         textExp = rt.TLatex(self.model.Xmin+11*xRange/100, self.model.Ymax-2.15*yRange/100*10, "Expected #pm 1 #sigma_{experiment}")
         textExp.SetTextFont(42)
         textExp.SetTextSize(0.040)
-        #textExp.Draw()
+        textExp.Draw()
         self.c.textExp = textExp
 
-        LObs.Draw("LSAME")
-        LObsM.Draw("LSAME")
-        LObsP.Draw("LSAME")
-        #LExp.Draw("LSAME")
+        #LObs.Draw("LSAME")
+        #LObsM.Draw("LSAME")
+        #LObsP.Draw("LSAME")
+
+        LExp.Draw("LSAME")
         #LExpM2.Draw("LSAME")
         #LExpP2.Draw("LSAME")
-        #LExpM.Draw("LSAME")
-        #LExpP.Draw("LSAME")
+        LExpM.Draw("LSAME")
+        LExpP.Draw("LSAME")
         
         self.c.LObs = LObs
         self.c.LObsM = LObsM
@@ -333,10 +334,10 @@ class smsPlotABS(object):
         #self.OBS['plus'].Draw("LSAME")
         #self.OBS['nominal'].Draw("LSAME") 
 
-        #self.EXP['minus'].Draw("LSAME")
-        #self.EXP['nominal'].Draw("LSAME")
-        #self.EXP['plus'].Draw("LSAME")
+        self.EXP['minus'].Draw("LSAME")
+        self.EXP['nominal'].Draw("LSAME")
+        self.EXP['plus'].Draw("LSAME")
     
-        self.OBS['minus'].Draw("LSAME")
-        self.OBS['nominal'].Draw("LSAME")
-        self.OBS['plus'].Draw("LSAME")
+        #self.OBS['minus'].Draw("LSAME")
+        #self.OBS['nominal'].Draw("LSAME")
+        #self.OBS['plus'].Draw("LSAME")

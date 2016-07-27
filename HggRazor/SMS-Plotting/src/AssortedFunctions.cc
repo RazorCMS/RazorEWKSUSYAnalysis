@@ -34,6 +34,7 @@ void GetLimit(Limit &limit, std::string fname, float ssFactor )
   limit.mlsp = massPair.second;
   limit.xsecL  = GetCrossSectionLimit( limit.obs, limit.msb);
   limit.xsecUn = GetCrossSectionUn( limit.msb );
+  limit.xsecLExp  = GetCrossSectionLimit( limit.exp, limit.msb);
 };
 std::pair<float, float> GetMasses(std::string fname)
 {

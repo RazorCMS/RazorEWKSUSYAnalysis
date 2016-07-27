@@ -7,7 +7,10 @@
 //ROOT INCLUDES
 #include <TFile.h>
 #include <TROOT.h>
+#include <TCanvas.h>
 #include <TF1.h>
+#include <TIterator.h>
+#include <TMath.h>
 #include <RooArgSet.h>
 #include <RooAbsArg.h>
 #include <RooAbsCollection.h>
@@ -16,6 +19,7 @@
 #include <RooRealVar.h>
 #include <RooFitResult.h>
 #include <RooWorkspace.h>
+#include <RooRandom.h>
 //LOCAL INCLUDES
 #include "HggRazorSystematics.hh"
 #include "CommandLineInput.hh"
@@ -25,7 +29,12 @@ const bool _debug = false;
 
 float GetNs( std::string fname, int bin, std::string cat = "highpt" );
 float GetNsErr( std::string fname, int bin, std::string cat = "highpt" );
+//
+float GetSMH( std::string fname, int bin, std::string cat = "highpt" );
+float GetSMHErr( std::string fname, int bin, std::string cat = "highpt" );
 float GetNbkg( std::string fname, std::string f1, int bin, bool _err = false, std::string cat = "highpt" );
+float GetErrorFromToys(RooWorkspace *ws, RooFitResult *fr, RooRealVar *Nbkg, TString pdfName, 
+        unsigned int ntoys = 1000, int binNum = 0);
 
 //----------------------------------------------                                                                                                                             
 //Load Binning                                                                                                                                                               
@@ -62,6 +71,7 @@ int main( int argc, char* argv[] )
 {
 
   gROOT->Reset();
+  gErrorIgnoreLevel = kWarning;
 
   std::map<Bin, std::string> myMap;
   std::map<std::string, Bin> myMap2;
@@ -568,11 +578,24 @@ int main( int argc, char* argv[] )
       
       float Ns = GetNs( ss_fn.str(),  myMap2[ss.str()].bin, categoryMode );
       float NsErr = GetNsErr( ss_fn.str(),  myMap2[ss.str()].bin, categoryMode );
+      
       float Nbkg = GetNbkg( ss_fn.str(),  myMap2[ss.str()].f1, myMap2[ss.str()].bin, false, categoryMode );
       float NbkgErr = GetNbkg( ss_fn.str(),  myMap2[ss.str()].f1, myMap2[ss.str()].bin, true, categoryMode );
-      
+
+      /*
+      //GET SMH from ntuples
       TString line = Form("%0.f-%0.f $\\otimes$ %.3f-%.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f \\\\",
 			  tmp[0], tmp[2], tmp[1], tmp[3], totalsmh, totalUn, Nbkg, NbkgErr, Ns, NsErr);
+      */
+      
+      //--------------------
+      //Get SMH from fit
+      //--------------------
+      float Nsmh = GetSMH( ss_fn.str(),  myMap2[ss.str()].bin, categoryMode );
+      float NsmhErr = GetSMHErr( ss_fn.str(),  myMap2[ss.str()].bin, categoryMode );
+      TString line = Form("%0.f-%0.f $\\otimes$ %.3f-%.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f \\\\",
+      tmp[0], tmp[2], tmp[1], tmp[3], Nsmh, NsmhErr, Nbkg, NbkgErr, Ns, NsErr);
+      
       std::cout << line << std::endl;
     }
   
@@ -628,6 +651,32 @@ float GetNsErr( std::string fname, int bin, std::string cat )
   return ss2->getError();
 };
 
+
+float GetSMH( std::string fname, int bin, std::string cat )
+{
+  TFile* fin = TFile::Open( fname.c_str(), "READ");
+  RooArgSet* norm_fit_s = (RooArgSet*) fin->Get("norm_fit_s");
+
+  std::stringstream ss;
+  if ( cat == "highres" ) ss << "highResBin" << bin << "/SMH";
+  else if ( cat == "lowres" ) ss << "lowResBin" << bin << "/SMH";
+  else ss << "bin" << bin << "/SMH";
+  RooRealVar* ss2 = (RooRealVar*)norm_fit_s->find( ss.str().c_str() );
+  return ss2->getVal();
+};
+
+float GetSMHErr( std::string fname, int bin, std::string cat )
+{
+  TFile* fin = TFile::Open( fname.c_str(), "READ");
+  RooArgSet* norm_fit_s = (RooArgSet*) fin->Get("norm_fit_s");
+  std::stringstream ss;
+  if ( cat == "highres" ) ss << "highResBin" << bin << "/SMH";
+  else if ( cat == "lowres" ) ss << "lowResBin" << bin << "/SMH";
+  else ss << "bin" << bin << "/SMH";
+  RooRealVar* ss2 = (RooRealVar*)norm_fit_s->find( ss.str().c_str() );
+  return ss2->getError();
+};
+
 float GetNbkg( std::string fname, std::string f1, int bin, bool _err, std::string cat )
 {
   RooFit::PrintLevel(5);
@@ -676,13 +725,16 @@ float GetNbkg( std::string fname, std::string f1, int bin, bool _err, std::strin
       RooRealVar *Nbkg = (RooRealVar*)fit_r->floatParsFinal().find( ss_2.str().c_str() );
       
       
-      TString pdf = MakeSingleExpNE( f1, mgg, *ws );
+      TString pdf = MakeSingleExpNE( Form("%s_Bkg_bin%d",f1.c_str(),realBin), mgg, *ws );
       ws->var( pdf + "_a" )->setVal( alpha->getVal() );
       RooAbsReal* igx = ws->pdf( pdf )->createIntegral(mgg);
       //std::cout << Nbkg->getVal() << " +/- " << Nbkg->getError() << std::endl;
       RooAbsReal* igx_sig = ws->pdf( pdf )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("signal"));
       //std::cout << Nbkg->getVal()*igx_sig->getVal() << " +/- " << Nbkg->getError()*igx_sig->getVal() << std::endl;
-      if ( _err ) return Nbkg->getError()*igx_sig->getVal();
+      if ( _err ) {
+        return GetErrorFromToys( ws, fit_r, Nbkg, pdf, 10000, realBin );
+      }
+      //if ( _err ) return Nbkg->getError()*igx_sig->getVal();
       return Nbkg->getVal()*igx_sig->getVal();
       //double shapeErr = ws->pdf( pdf )->getPropagatedError(*fit_r)*Nbkg->getVal();
       /*
@@ -720,7 +772,7 @@ float GetNbkg( std::string fname, std::string f1, int bin, bool _err, std::strin
       std::stringstream ssC;
       ssC << "poly2_Bkg_bin" << realBin << "_pol2_pC";
       RooRealVar *pC = (RooRealVar*)fit_r->floatParsFinal().find( ssC.str().c_str() );
-      
+
       std::stringstream ss_2;
       if ( cat == "highres" ) ss_2 << "shapeBkg_Bkg_highResBin" << bin << "__norm";
       else if ( cat == "lowres" ) ss_2 << "shapeBkg_Bkg_lowResBin" << bin << "__norm";
@@ -728,7 +780,7 @@ float GetNbkg( std::string fname, std::string f1, int bin, bool _err, std::strin
       RooRealVar *Nbkg = (RooRealVar*)fit_r->floatParsFinal().find( ss_2.str().c_str() );
       
       
-      TString pdf = MakePoly2NE( f1, mgg, *ws );
+      TString pdf = MakePoly2NE( Form("%s_Bkg_bin%d",f1.c_str(),realBin), mgg, *ws );
       ws->var( pdf + "_p0" )->setVal( p0->getVal() );
       ws->var( pdf + "_p1" )->setVal( p1->getVal() );
       ws->var( pdf + "_pC" )->setVal( pC->getVal() );
@@ -736,7 +788,10 @@ float GetNbkg( std::string fname, std::string f1, int bin, bool _err, std::strin
       //std::cout << Nbkg->getVal() << " +/- " << Nbkg->getError() << std::endl;
       RooAbsReal* igx_sig = ws->pdf( pdf )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("signal"));
       //std::cout << Nbkg->getVal()*igx_sig->getVal() << " +/- " << Nbkg->getError()*igx_sig->getVal() << std::endl;
-      if ( _err ) return Nbkg->getError()*igx_sig->getVal();
+      if ( _err ) {
+        return GetErrorFromToys( ws, fit_r, Nbkg, pdf, 10000, realBin );
+      }
+      //if ( _err ) return Nbkg->getError()*igx_sig->getVal();
       return Nbkg->getVal()*igx_sig->getVal();
     }
   else if ( f1 == "poly3" )
@@ -764,7 +819,7 @@ float GetNbkg( std::string fname, std::string f1, int bin, bool _err, std::strin
       RooRealVar *Nbkg = (RooRealVar*)fit_r->floatParsFinal().find( ss_2.str().c_str() );
 
       
-      TString pdf = MakePoly3NE( f1, mgg, *ws );
+      TString pdf = MakePoly3NE( Form("%s_Bkg_bin%d",f1.c_str(),realBin), mgg, *ws );
       ws->var( pdf + "_p0" )->setVal( p0->getVal() );
       ws->var( pdf + "_p1" )->setVal( p1->getVal() );
       ws->var( pdf + "_p2" )->setVal( p1->getVal() );
@@ -773,7 +828,10 @@ float GetNbkg( std::string fname, std::string f1, int bin, bool _err, std::strin
       //std::cout << Nbkg->getVal() << " +/- " << Nbkg->getError() << std::endl;
       RooAbsReal* igx_sig = ws->pdf( pdf )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("signal"));
       //std::cout << Nbkg->getVal()*igx_sig->getVal() << " +/- " << Nbkg->getError()*igx_sig->getVal() << std::endl;
-      if ( _err ) return Nbkg->getError()*igx_sig->getVal();
+      if ( _err ) {
+        return GetErrorFromToys( ws, fit_r, Nbkg, pdf, 10000, realBin );
+      }
+      //if ( _err ) return Nbkg->getError()*igx_sig->getVal();
       return Nbkg->getVal()*igx_sig->getVal();
     }
   else if ( f1 == "modExp" )
@@ -794,16 +852,84 @@ float GetNbkg( std::string fname, std::string f1, int bin, bool _err, std::strin
       RooRealVar *Nbkg = (RooRealVar*)fit_r->floatParsFinal().find( ss_2.str().c_str() );
       
       
-      TString pdf = MakeModExpNE( f1, mgg, *ws );
+      TString pdf = MakeModExpNE( Form("%s_Bkg_bin%d",f1.c_str(),realBin), mgg, *ws );
       ws->var( pdf + "_a" )->setVal( alpha->getVal() );
       ws->var( pdf + "_m" )->setVal( m->getVal() );
       RooAbsReal* igx = ws->pdf( pdf )->createIntegral(mgg);
       //std::cout << Nbkg->getVal() << " +/- " << Nbkg->getError() << std::endl;
       RooAbsReal* igx_sig = ws->pdf( pdf )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("signal"));
       //std::cout << Nbkg->getVal()*igx_sig->getVal() << " +/- " << Nbkg->getError()*igx_sig->getVal() << std::endl;
-      if ( _err ) return Nbkg->getError()*igx_sig->getVal();
+      if ( _err ) {
+        return GetErrorFromToys( ws, fit_r, Nbkg, pdf, 10000, realBin );
+      }
+      //if ( _err ) return Nbkg->getError()*igx_sig->getVal();
       return Nbkg->getVal()*igx_sig->getVal();
     }
 
   return 0;
 };
+
+float GetErrorFromToys(RooWorkspace *ws, RooFitResult *fr, RooRealVar *Nbkg, TString pdfName, 
+        unsigned int ntoys, int binNum) {
+    RooRandom::randomGenerator()->SetSeed(33333);
+
+    RooAbsPdf *pdf = ws->pdf(pdfName);
+    float norm = Nbkg->getVal();
+    float normRelErr = Nbkg->getError()/norm;
+
+    // throw toys
+    std::vector<float> toyYields;
+    for( unsigned int itoy = 0; itoy < ntoys; itoy++ ) {
+        // randomize function parameters
+        RooArgList toyPars = fr->randomizePars();
+        // randomize norm 
+        float xGaus = RooRandom::randomGenerator()->Gaus(0,1); //draw from std normal
+        float toyNorm = norm*TMath::Power(1+normRelErr,xGaus); //get corresponding log-normal value
+
+        // set params to new values
+        TIterator *toyIter = toyPars.createIterator();
+        while( RooRealVar *curVar = (RooRealVar*)toyIter->Next() ) {
+            if (curVar->isConstant()) continue;
+            RooRealVar *pdfVar = ws->var( curVar->GetName() );
+            if (pdfVar) {
+                pdfVar->setVal( curVar->getVal() );
+                pdfVar->setError( curVar->getError() );
+            }
+        }
+
+        // get norm of pdf in signal region
+        RooAbsReal *integral = pdf->createIntegral( *(ws->var("mGammaGamma")), 
+                RooFit::NormSet( RooArgSet(*(ws->var("mGammaGamma"))) ), RooFit::Range("signal") );
+        toyYields.push_back( integral->getVal()*toyNorm );
+    }
+    // compute mean, min, max
+    float mean = 0.0;
+    float min = 999999.;
+    float max = -1.;
+    for( auto &yield : toyYields ) {
+        mean += yield;
+        if (yield > max) max = yield;
+        if (yield < min) min = yield;
+    }
+    mean /= ntoys;
+    // make histogram for illustration
+    TH1F *yieldHist = new TH1F("yieldHist", Form("Toys for Bin %d", binNum), 50, min*0.9, max*1.1);
+    // compute variance
+    float variance = 0.0;
+    for( auto &yield : toyYields ) {
+        variance += (yield-mean)*(yield-mean);
+        yieldHist->Fill(yield);
+    }
+    variance /= (ntoys-1);
+
+    // make plot
+    TCanvas *c = new TCanvas("c","c",400,300);
+    yieldHist->SetMarkerStyle(20);
+    yieldHist->SetMarkerSize(.5);
+    yieldHist->Draw("p");
+    c->Print(Form("toysbin%d.pdf",binNum));
+    delete yieldHist;
+    delete c;
+    // return standard deviation
+    return sqrt(variance);
+}

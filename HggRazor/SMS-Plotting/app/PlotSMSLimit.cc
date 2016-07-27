@@ -82,6 +82,7 @@ int main( int argc, char* argv[] )
 	  
 	  //Filling observed limit TH2F
 	  h2_limit->Fill(myLimit.msb, myLimit.mlsp, myLimit.xsecL );
+	  h2_limit_exp->Fill(myLimit.msb, myLimit.mlsp, myLimit.xsecLExp );
 	  //-------------------------------------------
 	  //N o m i n a l   o b s e r v e d   l i m i t
 	  //-------------------------------------------
@@ -361,6 +362,7 @@ int main( int argc, char* argv[] )
   
   fout->cd();
   h2_limit->Write("limit");
+  h2_limit_exp->Write("limit_exp");
   //Obs
   obs->Write("obs");
   obsUp->Write("obsUp");
