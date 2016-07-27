@@ -882,6 +882,7 @@ float GetErrorFromToys(RooWorkspace *ws, RooFitResult *fr, RooRealVar *Nbkg, TSt
     for( unsigned int itoy = 0; itoy < ntoys; itoy++ ) {
         // randomize function parameters
         RooArgList toyPars = fr->randomizePars();
+	//toyPars.Print();
         // randomize norm 
         float xGaus = RooRandom::randomGenerator()->Gaus(0,1); //draw from std normal
         float toyNorm = norm*TMath::Power(1+normRelErr,xGaus); //get corresponding log-normal value
@@ -889,13 +890,21 @@ float GetErrorFromToys(RooWorkspace *ws, RooFitResult *fr, RooRealVar *Nbkg, TSt
         // set params to new values
         TIterator *toyIter = toyPars.createIterator();
         while( RooRealVar *curVar = (RooRealVar*)toyIter->Next() ) {
-            if (curVar->isConstant()) continue;
-            RooRealVar *pdfVar = ws->var( curVar->GetName() );
-            if (pdfVar) {
-                pdfVar->setVal( curVar->getVal() );
-                pdfVar->setError( curVar->getError() );
-            }
-        }
+	  std::string varName = curVar->GetName();
+	  if (curVar->isConstant() && varName.find("shapeBkg_Bkg") == std::string::npos ) continue;
+	  
+	  RooRealVar *pdfVar = ws->var( curVar->GetName() );
+	  if (pdfVar) {
+	    //std::cout << "name: " << curVar->GetName() << " val: " << curVar->getVal() << std::endl;
+	    pdfVar->setVal( curVar->getVal() );
+	    pdfVar->setError( curVar->getError() );
+	  }
+	  std::stringstream ntotalName;
+	  if ( binNum <= 8 ) ntotalName << "shapeBkg_Bkg_bin" << binNum << "__norm";
+	  else if ( binNum <= 13 ) ntotalName << "shapeBkg_Bkg_highResBin" << binNum << "__norm";
+	  else if ( binNum <= 18 ) ntotalName << "shapeBkg_Bkg_lowResBin" << binNum-5 << "__norm";
+	  if ( curVar->GetName() == ntotalName.str() ) toyNorm = curVar->getVal();
+	}
 
         // get norm of pdf in signal region
         RooAbsReal *integral = pdf->createIntegral( *(ws->var("mGammaGamma")), 
