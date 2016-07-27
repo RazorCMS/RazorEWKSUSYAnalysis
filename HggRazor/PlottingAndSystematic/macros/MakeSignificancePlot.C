@@ -111,7 +111,7 @@ void MakeSignificancePlot( int option = 0) {
   //gr->Draw("psame");
   gr->SetLineWidth(2);
   gr->SetMarkerStyle(20);
-  gr->SetMarkerSize(1);
+  gr->SetMarkerSize(1.5);
   // gr->GetXaxis()->SetTitle("Bin Number");
   // gr->GetYaxis()->SetTitle("Observed Significance");
   // gr->GetXaxis()->SetTitleSize(0.05);
@@ -152,7 +152,7 @@ void MakeSignificancePlot( int option = 0) {
   tex->SetTextSize(0.040);
   tex->SetTextFont(42);
   tex->SetTextColor(kBlack);
-  tex->DrawLatex(0.7, 0.92, "6.3 fb^{-1} (13 TeV)");
+  tex->DrawLatex(0.7, 0.92, "15.2 fb^{-1} (13 TeV)");
   tex->DrawLatex(0.4, 0.92, "Razor H#rightarrow#gamma#gamma Search");
   tex->Draw();
   
