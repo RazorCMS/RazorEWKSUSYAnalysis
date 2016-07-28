@@ -83,7 +83,7 @@ MRRsqSignal->GetYaxis()->SetLabelSize(0.04);
  if (category == "highpt") categoryText = "HighPt Category";
  else if (category == "hbb") categoryText = "Hbb Category";
  else if (category == "zbb") categoryText = "Zbb Category";
- else if (category == "hzbb") categoryText = "H(#gamma#gamma)-HZ(bb) Category";
+ else if (category == "hzbb") categoryText = "H(#gamma#gamma)-H/Z(bb) Category";
  else if (category == "highres") categoryText = "HighRes Category";
  else if (category == "lowres") categoryText = "LowRes Category";
  
