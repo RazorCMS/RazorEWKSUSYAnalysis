@@ -64,6 +64,13 @@ void plotMRRsq(string category = "highpt") {
 
  MRRsqSignal->Draw("colz");
 
+MRRsqSignal->GetXaxis()->SetTitleSize(0.05);
+MRRsqSignal->GetXaxis()->SetTitleOffset(0.85);
+MRRsqSignal->GetXaxis()->SetLabelSize(0.04);
+MRRsqSignal->GetYaxis()->SetTitleSize(0.05);
+MRRsqSignal->GetYaxis()->SetTitleOffset(0.85);
+MRRsqSignal->GetYaxis()->SetLabelSize(0.04);
+
  //MRRsqSignal->SetMarkerStyle(20);
  //MRRsqSignal->SetMarkerColor(kBlack);
  /*if (category == "lowres") {
