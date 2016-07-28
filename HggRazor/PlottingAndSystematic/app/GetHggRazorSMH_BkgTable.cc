@@ -36,7 +36,7 @@ float GetSMH( std::string fname, int bin, std::string cat = "highpt" );
 float GetSMHErr( std::string fname, int bin, std::string cat = "highpt" );
 float GetNbkg( std::string fname, std::string f1, int bin, bool _err = false, std::string cat = "highpt" );
 float GetErrorFromToys(RooWorkspace *ws, RooFitResult *fr, TString pdfName, 
-        unsigned int ntoys = 1000, int binNum = 0);
+        unsigned int ntoys = 1000, int binNum = 0, bool plotBkgFuncs = false);
 
 //----------------------------------------------                                                                                                                             
 //Load Binning                                                                                                                                                               
@@ -871,7 +871,8 @@ float GetNbkg( std::string fname, std::string f1, int bin, bool _err, std::strin
   return 0;
 };
 
-float GetErrorFromToys(RooWorkspace *ws, RooFitResult *fr, TString pdfName, unsigned int ntoys, int binNum) {
+float GetErrorFromToys(RooWorkspace *ws, RooFitResult *fr, TString pdfName, unsigned int ntoys, int binNum, 
+        bool plotBkgFuncs) {
     RooRandom::randomGenerator()->SetSeed(33333);
     TCanvas *c = new TCanvas("c","c",400,300);
     RooPlot *frame = ws->var("mGammaGamma")->frame();
@@ -909,13 +910,17 @@ float GetErrorFromToys(RooWorkspace *ws, RooFitResult *fr, TString pdfName, unsi
         toyYields.push_back( integral->getVal()*toyNorm );
 
         // draw the curve
-        pdf->plotOn(frame, RooFit::LineWidth(1), RooFit::LineColor(
+        if (plotBkgFuncs) {
+            pdf->plotOn(frame, RooFit::LineWidth(1), RooFit::LineColor(
                     TColor::GetColor((Float_t)0.,(Float_t)0.,(Float_t)(itoy*1.0/ntoys))));
+        }
     }
 
-    // draw frame with all sampled curves
-    frame->Draw();
-    c->Print(Form("toysenvelopebin%d.pdf",binNum));
+    if (plotBkgFuncs) {
+        // draw frame with all sampled curves
+        frame->Draw();
+        c->Print(Form("toysenvelopebin%d.pdf",binNum));
+    }
 
     // compute mean, min, max
     float mean = 0.0;
