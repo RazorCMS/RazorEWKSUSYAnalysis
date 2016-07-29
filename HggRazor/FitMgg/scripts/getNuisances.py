@@ -1,3 +1,5 @@
+### Plot post-fit nuisances for the mGammaGamma fits in each analysis bin
+
 import sys,os
 import ROOT as rt
 
@@ -31,8 +33,8 @@ def getStdDev(cov, nuis):
 
 if __name__ == '__main__':
     rt.gROOT.SetBatch()
-    fnames = [ "HggRazorDataCards/FromCristian/mlfit_bin%d.root"%(ibin) for ibin in range(14) ]
-    fnames.append("HggRazorDataCards/FromCristian/mlfit_allbins.root")
+    fnames = [ "mlfit_bin%d.root"%(ibin) for ibin in range(14) ]
+    #fnames.append("mlfit_allbins.root")
     c = rt.TCanvas("c","c",400,300)
     #histogram for mu_Global
     mu = rt.TH1F("mu",";Bin number;#mu",14,0,14)

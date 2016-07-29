@@ -66,6 +66,8 @@ int main( int argc, char* argv[] )
   TFile* fout = new TFile("test_limit.root", "recreate");
   TH2F* h2_limit     = new TH2F("h2_limit", "", 15, -25, 725, 15, -25, 725);
   TH2F* h2_limit_exp = new TH2F("h2_limit_exp", "", 15, -25, 725, 15, -25, 725);
+  TH2F* h2_limit_exp_up = new TH2F("h2_limit_exp_up", "", 15, -25, 725, 15, -25, 725);
+  TH2F* h2_limit_exp_down = new TH2F("h2_limit_exp_down", "", 15, -25, 725, 15, -25, 725);
   
   std::ifstream ifs( inputList.c_str(), std::fstream::in );
   if ( ifs.is_open() )
@@ -82,6 +84,9 @@ int main( int argc, char* argv[] )
 	  
 	  //Filling observed limit TH2F
 	  h2_limit->Fill(myLimit.msb, myLimit.mlsp, myLimit.xsecL );
+	  h2_limit_exp->Fill(myLimit.msb, myLimit.mlsp, myLimit.xsecLExp );
+	  h2_limit_exp_up->Fill(myLimit.msb, myLimit.mlsp, myLimit.xsecLExpUp );
+	  h2_limit_exp_down->Fill(myLimit.msb, myLimit.mlsp, myLimit.xsecLExpDown );
 	  //-------------------------------------------
 	  //N o m i n a l   o b s e r v e d   l i m i t
 	  //-------------------------------------------
@@ -361,6 +366,9 @@ int main( int argc, char* argv[] )
   
   fout->cd();
   h2_limit->Write("limit");
+  h2_limit_exp->Write("limit_exp");
+  h2_limit_exp_up->Write("limit_exp_up");
+  h2_limit_exp_down->Write("limit_exp_down");
   //Obs
   obs->Write("obs");
   obsUp->Write("obsUp");

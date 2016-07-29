@@ -19,7 +19,7 @@ void plotMRRsq(string category = "highpt") {
   // TFile *fileData = new TFile("/afs/cern.ch/user/s/sixie/eos/cms/store/group/phys_susy/razor/Run2Analysis/HggRazor/2016/V3p3_PhotonCorrJune16/HggRazor_DoubleEG_2015+2016_GoodLumiGolden6p3ifb_MR150Skim.root","READ");
 
   //File with photon ID applied
-  TFile *fileData = new TFile("/afs/cern.ch/work/j/jmao/razorRun1/CMSSW_7_6_3/src/RazorEWKSUSYAnalysis/HggRazor/FitMgg/eos/cms/store/group/phys_susy/razor/Run2Analysis/HggRazor/2016/V3p4_PhotonCorrJuly8_RegularSelectionSequence/HggRazor_SMS-T2bH_mSbottom-300_mLSP-1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_MiniAODv1_1pb_weighted.root","READ");
+  TFile *fileData = new TFile("/afs/cern.ch/user/z/zhicaiz/eos/cms/store/group/phys_susy/razor/Run2Analysis/HggRazor/2016/V3p4_PhotonCorrJuly20_RegularSelectionSequence_20160720/HggRazor_SMS-T2bH_mSbottom-300_mLSP-1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_MiniAODv1_1pb_weighted.root","READ");
   TTree *tree = (TTree*)fileData->Get("HggRazor");
 
   string categoryCutString = "";
@@ -36,7 +36,7 @@ void plotMRRsq(string category = "highpt") {
   TH2F *MRRsqSignal = new TH2F("MRRsqSignal",";M_{R} (GeV); R^{2} ; ", 135, 150,1500, 30 , 0.0, 0.3);
 
   //tree->Draw("t1Rsq:MR>>MRRsqSideband", ("(abs(pho1Eta) <1.44 && abs(pho2Eta)<1.44 && (pho1Pt>40||pho2Pt>40)&&pho1Pt>25 && pho2Pt>25 && pho1passIso && pho2passIso && pho1passEleVeto && pho2passEleVeto && ((mGammaGamma > 105 && mGammaGamma < 120) || (mGammaGamma > 131 && mGammaGamma < 160)) && MR > 150 && t1Rsq >= 0.0 " + categoryCutString+ " )").c_str(),"");
-  tree->Draw("t1Rsq:MR>>MRRsqSignal", ("6300*weight*pileupWeight*triggerEffWeight*btagCorrFactor*(abs(pho1Eta) <1.44 && abs(pho2Eta)<1.44 && (pho1Pt>40||pho2Pt>40)&&pho1Pt>25 && pho2Pt>25 && pho1passIso && pho2passIso && MR > 150 && t1Rsq >= 0.0)" + categoryCutString + signalRegionCutString).c_str(),"");
+  tree->Draw("t1Rsq:MR>>MRRsqSignal", ("15215*weight*pileupWeight*triggerEffWeight*btagCorrFactor*(abs(pho1Eta) <1.44 && abs(pho2Eta)<1.44 && (pho1Pt>40||pho2Pt>40)&&pho1Pt>25 && pho2Pt>25 && pho1passIso && pho2passIso && MR > 150 && t1Rsq >= 0.0)" + categoryCutString + signalRegionCutString).c_str(),"");
 
   //std::cout << "draw string: " <<  ("( abs(pho1Eta) <1.44 && abs(pho2Eta)<1.44 && (pho1Pt>40||pho2Pt>40)&&pho1Pt>25 && pho2Pt>25 && ((mGammaGamma > 105 && mGammaGamma < 120) || (mGammaGamma > 131 && mGammaGamma < 160)) && MR > 150 && t1Rsq >= 0.0 " + categoryCutString+ " )") << "\n";
 
@@ -56,12 +56,20 @@ void plotMRRsq(string category = "highpt") {
  TLatex *tex = 0;
 
  cv = new TCanvas("cv","cv", 800,600); 
+ cv->SetRightMargin(0.125);
  //MRRsqSideband->SetStats(0);
  MRRsqSignal->SetStats(0);
 
  //MRRsqSideband->Draw("colz");
 
  MRRsqSignal->Draw("colz");
+
+MRRsqSignal->GetXaxis()->SetTitleSize(0.05);
+MRRsqSignal->GetXaxis()->SetTitleOffset(0.85);
+MRRsqSignal->GetXaxis()->SetLabelSize(0.04);
+MRRsqSignal->GetYaxis()->SetTitleSize(0.05);
+MRRsqSignal->GetYaxis()->SetTitleOffset(0.85);
+MRRsqSignal->GetYaxis()->SetLabelSize(0.04);
 
  //MRRsqSignal->SetMarkerStyle(20);
  //MRRsqSignal->SetMarkerColor(kBlack);
@@ -75,6 +83,7 @@ void plotMRRsq(string category = "highpt") {
  if (category == "highpt") categoryText = "HighPt Category";
  else if (category == "hbb") categoryText = "Hbb Category";
  else if (category == "zbb") categoryText = "Zbb Category";
+ else if (category == "hzbb") categoryText = "H(#gamma#gamma)-H/Z(bb) Category";
  else if (category == "highres") categoryText = "HighRes Category";
  else if (category == "lowres") categoryText = "LowRes Category";
  
@@ -83,8 +92,8 @@ void plotMRRsq(string category = "highpt") {
  tex->SetTextSize(0.040);
  tex->SetTextFont(42);
  tex->SetTextColor(kBlack);
- tex->DrawLatex(0.7, 0.92, "6.3 fb^{-1} (13 TeV)");
- tex->DrawLatex(0.45, 0.92, categoryText.c_str());
+ tex->DrawLatex(0.7, 0.92, "15.2 fb^{-1} (13 TeV)");
+ tex->DrawLatex((category=="hzbb")?0.4:0.45, 0.92, categoryText.c_str());
  tex->Draw();
  
  TLatex *CMSLabel = new TLatex();
@@ -164,8 +173,18 @@ void plotMRRsq(string category = "highpt") {
 
  if (category == "hzbb") {
 
-
- }
+  TPaveText *bin8 = new TPaveText(170,0.28,220,0.29);
+  bin8->SetFillColor(0);
+  bin8->SetShadowColor(0);
+  bin8->SetLineColor(0);
+  //bin8->SetNDC();
+  bin8->SetTextSize(0.05);
+  //bin8->SetTextFont(42);
+  //bin8->SetTextColor(kBlack);
+  bin8->AddText("8");
+  bin8->Draw();
+ 
+}
  if (category == "hbb") {
 
 

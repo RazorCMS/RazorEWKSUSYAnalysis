@@ -1858,6 +1858,10 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   TString dataCardName = "HggRazorDataCards/" + sModel + "/HggRazorCard_bin" + binNumber + ".txt";
   std::ofstream ofs( dataCardName , std::ofstream::out );
 
+  int combinedBinNumber = atoi(binNumber); // this is equal to binNumber, except for the LowRes bins, where it is equal to the number of the corresponding HighRes bin
+  if ( combinedBinNumber > 13 ) {
+      combinedBinNumber -= 5;
+  }
   if ( !_signalOnly )
     {
       ofs << "imax 1 number of bins\njmax 2 number of processes minus 1\nkmax * number of nuisance parameters\n";
@@ -1896,15 +1900,15 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
 	    }
 	  else if ( isys == 2 )
 	    {
-	      ofs << "SMH_facScale_bin" << binNumber << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	      ofs << "SMH_facScale_bin" << combinedBinNumber << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
 	    }
 	  else if ( isys == 4 )
 	    {
-	      ofs << "SMH_renScale_bin" << binNumber << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	      ofs << "SMH_renScale_bin" << combinedBinNumber << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
 	    }
 	  else if ( isys == 6 )
 	    {
-	      ofs << "SMH_facRenScale_bin" << binNumber << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	      ofs << "SMH_facRenScale_bin" << combinedBinNumber << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
 	    }
 	  else if ( isys > 7 )
 	    {
@@ -1932,15 +1936,15 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
 	    }
 	  else if ( isys == 2 )
 	    {
-	      ofs << "Signal_facScale_bin" << binNumber << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	      ofs << "Signal_facScale_bin" << combinedBinNumber << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
 	    }
 	  else if ( isys == 4 )
 	    {
-	      ofs << "Signal_renScale_bin" << binNumber << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	      ofs << "Signal_renScale_bin" << combinedBinNumber << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
 	    }
 	  else if ( isys == 6 )
 	    {
-	      ofs << "Signal_facRenScale_bin" << binNumber << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	      ofs << "Signal_facRenScale_bin" << combinedBinNumber << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
 	    }
 	  else if ( isys > 7 )
 	    {
