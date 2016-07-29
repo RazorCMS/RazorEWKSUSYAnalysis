@@ -17,6 +17,8 @@ struct Limit
   float xsecL;
   float xsecUn;
   float xsecLExp;
+  float xsecLExpUp;
+  float xsecLExpDown;
 };
 
 
