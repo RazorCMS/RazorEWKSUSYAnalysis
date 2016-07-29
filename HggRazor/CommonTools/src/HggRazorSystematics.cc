@@ -315,9 +315,9 @@ void HggRazorSystematics::Loop()
 
       float commonW = 0;
       if (_analysisTag == "Razor2015_76X") {
-	commonW = this->Lumi*weight*pileupWeight*btagCorrFactor;
+	commonW = this->Lumi*weight*pileupWeight*btagCorrFactor*photonEffSF;
       } else if (_analysisTag == "Razor2016_80X") {
-	commonW = this->Lumi*weight*pileupWeight*btagCorrFactor*triggerEffWeight;
+	commonW = this->Lumi*weight*pileupWeight*btagCorrFactor*triggerEffWeight*photonEffSF;
       } else {
 	std::cout << "Analysis Tag " << _analysisTag << " not recognized. Error!\n";
 	return;

@@ -26,7 +26,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
 			    float Signal_Yield, std::string Signal_CF, TString binNumber = "-1", TString category = "category",
 			    bool isHighMass = false, TString sModel = "dummy", TString f1 = "singleExp", bool _signalOnly = false );
 void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std::string Signal_CF,
-		      float mass = 125., TString binNumber = "-1", TString category = "category" );
+		      float mass = 125., TString binNumber = "-1", TString category = "category", TString year = "2016" );
 
 RooWorkspace* MakeSideBandFitAIC( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName, double& AIC, TString ffName );
 RooWorkspace* DoBiasTest( TTree* tree, TString mggName, TString f1, TString f2, int ntoys = 1e2, int npoints = 1e4 );

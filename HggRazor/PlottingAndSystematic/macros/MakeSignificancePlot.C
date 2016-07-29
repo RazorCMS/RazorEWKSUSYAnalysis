@@ -13,24 +13,49 @@ void MakeSignificancePlot( int option = 0) {
   if (option == 0) {
     //use significance computed from log likelihood
     
+    // //**************************
+    // //2.3+4.0 dataset
+    // //**************************
+    // //highPt Category
+    // y[0] = -1000;
+    // y[1] = 1.1;
+    // y[2] = 0.9;
+    // y[3] = 0;
+    // y[4] = -0.7;
+    // y[5] = 0.8;
+    // y[6] = 1.3;
+    // y[7] = 0.8;
+    // y[8] = 0.7;
+    // //hbb category  
+    // y[9] = 0.6;
+    // //highres category
+    // y[10] = -0.4;
+    // y[11] = 1.1;
+    // y[12] = 0.8;
+    // y[13] = 1.7;
+    // y[14] = 0.7;
+
+   //**************************
+    //2.3+12.9 dataset
+    //**************************
     //highPt Category
     y[0] = -1000;
-    y[1] = 1.1;
-    y[2] = 0.9;
-    y[3] = 0;
-    y[4] = -0.7;
-    y[5] = 0.8;
-    y[6] = 1.3;
-    y[7] = 0.8;
-    y[8] = 0.7;
+    y[1] = 3.4;
+    y[2] = 0.2;
+    y[3] = -1.5;
+    y[4] = -0.4;
+    y[5] = -1.6;
+    y[6] = 1.9;
+    y[7] = 0.6;
+    y[8] = 0.8;
     //hbb category  
-    y[9] = 0.6;
+    y[9] = 1.0;
     //highres category
-    y[10] = -0.4;
-    y[11] = 1.1;
-    y[12] = 0.8;
-    y[13] = 1.7;
-    y[14] = 0.7;
+    y[10] = -0.1;
+    y[11] = 1.7;
+    y[12] = 0.0;
+    y[13] = 0.5;
+    y[14] = 0.2;
 
   } else if (option == 1) {
     //use fitted signal yield / uncertainty
@@ -86,7 +111,7 @@ void MakeSignificancePlot( int option = 0) {
   //gr->Draw("psame");
   gr->SetLineWidth(2);
   gr->SetMarkerStyle(20);
-  gr->SetMarkerSize(1);
+  gr->SetMarkerSize(1.5);
   // gr->GetXaxis()->SetTitle("Bin Number");
   // gr->GetYaxis()->SetTitle("Observed Significance");
   // gr->GetXaxis()->SetTitleSize(0.05);
@@ -127,7 +152,7 @@ void MakeSignificancePlot( int option = 0) {
   tex->SetTextSize(0.040);
   tex->SetTextFont(42);
   tex->SetTextColor(kBlack);
-  tex->DrawLatex(0.7, 0.92, "6.3 fb^{-1} (13 TeV)");
+  tex->DrawLatex(0.7, 0.92, "15.2 fb^{-1} (13 TeV)");
   tex->DrawLatex(0.4, 0.92, "Razor H#rightarrow#gamma#gamma Search");
   tex->Draw();
   

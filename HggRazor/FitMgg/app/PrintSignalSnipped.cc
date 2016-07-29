@@ -123,8 +123,8 @@ int main( int argc, char** argv )
   int npoints = mymass.size();
 
   //Loop for mu;
-  //TString className = "double RooIntepolateDSCB_W0p014_Spin0_EBEB";
-  TString className = "double RooIntepolateDSCB_W0p014_Spin0_EBEE";
+  //TString className = "double RooIntepolateDSCB_W0p014_Spin0_EBEB_2016";
+  TString className = "double RooIntepolateDSCB_W0p014_Spin0_EBEE_2016";
   std::cout << className << "::getMean( double m ) const\n{\n";
   for ( int i = 0; i < npoints; i++ )
     {

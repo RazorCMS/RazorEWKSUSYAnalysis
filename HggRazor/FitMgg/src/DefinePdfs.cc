@@ -336,7 +336,9 @@ TString MakeDoubleCBNE( TString tag, RooRealVar& mgg, RooWorkspace& w, bool _glo
   return pdf_name;
 };
 
-
+//----------------
+//
+//-----------------
 TString MakeDoubleCBInterpolate( TString tag, RooRealVar& mgg, RooWorkspace& w )
 {
    //------------------------------
@@ -363,6 +365,10 @@ TString MakeDoubleCBInterpolate( TString tag, RooRealVar& mgg, RooWorkspace& w )
   return ex_pdf_name;
 };
 
+
+//-------------------------
+//2015 Interpolation
+//-------------------------
 TString MakeDoubleCBInterpolateNE( TString tag, RooRealVar& mgg, RooWorkspace& w, TString category )
 {
   RooRealVar* mass     = new RooRealVar( tag + "_DCBI_mass", "#mass_{CB}", 750, "" );
@@ -392,6 +398,40 @@ TString MakeDoubleCBInterpolateNE( TString tag, RooRealVar& mgg, RooWorkspace& w
   exit (EXIT_FAILURE);
   return "";
 };
+
+//-------------------------
+//2016 Interpolation
+//-------------------------
+TString MakeDoubleCBInterpolateNE2016( TString tag, RooRealVar& mgg, RooWorkspace& w, TString category )
+{
+  RooRealVar* mass     = new RooRealVar( tag + "_DCBI_mass", "#mass_{CB}", 750, "" );
+  mass->setConstant(kFALSE);
+  
+  TString pdf_name = tag + "_DCBI";
+  
+  if ( category == "EBEB" )
+    {
+      RooRealVar* muGlobal = new RooRealVar( "mu_Global_EBEB", "#mu_{g}", 0, "" );
+      RooFormulaVar* mggp  = new RooFormulaVar( tag + "_DG_muG", "m_{gg} - #mu_{g}", "(@0-@1)", RooArgList(mgg, *muGlobal) );
+      RooIntepolateDSCB_W0p014_Spin0_EBEB_2016* dCB = new RooIntepolateDSCB_W0p014_Spin0_EBEB_2016( pdf_name , "", *mggp, *mass );
+      w.import( *dCB );
+      return pdf_name;
+    }
+  else if ( category == "EBEE" )
+    {
+      RooRealVar* muGlobal = new RooRealVar( "mu_Global_EBEE", "#mu_{g}", 0, "" );
+      RooFormulaVar* mggp  = new RooFormulaVar( tag + "_DG_muG", "m_{gg} - #mu_{g}", "(@0-@1)", RooArgList(mgg, *muGlobal) );
+      RooIntepolateDSCB_W0p014_Spin0_EBEE_2016* dCB = new RooIntepolateDSCB_W0p014_Spin0_EBEE_2016( pdf_name , "", *mggp, *mass );
+      w.import( *dCB );
+      
+      return pdf_name;
+    }
+  
+  std::cerr << "category: " <<  category << " NOT DEFINED for HM Analysis, terminating" << std::endl;
+  exit (EXIT_FAILURE);
+  return "";
+};
+
 
 TString MakeDoubleExp(TString tag, RooRealVar& mgg, RooWorkspace& w)
 {
@@ -568,22 +608,21 @@ TString MakeHMDiphotonNE( TString tag, RooRealVar& mgg, RooWorkspace& w )
 
 TString MakeModExp(TString tag, RooRealVar& mgg,RooWorkspace& w)
 {
-  //RooRealVar *alpha = new RooRealVar(tag+"_a","#alpha",-1, "");
-  RooRealVar *alpha = new RooRealVar(tag+"_a","#alpha",0.06, "");
+  RooRealVar *alpha = new RooRealVar(tag+"_a","#alpha",0.148, "");
   alpha->setConstant(kFALSE);
-  alpha->setMin(0.0);
+  //alpha->setMin(0.0);
   RooFormulaVar* aSq = new RooFormulaVar( tag + "_aSq","","-1*@0*@0", *alpha);
 
-  RooRealVar *m = new RooRealVar(tag+"_m","m", 1., "");
-  m->setMin(0.0);
-  //RooRealVar *m = new RooRealVar(tag+"_m","m", 1.0, 0.0, 20.0,"");
+  RooRealVar *m = new RooRealVar(tag+"_m","m", 1, "");
+  //m->setMin(0.0);
   m->setConstant(kFALSE);
+  RooFormulaVar* mSq = new RooFormulaVar( tag + "_mSq","","@0*@0", *m);
+  
   RooRealVar *Nbkg   = new RooRealVar(tag+"_Nbkg","N_{bkg}", 10, "events");  
   Nbkg->setConstant(kFALSE);
 
-  //Define as exp(-(alpha^2)*x^m), to avoid infinite integrals
-  RooGenericPdf *mexp = new RooGenericPdf(tag+"_mexp","mod_exp","exp(@0*(@1^@2))",RooArgList(*aSq,mgg,*m));
-  //RooGenericPdf *mexp = new RooGenericPdf( tag+"_mexp","mod_exp","exp(@0*(@1^@2))", RooArgList(*alpha,mgg,*m) );
+  //Define as exp(-(alpha^2)*x^(m^2)), to avoid infinite integrals and unphysical pdfs
+   RooGenericPdf *mexp = new RooGenericPdf(tag+"_mexp","mod_exp","exp(@0*(@1^@2))",RooArgList(*aSq,mgg,*mSq));
   
   TString pdfName = tag+"_mexp_ext";
   RooAddPdf* modExp_Ext = new RooAddPdf( pdfName, "modExp", RooArgList(*mexp), RooArgList(*Nbkg) );
@@ -594,24 +633,19 @@ TString MakeModExp(TString tag, RooRealVar& mgg,RooWorkspace& w)
 
 TString MakeModExpNE(TString tag, RooRealVar& mgg,RooWorkspace& w)
 {
-  //RooRealVar *alpha = new RooRealVar(tag+"_a","#alpha",-1, "");
   RooRealVar *alpha = new RooRealVar(tag+"_mexp_a","#alpha",0.06, "");
   alpha->setConstant(kFALSE);
-  alpha->setMin(0.0);
+  //alpha->setMin(0.0);
   RooFormulaVar* aSq = new RooFormulaVar( tag + "_mexp_aSq","","-1*@0*@0", *alpha);
 
   RooRealVar *m = new RooRealVar(tag+"_mexp_m","m", 1., "");
-  m->setMin(0.0);
-  //RooRealVar *m = new RooRealVar(tag+"_m","m", 1.0, 0.0, 20.0,"");
+  //m->setMin(0.0);
   m->setConstant(kFALSE);
-  RooRealVar *Nbkg   = new RooRealVar(tag+"_mexp_Nbkg","N_{bkg}", 10, "events");  
-  Nbkg->setConstant(kFALSE);
+  RooFormulaVar* mSq = new RooFormulaVar( tag + "_mSq","","@0*@0", *m);
 
   TString pdfName = tag+"_mexp";
-  //Define as exp(-(alpha^2)*x^m), to avoid infinite integrals
-  RooGenericPdf *mexp = new RooGenericPdf(pdfName,"","exp(@0*(@1^@2))",RooArgList(*aSq,mgg,*m));
-  //RooGenericPdf *mexp = new RooGenericPdf( tag+"_mexp","mod_exp","exp(@0*(@1^@2))", RooArgList(*alpha,mgg,*m) );
-  
+  //Define as exp(-(alpha^2)*x^(m^2)), to avoid infinite integrals and unphysical pdfs
+  RooGenericPdf *mexp = new RooGenericPdf(tag+"_mexp","mod_exp","exp(@0*(@1^@2))",RooArgList(*aSq,mgg,*mSq));
   w.import( *mexp );
   return pdfName;
 };

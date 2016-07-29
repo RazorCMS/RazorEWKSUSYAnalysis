@@ -49,7 +49,7 @@ const float bottomMargin = 0.12;
 TString CMSText = "CMS";
 TString extraText   = "Preliminary";
 //TString lumiText = "2.32 fb^{-1} (13 TeV)";
-TString lumiText = "2.55 fb^{-1} (13 TeV)";
+TString lumiText = "12.92 fb^{-1} (13 TeV)";
 
 bool AddCMS( TCanvas* C );
 
@@ -78,8 +78,9 @@ int main( int argc, char** argv )
 	{
 	  ifs >> fname;
 	  if ( ifs.eof() ) break;
-	  //std::cout << "fname: " << fname << std::endl;
+	  //	  std::cout << "fname: " << fname << std::endl;
 	  TFile* fin = new TFile( fname.c_str(), "READ" );
+	  if ( fin->IsZombie() ) continue;
 	  int low  = fname.find(".mH")+3;
 	  int high = fname.find(".root") - low;
 	  std::string mass = fname.substr( low, high );
@@ -182,7 +183,8 @@ int main( int argc, char** argv )
   gTwoS->GetYaxis()->CenterTitle(kTRUE);
   gTwoS->GetYaxis()->SetTitle("95% C.L. limit #sigma(pp#rightarrowG#rightarrow#gamma#gamma) (fb)");
 
-  gTwoS->GetYaxis()->SetRangeUser(0,20.6);
+  //gTwoS->GetYaxis()->SetRangeUser(0,20.6);
+  gTwoS->GetYaxis()->SetRangeUser(0,10.6);
   gTwoS->GetXaxis()->SetRangeUser(450,3300);
   
   gTwoS->Draw("AFL");

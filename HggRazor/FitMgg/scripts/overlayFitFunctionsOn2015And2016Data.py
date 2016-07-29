@@ -1,3 +1,5 @@
+### Get the best-fit function shape from the combined 2015+2016 background fit and overlay it on 2015 and 2016 data separately
+
 import ROOT as rt
 rt.gROOT.SetBatch()
 
