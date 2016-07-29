@@ -287,8 +287,8 @@ int main ( int argc, char* argv[] )
       exit( EXIT_FAILURE );
     }
   const int nplots = 4;
-  double k_f = 1.157;//Difference in data/mc normalization for inclusive sample
-  //double k_f = 1.49; //Difference in data/mc normalization for MR>150 cut
+  double k_f = 0.796; //Difference in data/mc normalization for inclusive sample
+  //double k_f = 0.978; //Difference in data/mc normalization for MR>150 cut
 
   double lumi = 0;
   if (analysisTag == "Razor2015_76X") lumi = 2300;
