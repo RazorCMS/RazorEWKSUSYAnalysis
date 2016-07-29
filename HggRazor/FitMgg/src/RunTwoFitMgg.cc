@@ -2011,6 +2011,8 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
 	  ofs << "Signal_btag\t\t\tlnN\t\t" << "0.961/1.04\t\t-\n";
 	  ofs << "Signal_misstag\t\t\tlnN\t\t" << "0.992/1.008\t\t-\n";
 	}
+      ofs << "mu_Global\t\t\tparam\t\t 0 1.25\n";
+      if ( category != "highres" ) ofs << category << "_mu_Global\t\t\tparam\t\t 0 1.25\n";
     }
   ofs.close();
   return ws;

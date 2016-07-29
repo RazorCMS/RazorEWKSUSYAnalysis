@@ -260,7 +260,8 @@ int main( int argc, char* argv[] )
 		if ( SMH_SYS == "nan" || SMH_SYS == "-nan" || SMH_SYS == "inf"  || SMH_SYS == "-inf" ) SMH_SYS_F = 0;
 		else SMH_SYS_F = atof( SMH_SYS.c_str() );
 		
-		smh_sys[i] = ( SMH_SYS_F*SMH2 + smh_sys[i]*SMH )/( SMH2 + SMH );//RELATIVE UNCERTAINTY ADDED FULLY CORRELATED
+		if ( SMH2 + SMH != 0 ) smh_sys[i] = ( SMH_SYS_F*SMH2 + smh_sys[i]*SMH )/( SMH2 + SMH );//RELATIVE UNCERTAINTY ADDED FULLY CORRELATED
+		else smh_sys[i] = 0;
 	      }
 	      //------------------------------------------------
 	      //Getting SIGNAL YIELD AND SYSTEMATIC for 2ND FILE
@@ -275,7 +276,8 @@ int main( int argc, char* argv[] )
 		if ( SIGNAL_SYS == "nan" || SIGNAL_SYS == "-nan" || SIGNAL_SYS == "inf"  || SIGNAL_SYS == "-inf" ) SIGNAL_SYS_F = 0;
 		else SIGNAL_SYS_F = atof( SIGNAL_SYS.c_str() );
 		
-		sig_sys[i] = ( SIGNAL_SYS_F*Signal2+sig_sys[i]*Signal )/(Signal2+Signal);//RELATIVE UNCERTAINTY ADDED FULLY CORRELATED
+		if ( Signal2+Signal != 0 ) sig_sys[i] = ( SIGNAL_SYS_F*Signal2+sig_sys[i]*Signal )/(Signal2+Signal);//RELATIVE UNCERTAINTY ADDED FULLY CORRELATED
+		else sig_sys[i] = 0;
 	      }
 	      
 	      // add the SM Higgs yields together
@@ -356,7 +358,10 @@ int main( int argc, char* argv[] )
   }
 
   outf << "combineCards.py HggRazorCombinedCard_bin*.txt > combineAll.txt\n"
-       << "combine -M Asymptotic combineAll.txt --minimizerStrategy=2 -n _combineAll"
+       << "combine -M Asymptotic combineAll.txt --minimizerStrategy=2 -n _combineAll\n"
+       << "combine -M ProfileLikelihood --signif combineAll.txt -n _all.nsigma --setPhysicsModelParameterRanges r=-20,20 --uncapped=1\n"
+       << "combine -M ProfileLikelihood --pvalue combineAll.txt -n _all.pvalue --setPhysicsModelParameterRanges r=-20,20 --uncapped=1\n"
+       << "hadd PL_nsigma_npvalue_all.root higgsCombine_all.nsigma.ProfileLikelihood.mH120.root higgsCombine_all.pvalue.ProfileLikelihood.mH120.root"
        << "\ncd - \n";
 
   //close files
