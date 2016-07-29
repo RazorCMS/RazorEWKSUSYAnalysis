@@ -62,11 +62,11 @@ int main( int argc, char** argv )
 
   gROOT->Reset();
   
-  std::ifstream ifs ( "/Users/cmorgoth/Work/git/RazorEWKSUSYAnalysis/HggRazor/FitMgg/ReferenceLists/EBEE_4fb.list", std::ifstream::in );
+  std::ifstream ifs ( "/Users/cmorgoth/Work/git/RazorEWKSUSYAnalysis/HggRazor/FitMgg/massList.EBEE.txt", std::ifstream::in );
   assert( ifs );
 
   //TFile* fin = new TFile("/Users/cmorgoth/Work/HighMassDiphoton/ReferenceFiles/HggRazorExo_DoubleEG_2015D_GoodLumiSilver.root", "READ");
-  TFile* fin = new TFile("DiphotonEXO_DoubleEG_2016B_PRv2_GoodLumiGoldenJun22.root", "READ");
+  TFile* fin = new TFile("/Users/cmorgoth/Work/git/RazorEWKSUSYAnalysis/HggRazor/FitMgg/DiphotonEXO_DoubleEG_2016_GoodLumiGolden12p9ifb.root", "READ");
   TTree* tree = (TTree*)fin->Get("HggRazor");
   //EBEB
   //TString cut = "mGammaGamma > 230. && pho1passIso == 1 && pho2passIso == 1 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && abs(pho1DefaultSC_Eta) <1.4442 && abs(pho2DefaultSC_Eta) < 1.4442 && pho1Pt> 75. && pho2Pt>75. && ( HLTDecision[93] == 1 || HLTDecision[209] == 1)";

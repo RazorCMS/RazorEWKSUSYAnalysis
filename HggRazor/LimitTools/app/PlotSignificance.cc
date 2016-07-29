@@ -46,7 +46,7 @@ const float bottomMargin = 0.12;
 TString CMSText = "CMS";
 TString extraText   = "Preliminary";
 //TString lumiText = "2.32 fb^{-1} (13 TeV)";
-TString lumiText = "2.69 fb^{-1} (13 TeV)";
+TString lumiText = "12.92 fb^{-1} (13 TeV)";
 
 bool AddCMS( TCanvas* C );
 
@@ -75,7 +75,7 @@ int main( int argc, char** argv )
 	{
 	  ifs >> fname;
 	  if ( ifs.eof() ) break;
-	  //std::cout << "fname: " << fname << std::endl;
+	  std::cout << "fname: " << fname << std::endl;
 	  TFile* fin = new TFile( fname.c_str(), "READ" );
 	  int low  = fname.find("_m")+2;
 	  int high = fname.find(".root") - low;
@@ -111,7 +111,15 @@ int main( int argc, char** argv )
   int ctr = 0;
   for ( auto tmp : mymap )
     {
-      if ( tmp.second.sigma != 0.0 ) std::cout << "mass: " << tmp.first << " expL: " << tmp.second.sigma << std::endl;
+      //if ( tmp.second.pvalue != 0.5 ) std::cout << "mass: " << tmp.first << " pval: " << tmp.second.pvalue << std::endl;
+      if ( tmp.second.pvalue == 0.0  || tmp.second.pvalue > 0.50 )
+	{
+	  tmp.second.sigma = 0.0;
+	  tmp.second.pvalue = 0.5;
+	};
+
+      std::cout << "mass: " << tmp.first << " pval: " << tmp.second.pvalue << std::endl;
+      
       x[ctr]     = tmp.first;
       sigma[ctr] = tmp.second.sigma;
       pval[ctr]  = tmp.second.pvalue;
@@ -197,8 +205,8 @@ int main( int argc, char** argv )
   c->SaveAs("NarrowResLimit_pval_BIAS.pdf");
   c->SaveAs("NarrowResLimit_pval_BIAS.C");
   
-  gsigma->Write("gObs");
-  gpval->Write("gExp");
+  gsigma->Write("gSigma");
+  gpval->Write("gPval");
   
   out->Close();
   return 0;

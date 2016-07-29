@@ -60,7 +60,10 @@ bool AddCMS( TCanvas* C );
 
 int main( int argc, char** argv )
 {
-
+  //------------------
+  //OLD RESULTS
+  //------------------
+  /*
   TFile* f = new TFile("AccEff_GluGlu_5p6_EBEB.root","read");
   TGraphAsymmErrors* g1 = (TGraphAsymmErrors*)f->Get("gr");
   f = new TFile("AccEff_GluGlu_5p6_EBEE.root","read");
@@ -69,8 +72,21 @@ int main( int argc, char** argv )
   TGraphAsymmErrors* g3 = (TGraphAsymmErrors*)f->Get("gr");
   f = new TFile("AccEff_RSGrav_k02_EBEE.root","read");
   TGraphAsymmErrors* g4 = (TGraphAsymmErrors*)f->Get("gr");
+  */
+  //--------------------
+  //12.9/fb results
+  //--------------------
+  TFile* f = new TFile("12p9ifbResults/AccEff_GluGlu_0p014_EBEB_FINAL.root","read");
+  TGraphAsymmErrors* g1 = (TGraphAsymmErrors*)f->Get("gr");
+  f = new TFile("12p9ifbResults/AccEff_GluGlu_0p014_EBEE_FINAL.root","read");
+  TGraphAsymmErrors* g2 = (TGraphAsymmErrors*)f->Get("gr");
+  f = new TFile("12p9ifbResults/AccEff_RSG_k0p001_EBEB_FINAL.root","read");
+  TGraphAsymmErrors* g3 = (TGraphAsymmErrors*)f->Get("gr");
+  f = new TFile("12p9ifbResults/AccEff_RSG_k0p001_EBEE_FINAL.root","read");
+  TGraphAsymmErrors* g4 = (TGraphAsymmErrors*)f->Get("gr");
   
-  TString mFname = "AccEff_LargestWidth";
+  
+  TString mFname = "AccEff_NarrowWidth_2016";
   TFile* out = new TFile(mFname+".root", "recreate");
   g1->SetMarkerStyle(20);
   g1->SetMarkerColor(kBlue-3);
@@ -151,8 +167,9 @@ int main( int argc, char** argv )
   latex.SetTextColor(kBlack);    
   latex.SetTextFont(42);
   latex.SetTextAlign(31); 
-  latex.SetTextSize(0.04);    
-  latex.DrawLatex( 0.32, 0.7, "#frac{#Gamma}{M} = 5.6%" );
+  latex.SetTextSize(0.04);
+  latex.DrawLatex( 0.32, 0.7, "#frac{#Gamma}{M} = 0.014%" );
+  //latex.DrawLatex( 0.32, 0.7, "#frac{#Gamma}{M} = 5.6%" );
   
   
   c->SaveAs(mFname+".pdf");
