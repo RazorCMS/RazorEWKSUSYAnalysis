@@ -847,7 +847,10 @@ RooWorkspace* MakeSignalBkgFit( TTree* treeData, TTree* treeSignal, TTree* treeS
 
 void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std::string Signal_CF, float mass, TString binNumber, TString category, TString year )
 {
-  std::cout << "entering datacard: " << Signal_Yield << std::endl;
+  std::cout << "====================================================================" << std::endl;
+  std::cout << "entering datacard: " << Signal_Yield << " Year: " << year << std::endl;
+  std::cout << "====================================================================" << std::endl;
+
   std::stringstream ss_signal;
   ss_signal << Signal_CF;
   float tmp;
@@ -871,17 +874,14 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
   TFile* ftmp = new TFile( combinedRootFileName, "recreate");
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
 
-  bool isEBEB = true;
+  bool isEBEB = false;
   
   if ( isEBEB ) mggName = "mGammaGamma_EBEB";
   else mggName = "mGammaGamma_EBEE";
 
-  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 230, 6000, "GeV" );//EBEBE
-  //RooRealVar mgg( mggName, "m_{#gamma#gamma}", 330, 6000, "GeV" );//EBEE
+  //RooRealVar mgg( mggName, "m_{#gamma#gamma}", 230, 6000, "GeV" );//EBEBE
+  RooRealVar mgg( mggName, "m_{#gamma#gamma}", 330, 6000, "GeV" );//EBEE
 
-  //RooRealVar mgg( mggName, "m_{#gamma#gamma}", 230, 10000, "GeV" );//EBEBE
-  //RooRealVar mgg( mggName, "m_{#gamma#gamma}", 330, 10000, "GeV" );//EBEE
-  
   
   mgg.setUnit( "GeV" );
   //mgg.setRange( "signal", 600., 900. );
@@ -965,13 +965,16 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
   ws->import( data );
 
   float SignaYieldOriginal = Signal_Yield;//2.69(1/fb)*10fb
+  float effSF_EBEB = 0.9627*0.9627;
+  float effSF_EBEE = 0.9627*0.9352;
+
   for ( int i = 0; i < 1501; i++ )
     {
       float _mass = 500. + (float)2*i;
       if ( isEBEB )
 	{
 	  if ( year == "2015" ) Signal_Yield = SignaYieldOriginal*( 2.44392e-01+(3.40500e-04)*_mass-(1.42193e-07)*pow(_mass,2)+(3.08615e-11)*pow(_mass,3)-(2.75671e-15)*pow(_mass,4) );
-	  else if ( year == "2016" ) Signal_Yield = SignaYieldOriginal*( 2.52927e-01+(3.26565e-04)*_mass-(1.34127e-07)*pow(_mass,2)+(2.86419e-11)*pow(_mass,3)-(2.52305e-15)*pow(_mass,4) );
+	  else if ( year == "2016" ) Signal_Yield = SignaYieldOriginal*effSF_EBEB*( 2.52927e-01+(3.26565e-04)*_mass-(1.34127e-07)*pow(_mass,2)+(2.86419e-11)*pow(_mass,3)-(2.52305e-15)*pow(_mass,4) );
 	  else 
 	    {
 	      std::cerr <<  "year: " << year << "not defined, could not find eff*acc; TERMINATING!!" << std::endl;
@@ -981,7 +984,7 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
       else
 	{
 	  if ( year == "2015" ) Signal_Yield = SignaYieldOriginal*( 1.61828e-01+(6.99351e-05)*_mass-(9.55028e-08)*pow(_mass,2)+(2.92184e-11)*pow(_mass,3)-(2.82880e-15)*pow(_mass,4) );
-	  else if ( year == "2016" ) Signal_Yield = SignaYieldOriginal*( 1.64433e-01+(5.87817e-05)*_mass-(8.72622e-08)*pow(_mass,2)+(2.69219e-11)*pow(_mass,3)-(2.60707e-15)*pow(_mass,4) );
+	  else if ( year == "2016" ) Signal_Yield = SignaYieldOriginal*effSF_EBEE*( 1.64433e-01+(5.87817e-05)*_mass-(8.72622e-08)*pow(_mass,2)+(2.69219e-11)*pow(_mass,3)-(2.60707e-15)*pow(_mass,4) );
 	  else 
 	    {
 	      std::cerr <<  "year: " << year << "not defined, could not find eff*acc; TERMINATING!!" << std::endl;
@@ -1185,7 +1188,7 @@ void MakeDataCardHMD( TTree* treeData, TString mggName, float Signal_Yield, std:
 	  ofs << "process\t\t\t\t\t\t0\t\t1\n";
 	  ofs << "rate\t\t\t\t\t\t1\t\t1\n";
 	  ofs << "----------------------------------------------------------------------------------------\n";
-	  ofs << "CMS_Lumi\t\t\tlnN\t\t1.057\t\t-\n";
+	  ofs << "CMS_Lumi\t\t\tlnN\t\t1.062\t\t-\n";
 	  ofs << "Photon_Trigger_" << det << "\t\t\tlnN\t\t1.08\t\t-\n";
 	  ofs << "PdfNorm_" << det << "\t\t\t\tlnN\t\t1.06\t\t-\n";
 	  int totalSys = signal_sys.size();
