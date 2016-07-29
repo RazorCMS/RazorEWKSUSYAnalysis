@@ -8,6 +8,7 @@
 #include <TFile.h>
 #include <TROOT.h>
 #include <TCanvas.h>
+#include <TColor.h>
 #include <TF1.h>
 #include <TIterator.h>
 #include <TMath.h>
@@ -20,6 +21,7 @@
 #include <RooFitResult.h>
 #include <RooWorkspace.h>
 #include <RooRandom.h>
+#include <RooPlot.h>
 //LOCAL INCLUDES
 #include "HggRazorSystematics.hh"
 #include "CommandLineInput.hh"
@@ -33,8 +35,8 @@ float GetNsErr( std::string fname, int bin, std::string cat = "highpt" );
 float GetSMH( std::string fname, int bin, std::string cat = "highpt" );
 float GetSMHErr( std::string fname, int bin, std::string cat = "highpt" );
 float GetNbkg( std::string fname, std::string f1, int bin, bool _err = false, std::string cat = "highpt" );
-float GetErrorFromToys(RooWorkspace *ws, RooFitResult *fr, RooRealVar *Nbkg, TString pdfName, 
-        unsigned int ntoys = 1000, int binNum = 0);
+float GetErrorFromToys(RooWorkspace *ws, RooFitResult *fr, TString pdfName, 
+        unsigned int ntoys = 1000, int binNum = 0, bool plotBkgFuncs = false);
 
 //----------------------------------------------                                                                                                                             
 //Load Binning                                                                                                                                                               
@@ -734,7 +736,7 @@ float GetNbkg( std::string fname, std::string f1, int bin, bool _err, std::strin
       RooAbsReal* igx_sig = ws->pdf( pdf )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("signal"));
       //std::cout << Nbkg->getVal()*igx_sig->getVal() << " +/- " << Nbkg->getError()*igx_sig->getVal() << std::endl;
       if ( _err ) {
-        return GetErrorFromToys( ws, fit_r, Nbkg, pdf, 10000, realBin );
+        return GetErrorFromToys( ws, fit_r, pdf, 10000, realBin );
       }
       //if ( _err ) return Nbkg->getError()*igx_sig->getVal();
       return Nbkg->getVal()*igx_sig->getVal();
@@ -791,7 +793,7 @@ float GetNbkg( std::string fname, std::string f1, int bin, bool _err, std::strin
       RooAbsReal* igx_sig = ws->pdf( pdf )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("signal"));
       //std::cout << Nbkg->getVal()*igx_sig->getVal() << " +/- " << Nbkg->getError()*igx_sig->getVal() << std::endl;
       if ( _err ) {
-        return GetErrorFromToys( ws, fit_r, Nbkg, pdf, 10000, realBin );
+        return GetErrorFromToys( ws, fit_r, pdf, 10000, realBin );
       }
       //if ( _err ) return Nbkg->getError()*igx_sig->getVal();
       return Nbkg->getVal()*igx_sig->getVal();
@@ -831,7 +833,7 @@ float GetNbkg( std::string fname, std::string f1, int bin, bool _err, std::strin
       RooAbsReal* igx_sig = ws->pdf( pdf )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("signal"));
       //std::cout << Nbkg->getVal()*igx_sig->getVal() << " +/- " << Nbkg->getError()*igx_sig->getVal() << std::endl;
       if ( _err ) {
-        return GetErrorFromToys( ws, fit_r, Nbkg, pdf, 10000, realBin );
+        return GetErrorFromToys( ws, fit_r, pdf, 10000, realBin );
       }
       //if ( _err ) return Nbkg->getError()*igx_sig->getVal();
       return Nbkg->getVal()*igx_sig->getVal();
@@ -862,7 +864,7 @@ float GetNbkg( std::string fname, std::string f1, int bin, bool _err, std::strin
       RooAbsReal* igx_sig = ws->pdf( pdf )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("signal"));
       //std::cout << Nbkg->getVal()*igx_sig->getVal() << " +/- " << Nbkg->getError()*igx_sig->getVal() << std::endl;
       if ( _err ) {
-        return GetErrorFromToys( ws, fit_r, Nbkg, pdf, 10000, realBin );
+        return GetErrorFromToys( ws, fit_r, pdf, 10000, realBin );
       }
       //if ( _err ) return Nbkg->getError()*igx_sig->getVal();
       return Nbkg->getVal()*igx_sig->getVal();
@@ -871,23 +873,20 @@ float GetNbkg( std::string fname, std::string f1, int bin, bool _err, std::strin
   return 0;
 };
 
-float GetErrorFromToys(RooWorkspace *ws, RooFitResult *fr, RooRealVar *Nbkg, TString pdfName, 
-        unsigned int ntoys, int binNum) {
+float GetErrorFromToys(RooWorkspace *ws, RooFitResult *fr, TString pdfName, unsigned int ntoys, int binNum, 
+        bool plotBkgFuncs) {
     RooRandom::randomGenerator()->SetSeed(33333);
+    TCanvas *c = new TCanvas("c","c",400,300);
+    RooPlot *frame = ws->var("mGammaGamma")->frame();
 
     RooAbsPdf *pdf = ws->pdf(pdfName);
-    float norm = Nbkg->getVal();
-    float normRelErr = Nbkg->getError()/norm;
 
     // throw toys
     std::vector<float> toyYields;
     for( unsigned int itoy = 0; itoy < ntoys; itoy++ ) {
         // randomize function parameters
         RooArgList toyPars = fr->randomizePars();
-	//toyPars.Print();
-        // randomize norm 
-        float xGaus = RooRandom::randomGenerator()->Gaus(0,1); //draw from std normal
-        float toyNorm = norm*TMath::Power(1+normRelErr,xGaus); //get corresponding log-normal value
+        float toyNorm = -1;
 
         // set params to new values
         TIterator *toyIter = toyPars.createIterator();
@@ -897,7 +896,6 @@ float GetErrorFromToys(RooWorkspace *ws, RooFitResult *fr, RooRealVar *Nbkg, TSt
 	  
 	  RooRealVar *pdfVar = ws->var( curVar->GetName() );
 	  if (pdfVar) {
-	    //std::cout << "name: " << curVar->GetName() << " val: " << curVar->getVal() << std::endl;
 	    pdfVar->setVal( curVar->getVal() );
 	    pdfVar->setError( curVar->getError() );
 	  }
@@ -912,7 +910,20 @@ float GetErrorFromToys(RooWorkspace *ws, RooFitResult *fr, RooRealVar *Nbkg, TSt
         RooAbsReal *integral = pdf->createIntegral( *(ws->var("mGammaGamma")), 
                 RooFit::NormSet( RooArgSet(*(ws->var("mGammaGamma"))) ), RooFit::Range("signal") );
         toyYields.push_back( integral->getVal()*toyNorm );
+
+        // draw the curve
+        if (plotBkgFuncs) {
+            pdf->plotOn(frame, RooFit::LineWidth(1), RooFit::LineColor(
+                    TColor::GetColor((Float_t)0.,(Float_t)0.,(Float_t)(itoy*1.0/ntoys))));
+        }
     }
+
+    if (plotBkgFuncs) {
+        // draw frame with all sampled curves
+        frame->Draw();
+        c->Print(Form("toysenvelopebin%d.pdf",binNum));
+    }
+
     // compute mean, min, max
     float mean = 0.0;
     float min = 999999.;
@@ -934,7 +945,6 @@ float GetErrorFromToys(RooWorkspace *ws, RooFitResult *fr, RooRealVar *Nbkg, TSt
     variance /= (ntoys-1);
 
     // make plot
-    TCanvas *c = new TCanvas("c","c",400,300);
     yieldHist->SetMarkerStyle(20);
     yieldHist->SetMarkerSize(.5);
     yieldHist->Draw("p");
