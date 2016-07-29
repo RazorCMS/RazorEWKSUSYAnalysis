@@ -91,20 +91,30 @@ class smsPlotABS(object):
         
         # CMS LABEL
         #textCMS = rt.TLatex(0.15,0.98,"CMS %s                 %.1f fb^{-1} (%s TeV)" %(self.preliminary, float(self.lumi)/1000., self.energy))
-        textCMS = rt.TLatex(0.15,0.98,"CMS")
+        textCMS = rt.TLatex(0.17,0.97,"CMS")
         textCMS.SetNDC()
         textCMS.SetTextAlign(13)
         textCMS.SetTextFont(62)
         textCMS.SetTextSize(0.05)
         textCMS.Draw()
-        textCMS1 = rt.TLatex(0.57,0.98,"%.1f fb^{-1} (%s TeV)" %(float(self.lumi)/1000., self.energy))
+
+        ##
+        textCMSp = rt.TLatex(0.28,0.965,"Preliminary")
+        textCMSp.SetNDC()
+        textCMSp.SetTextAlign(13)
+        textCMSp.SetTextFont(52)
+        textCMSp.SetTextSize(0.045)
+        textCMSp.Draw()
+        
+        textCMS1 = rt.TLatex(0.55,0.97,"%.1f fb^{-1} (%s TeV)" %(float(self.lumi)/1000., self.energy))
         textCMS1.SetNDC()
         textCMS1.SetTextAlign(13)
         textCMS1.SetTextFont(42)
-        textCMS1.SetTextSize(0.038)
+        textCMS1.SetTextSize(0.04)
         textCMS1.Draw()
         self.c.textCMS = textCMS
         self.c.textCMS1 = textCMS1
+        self.c.textCMSp = textCMSp
         # MODEL LABEL
         textModelLabel= rt.TLatex(0.185,0.90,"%s" %self.model.label)
         #textModelLabel= rt.TLatex(0.16,0.90,"%s" %self.model.label)
@@ -183,7 +193,7 @@ class smsPlotABS(object):
         textObs = rt.TLatex(self.model.Xmin+11*xRange/100, self.model.Ymax-1.50*yRange/100*10, "Observed #pm 1 #sigma_{theory}")
         textObs.SetTextFont(42)
         textObs.SetTextSize(0.040)
-        textObs.Draw()
+        #textObs.Draw()
         self.c.textObs = textObs
 
         LExpP = rt.TGraph(2)
@@ -235,18 +245,18 @@ class smsPlotABS(object):
         textExp = rt.TLatex(self.model.Xmin+11*xRange/100, self.model.Ymax-2.15*yRange/100*10, "Expected #pm 1 #sigma_{experiment}")
         textExp.SetTextFont(42)
         textExp.SetTextSize(0.040)
-        #textExp.Draw()
+        textExp.Draw()
         self.c.textExp = textExp
 
-        LObs.Draw("LSAME")
-        LObsM.Draw("LSAME")
-        LObsP.Draw("LSAME")
+        #LObs.Draw("LSAME")
+        #LObsM.Draw("LSAME")
+        #LObsP.Draw("LSAME")
 
-        #LExp.Draw("LSAME")
+        LExp.Draw("LSAME")
         #LExpM2.Draw("LSAME")
         #LExpP2.Draw("LSAME")
-        #LExpM.Draw("LSAME")
-        #LExpP.Draw("LSAME")
+        LExpM.Draw("LSAME")
+        LExpP.Draw("LSAME")
         
         self.c.LObs = LObs
         self.c.LObsM = LObsM
@@ -334,10 +344,10 @@ class smsPlotABS(object):
         #self.OBS['plus'].Draw("LSAME")
         #self.OBS['nominal'].Draw("LSAME") 
 
-        #self.EXP['minus'].Draw("LSAME")
-        #self.EXP['nominal'].Draw("LSAME")
-        #self.EXP['plus'].Draw("LSAME")
+        self.EXP['minus'].Draw("LSAME")
+        self.EXP['nominal'].Draw("LSAME")
+        self.EXP['plus'].Draw("LSAME")
     
-        self.OBS['minus'].Draw("LSAME")
-        self.OBS['nominal'].Draw("LSAME")
-        self.OBS['plus'].Draw("LSAME")
+        #self.OBS['minus'].Draw("LSAME")
+        #self.OBS['nominal'].Draw("LSAME")
+        #self.OBS['plus'].Draw("LSAME")

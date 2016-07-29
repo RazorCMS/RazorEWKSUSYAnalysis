@@ -655,7 +655,8 @@ float GetNsErr( std::string fname, int bin, std::string cat )
 float GetSMH( std::string fname, int bin, std::string cat )
 {
   TFile* fin = TFile::Open( fname.c_str(), "READ");
-  RooArgSet* norm_fit_s = (RooArgSet*) fin->Get("norm_fit_s");
+  //RooArgSet* norm_fit_s = (RooArgSet*) fin->Get("norm_fit_s");
+  RooArgSet* norm_fit_s = (RooArgSet*) fin->Get("norm_prefit");
 
   std::stringstream ss;
   if ( cat == "highres" ) ss << "highResBin" << bin << "/SMH";
@@ -668,7 +669,8 @@ float GetSMH( std::string fname, int bin, std::string cat )
 float GetSMHErr( std::string fname, int bin, std::string cat )
 {
   TFile* fin = TFile::Open( fname.c_str(), "READ");
-  RooArgSet* norm_fit_s = (RooArgSet*) fin->Get("norm_fit_s");
+  //RooArgSet* norm_fit_s = (RooArgSet*) fin->Get("norm_fit_s");
+  RooArgSet* norm_fit_s = (RooArgSet*) fin->Get("norm_prefit");
   std::stringstream ss;
   if ( cat == "highres" ) ss << "highResBin" << bin << "/SMH";
   else if ( cat == "lowres" ) ss << "lowResBin" << bin << "/SMH";
