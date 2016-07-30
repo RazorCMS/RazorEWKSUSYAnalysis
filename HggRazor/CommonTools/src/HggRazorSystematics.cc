@@ -34,19 +34,6 @@ HggRazorSystematics::HggRazorSystematics( TTree* tree, TString processName, TStr
       this->boxName = boxName;
     }
 
-  /*
-  h2p = NULL;
-  h2p_facScaleUp = NULL;
-  h2p_facScaleDown = NULL;
-  h2p_renScaleUp = NULL;
-  h2p_renScaleDown = NULL;
-  h2p_facRenScaleUp = NULL;
-  h2p_facRenScaleDown = NULL;
-  
-  NEvents = NULL;
-  SumScaleWeights = NULL;
-  SumPdfWeights = NULL;
-  */
 };
 
 HggRazorSystematics::~HggRazorSystematics()
@@ -55,6 +42,8 @@ HggRazorSystematics::~HggRazorSystematics()
   
   if ( this->h2p != NULL ) delete h2p;
   if ( this->h2p_eff != NULL ) delete h2p_eff;
+  if ( this->h2p_ISRUp != NULL ) delete h2p_ISRUp;
+  if ( this->h2p_ISRDown != NULL ) delete h2p_ISRDown;
   if ( this->h2p_facScaleUp != NULL ) delete h2p_facScaleUp;
   if ( this->h2p_facScaleDown != NULL ) delete h2p_facScaleDown;
   if ( this->h2p_renScaleUp != NULL ) delete h2p_renScaleUp;
@@ -95,6 +84,8 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
       h2p_Err = new TH2Poly(this->processName+"_nominal_err", "", 150, 10000, 0, 1);
       h2p_eff = new TH2Poly(this->processName+"_eff", "", 150, 10000, 0, 1);
       
+      h2p_ISRUp      = new TH2Poly(this->processName+"_ISRUp", "", 150, 10000, 0, 1);
+      h2p_ISRDown    = new TH2Poly(this->processName+"_ISRDown", "", 150, 10000, 0, 1);
       h2p_facScaleUp      = new TH2Poly(this->processName+"_facScaleUp", "", 150, 10000, 0, 1);
       h2p_facScaleDown    = new TH2Poly(this->processName+"_facScaleDown", "", 150, 10000, 0, 1);
       h2p_renScaleUp      = new TH2Poly(this->processName+"_renScaleUp", "", 150, 10000, 0, 1);
@@ -123,6 +114,9 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
 	      h2p->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
 	      h2p_Err->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
 	      h2p_eff->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
+
+	      h2p_ISRUp->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
+	      h2p_ISRDown->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
 	      h2p_facScaleUp->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
 	      h2p_facScaleDown->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
 	      h2p_renScaleUp->AddBin( tmp.first.first, tmp.second.at(i), tmp.first.second, tmp.second.at(i+1) );
@@ -155,6 +149,9 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
       h2p_Err = new TH2Poly(this->processName+"_nominal_err", "", 150, 10000, 0, 1);
       h2p_eff = new TH2Poly(this->processName+"_eff", "", 150, 10000, 0, 1);
       
+      h2p_ISRUp      = new TH2Poly(this->processName+"_ISRUp", "", 150, 10000, 0, 1);
+      h2p_ISRDown    = new TH2Poly(this->processName+"_ISRDown", "", 150, 10000, 0, 1);
+
       h2p_facScaleUp      = new TH2Poly(this->processName+"_facScaleUp", "", 150, 10000, 0, 1);
       h2p_facScaleDown    = new TH2Poly(this->processName+"_facScaleDown", "", 150, 10000, 0, 1);
 
@@ -185,6 +182,9 @@ bool HggRazorSystematics::InitMrRsqTH2Poly( int mode )
 	  h2p->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
 	  h2p_Err->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
 	  h2p_eff->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
+	  
+	  h2p_ISRUp->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
+	  h2p_ISRDown->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
 	  
 	  h2p_facScaleUp->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
 	  h2p_facScaleDown->AddBin(tmp[0], tmp[1], tmp[2], tmp[3]);
@@ -239,6 +239,13 @@ void HggRazorSystematics::Loop()
       return;
     }
   
+  if ( this->processName == "signal") {
+    if ( this->ISRHist == NULL ) {
+      std::cerr << "[ERROR]: ISRHist has not been set for the signal process" << std::endl;
+      return;
+    }
+  }
+
   if ( _debug ) std::cout << "[DEBUG]: Setting N_events and N_facScale" << std::endl;
   
   float N_events;
@@ -255,7 +262,31 @@ void HggRazorSystematics::Loop()
   for ( int i = 0; i < n_PdfSys; i++ ) N_Pdf[i] = this->SumPdfWeights->GetBinContent( i+1 );
     
   if ( _debug ) std::cout << "[DEBUG]: Passed N_events, N_facScale, N_PDF" << std::endl;
-  
+
+
+  //****************************************************
+  //Signal ISR Correction
+  //****************************************************
+  double ISRCorrection[7] = { 1, 0.882, 0.792, 0.702, 0.648, 0.601, 0.515};
+  if( this->processName == "signal" ) {
+    if ( this->ISRHist ) {
+      double tmpTotal = 0;
+      for (int i = 1; i<= 7; i++) tmpTotal += this->ISRHist->GetBinContent(i);
+      double tmpCorrTotal = 0;
+      for (int i = 2; i<= 7; i++) tmpCorrTotal += ISRCorrection[i] * this->ISRHist->GetBinContent(i);
+      ISRCorrection[0] = (tmpTotal - tmpCorrTotal) / this->ISRHist->GetBinContent(1);
+
+      std::cout << "[DEBUG] : total = " << tmpTotal << " , tmpCorrTotal = " << tmpCorrTotal 
+		<< " , Original Bin 1 = " << this->ISRHist->GetBinContent(1) << " , "
+		<< " ISRCorrection[0] = " << ISRCorrection[0] << "\n";
+
+    } else {
+      std::cout << "[ERROR] : ISRHist has not been loaded.\n";
+    }
+  }
+
+
+
   //--------------------------------
   //Photon Trigger Efficiency
   //--------------------------------
@@ -268,8 +299,6 @@ void HggRazorSystematics::Loop()
     std::cout << "Error: Trigger efficiency files not loaded.\n";
     return;
   }
-
-
 
   Long64_t nentries = fChain->GetEntriesFast();
   Long64_t nbytes = 0, nb = 0;
@@ -312,12 +341,16 @@ void HggRazorSystematics::Loop()
       triggerEffWeight = triggerEffLeadingLeg*triggerEffTrailingLeg;
       //**********************************************************
 
+      double ISRCorrValue = 1.0;
+      if( this->processName == "signal" ) {
+	ISRCorrValue = ISRCorrection[std::min(NISRJets,6)];
+      }
 
       float commonW = 0;
       if (_analysisTag == "Razor2015_76X") {
-	commonW = this->Lumi*weight*pileupWeight*btagCorrFactor*photonEffSF;
+	commonW = this->Lumi*weight*pileupWeight*btagCorrFactor*photonEffSF*ISRCorrValue;
       } else if (_analysisTag == "Razor2016_80X") {
-	commonW = this->Lumi*weight*pileupWeight*btagCorrFactor*triggerEffWeight*photonEffSF;
+	commonW = this->Lumi*weight*pileupWeight*btagCorrFactor*triggerEffWeight*photonEffSF*ISRCorrValue;
       } else {
 	std::cout << "Analysis Tag " << _analysisTag << " not recognized. Error!\n";
 	return;
@@ -344,6 +377,9 @@ void HggRazorSystematics::Loop()
 	// Protect against samples without theory uncertainty info.
 	// If they are missing just make them 0.
 	//************************************************************
+	h2p_ISRUp->Fill( MR, fmin(t1Rsq,0.999), commonW/ISRCorrValue );
+	h2p_ISRDown->Fill( MR, fmin(t1Rsq,0.999), commonW/ISRCorrValue );
+
 	if( fabs(N_facScale[0]) > 0) h2p_facScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW*sf_facScaleUp*N_events/N_facScale[0] );
 	else h2p_facScaleUp->Fill( MR, fmin(t1Rsq,0.999), commonW );
 	  
@@ -525,6 +561,8 @@ bool HggRazorSystematics::WriteOutput( TString outName )
   this->fout = new TFile( outName + "_" + this->processName + ".root", "recreate");
   if ( h2p != NULL ) h2p->Write( this->boxName + "_histo" );
   if ( h2p_eff != NULL ) h2p_eff->Write( this->boxName + "_histo_eff" );
+  if ( h2p_ISRUp != NULL ) h2p_ISRUp->Write( this->boxName + "_histo_ISRUp" );
+  if ( h2p_ISRDown != NULL ) h2p_ISRDown->Write( this->boxName + "_histo_ISRDown" );
   if ( h2p_facScaleUp != NULL ) h2p_facScaleUp->Write( this->boxName + "_histo_facScaleUp" );
   if ( h2p_facScaleDown != NULL ) h2p_facScaleDown->Write( this->boxName + "_histo_facScaleDown" );
   if ( h2p_renScaleUp != NULL ) h2p_renScaleUp->Write( this->boxName + "_histo_renScaleUp" );
@@ -562,6 +600,19 @@ bool HggRazorSystematics::SetNeventsHisto( TH1F* histo )
       return false;
     }
   this->NEvents = new TH1F( *histo );
+  return true;
+};
+
+bool HggRazorSystematics::SetISRHisto( TH1F* histo )
+{
+  this->ISRHist = NULL;
+  if ( histo == NULL )
+    {
+      if (this->processName == "signal" ) std::cerr << "[ERROR]: ISR histogram provided is equal to NULL" << std::endl;
+      return false;
+    }
+  this->ISRHist = new TH1F( *histo );
+
   return true;
 };
 
@@ -616,6 +667,20 @@ std::pair<float, float> HggRazorSystematics::GetFacScaleSystematic( float mr, fl
   float smhY_Down = h2p_facScaleDown->GetBinContent( bin )-smhY;
   //std::cout << "mr: " << mr << " rsq: " << rsq << "; up: " << smhY_Up << ", down: " << smhY_Down << std::endl;
   return std::make_pair( smhY_Up, smhY_Down );
+};
+
+std::pair<float, float> HggRazorSystematics::GetISRSystematic( float mr, float rsq )
+{
+  int bin = h2p->FindBin( mr+10, rsq+0.0001 );
+  float smhY      = h2p->GetBinContent( bin );
+  float uncorrY   = h2p_ISRUp->GetBinContent( bin );
+  float smhY_Up   = smhY + (uncorrY - smhY) * 0.5;
+  float smhY_Down = smhY - (uncorrY - smhY) * 0.5;
+
+  float errUp = smhY_Up - smhY;
+  float errDown = smhY_Down - smhY;
+
+  return std::make_pair( errUp , errDown );
 };
 
 std::pair<float, float> HggRazorSystematics::GetRenScaleSystematic( float mr, float rsq )

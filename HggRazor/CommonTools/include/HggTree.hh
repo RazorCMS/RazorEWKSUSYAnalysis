@@ -31,6 +31,7 @@ public :
    Float_t         photonEffSF;
    Float_t         ISRSystWeightUp;
    Float_t         ISRSystWeightDown;
+   Int_t           NISRJets;
    Float_t         btagCorrFactor;
    Float_t         sf_btagUp;
    Float_t         sf_btagDown;
@@ -165,6 +166,7 @@ public :
    TBranch        *b_photonEffSF;   //!
    TBranch        *b_ISRSystWeightUp;   //!
    TBranch        *b_ISRSystWeightDown;   //!
+   TBranch        *b_NISRJets;   //!
    TBranch        *b_btagCorrFactor;   //!
    TBranch        *b_sf_btagUp;   //!
    TBranch        *b_sf_btagDown;   //!
@@ -371,6 +373,7 @@ void HggTree::Init(TTree *tree)
    fChain->SetBranchAddress("photonEffSF", &photonEffSF, &b_photonEffSF);
    fChain->SetBranchAddress("ISRSystWeightUp", &ISRSystWeightUp, &b_ISRSystWeightUp);
    fChain->SetBranchAddress("ISRSystWeightDown", &ISRSystWeightDown, &b_ISRSystWeightDown);
+   fChain->SetBranchAddress("NISRJets", &NISRJets, &b_NISRJets);
    fChain->SetBranchAddress("btagCorrFactor", &btagCorrFactor, &b_btagCorrFactor);
    fChain->SetBranchAddress("sf_btagUp", &sf_btagUp, &b_sf_btagUp);
    fChain->SetBranchAddress("sf_btagDown", &sf_btagDown, &b_sf_btagDown);

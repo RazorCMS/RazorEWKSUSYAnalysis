@@ -222,6 +222,9 @@ int main( int argc, char* argv[] )
   TH2Poly* nominal  = new TH2Poly("nominal_SMH", "", 150, 10000, 0, 1 );
   TH2Poly* nominalS = new TH2Poly("nominal_Signal", "", 150, 10000, 0, 1 );
 
+  TH2Poly* ISRUpS   = new TH2Poly("ISRUpS", "", 150, 10000, 0, 1 );
+  TH2Poly* ISRDownS = new TH2Poly("ISRDownS", "", 150, 10000, 0, 1 );
+
   TH2Poly* facScaleUp    = new TH2Poly("facScaleUp", "", 150, 10000, 0, 1 );
   TH2Poly* facScaleDown  = new TH2Poly("facScaleDown", "", 150, 10000, 0, 1 );
   TH2Poly* facScaleUpS   = new TH2Poly("facScaleUpS", "", 150, 10000, 0, 1 );
@@ -266,6 +269,8 @@ int main( int argc, char* argv[] )
     {
       nominal->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       nominalS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+      ISRUpS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+      ISRDownS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       facScaleUp->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       facScaleUpS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       facScaleDown->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
@@ -323,7 +328,9 @@ int main( int argc, char* argv[] )
       if ( process != "signal" ) assert( SumScaleWeights );
       TH1F* SumPdfWeights   = (TH1F*)fin->Get("SumPdfWeights");
       if ( process != "signal" ) assert( SumPdfWeights );     
- 
+      TH1F* ISRHist = (TH1F*)fin->Get("NISRJets");
+      if ( process == "signal" ) assert( ISRHist );
+
       TString tmpName = Form("tmp_%d.root", rand());
       TFile* tmp = new TFile( tmpName , "RECREATE");
       TTree* cutTree = tree->CopyTree( cut );
@@ -343,6 +350,7 @@ int main( int argc, char* argv[] )
       hggSys->SetNeventsHisto( NEvents );
       hggSys->SetFacScaleWeightsHisto( SumScaleWeights );
       hggSys->SetPdfWeightsHisto( SumPdfWeights );
+      hggSys->SetISRHisto( ISRHist );
       hggSys->Loop();
       for ( auto tmp: myVectBinning )
 	{
@@ -356,7 +364,6 @@ int main( int argc, char* argv[] )
 	      facSys = hggSys->GetJesSystematic( tmp[0], tmp[1] );
 	      JesUpS->SetBinContent( bin, facSys.first );
 	      JesDownS->SetBinContent( bin, facSys.second );
-
 	      //btag
 	      facSys = hggSys->GetBtagSystematic( tmp[0], tmp[1] );
 	      btagUpS->SetBinContent( bin, facSys.first );
@@ -366,9 +373,11 @@ int main( int argc, char* argv[] )
 	      misstagUpS->SetBinContent( bin, facSys.first );
 	      misstagDownS->SetBinContent( bin, facSys.second );
 
-	      //*****************************************************************
-	      //Turn off signal theory systematics for now, because it isn't working
-	      //*****************************************************************
+	      //Signal ISR systematic
+	      facSys = hggSys->GetISRSystematic( tmp[0], tmp[1] );
+	      ISRUpS->SetBinContent( bin,  facSys.first );
+	      ISRDownS->SetBinContent( bin, facSys.second );
+
 	      //facScale
 	      facSys = hggSys->GetFacScaleSystematic( tmp[0], tmp[1] );
 	      //facSys = std::pair<float,float>(0,0);
@@ -467,6 +476,10 @@ int main( int argc, char* argv[] )
 
        float totalFractionalUncertaintySqr = 0;
 
+       //ISR systematic
+       ISRUpS->SetBinContent( bin, ISRUpS->GetBinContent(bin)/nomS );
+       ISRDownS->SetBinContent( bin, ISRDownS->GetBinContent(bin)/nomS );
+
        //Fac
        facScaleUp->SetBinContent( bin, facScaleUp->GetBinContent(bin)/nom );
        facScaleDown->SetBinContent( bin, facScaleDown->GetBinContent(bin)/nom );
@@ -531,6 +544,7 @@ int main( int argc, char* argv[] )
        //Signal
        outf <<  nomS << "\t"
 	    << JesUpS->GetBinContent( bin ) << "\t" <<  JesDownS->GetBinContent( bin ) << "\t"
+	    << ISRUpS->GetBinContent( bin ) << "\t" <<  ISRDownS->GetBinContent( bin ) << "\t"
 	    << facScaleUpS->GetBinContent( bin ) << "\t" <<  facScaleDownS->GetBinContent( bin ) << "\t"
 	    <<  renScaleUpS->GetBinContent( bin )    << "\t" <<  renScaleDownS->GetBinContent( bin ) << "\t"
 	    <<  facRenScaleUpS->GetBinContent( bin ) << "\t" <<  facRenScaleDownS->GetBinContent( bin ) << "\t";
