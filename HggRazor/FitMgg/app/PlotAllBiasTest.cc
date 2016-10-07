@@ -33,6 +33,7 @@ int main( int argc, char* argv[])
   std::string mode = ParseCommandLine( argc, argv, "-mode=" );
   
   std::map< std::pair <std::string, std::string>, double > mean_map;//mean values for bias or fit error are strored
+  std::map< std::pair <std::string, std::string>, double > mean_err_map;//mean values for bias or fit error are strored
   std::map< std::pair <std::string, std::string>, double > mean_map_aux;//use to obtain both bias and fit errors.
   std::map< std::pair <std::string, std::string>, double > rms_map;
   if (  mode == "" )
@@ -64,7 +65,7 @@ int main( int argc, char* argv[])
   std::string fitFunc = ParseCommandLine( argc, argv, "-fitFunc=" );
   if (fitFunc == "") 
   {
-      std::cerr << "[WARNING]: please provide the bias fit function by using --fitFunc=<singleGaus/doubleGaus/crystalBall/doublecrystalBall>" << std::endl;
+      std::cerr << "[WARNING]: please provide the bias fit function by using --fitFunc=<singleGaus/doubleGaus/crystalBall/doublecrystalBall/doubleTailCrystalBall>" << std::endl;
       std::cerr << "[WARNING]: fit function not indicated, use default one: singleGaus" <<std::endl;
       fitFunc = "singleGaus";
   }
@@ -177,11 +178,17 @@ int main( int argc, char* argv[])
 	      std::string f2 = aux_s.substr( begin_s, end_s - begin_s );
 	      std::pair< std::string, std::string > tmp_p = std::make_pair( f1, f2 );
 	      std::cout << "f1: " << f1 << " f2: " << f2 << std::endl;
-	      double mean = FitBias( rootFile.c_str(), f1.c_str(), f2.c_str(), outputDir, _fitStatus, fitFunc );
+	      double mean_err = 0.0; 
+	      double mean = FitBias(&mean_err,  rootFile.c_str(), f1.c_str(), f2.c_str(), outputDir, _fitStatus, fitFunc );
 	       if ( mean_map.find( tmp_p ) == mean_map.end() )
 		 {
 		   mean_map[tmp_p] = mean;
 		 }
+		if ( mean_err_map.find( tmp_p ) == mean_err_map.end() )
+		 {
+		   mean_err_map[tmp_p] = mean_err;
+		 }
+
 	       std::cout << "mean--> " << mean << std::endl;
 	    }
 	  else if ( mode == "tableFitErr" )
@@ -278,7 +285,7 @@ int main( int argc, char* argv[])
 	{
 		std::cout<<v_func_name[i]<<"   "<<func_map[v_func_name[i]]<<std::endl;
 	}
-      MakeTable2( mean_map, "mean", categoryMode, LowMRcut, HighMRcut, LowRSQcut, HighRSQcut, SoB, func_map,v_func_name);
+      MakeTable2( mean_map, mean_err_map, "mean", categoryMode, LowMRcut, HighMRcut, LowRSQcut, HighRSQcut, SoB, func_map,v_func_name);
     }
   
   if ( mode == "tableFitErr" )
