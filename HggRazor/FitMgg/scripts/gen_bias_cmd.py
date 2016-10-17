@@ -7,7 +7,7 @@ import subprocess, time, sys, os, shlex
 
 print "RUNNING BIAS TEST"
 
-inputList = "/afs/cern.ch/work/z/zhicaiz/public/BiasSignalTest_result_2016BCDEFG_20161004/trees/"
+inputList = "/afs/cern.ch/work/z/zhicaiz/public/BiasSignalTest_result_2016BCDEFG_20161011/trees/"
 
 outputDir ="Bias_output/Bias_plots/"
 SoverB = ["0.0"]

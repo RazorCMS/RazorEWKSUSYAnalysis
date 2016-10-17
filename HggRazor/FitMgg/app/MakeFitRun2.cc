@@ -477,10 +477,10 @@ int main( int argc, char* argv[])
       cutMETfilters = " && 1";
     }
   
-  if(fitMode == "AIC2")
+  if(fitMode == "AIC2" || fitMode == "sb")
      {
-	cutMETfilters = "&& (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
-	cutTrigger = "&&  HLTDecision[65] == 1";
+	cutMETfilters = cutMETfiltersData;//"&& (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1)";
+	cutTrigger = cutTriggerData;//"&&  HLTDecision[65] == 1";
      }
   //****************************************************
   //Category Cut String
@@ -575,7 +575,10 @@ int main( int argc, char* argv[])
   TFile* fout = 0;
   if (outputfilename == "")
     {
-      fout = new TFile( Form("test_out_%d.root",rand()), "recreate" );
+      outName = Form("test_out_%d",rand());
+      //fout = new TFile( Form("test_out_%d.root",rand()), "recreate" );
+      fout = new TFile(outName+".root" , "recreate" );
+
     }
   else
     {
