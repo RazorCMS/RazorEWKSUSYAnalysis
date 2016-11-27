@@ -273,9 +273,9 @@ void HggRazorSystematics::Loop()
       double tmpTotal = 0;
       for (int i = 1; i<= 7; i++) tmpTotal += this->ISRHist->GetBinContent(i);
       double tmpCorrTotal = 0;
-      for (int i = 2; i<= 7; i++) tmpCorrTotal += ISRCorrection[i] * this->ISRHist->GetBinContent(i);
-      ISRCorrection[0] = (tmpTotal - tmpCorrTotal) / this->ISRHist->GetBinContent(1);
-
+      for (int i = 1; i <= 7; i++) tmpCorrTotal += ISRCorrection[i-1] * this->ISRHist->GetBinContent(i);
+      for (int i = 0; i < 7; i++) ISRCorrection[i] = ISRCorrection[i]*tmpTotal/tmpCorrTotal;
+      
       std::cout << "[DEBUG] : total = " << tmpTotal << " , tmpCorrTotal = " << tmpCorrTotal 
 		<< " , Original Bin 1 = " << this->ISRHist->GetBinContent(1) << " , "
 		<< " ISRCorrection[0] = " << ISRCorrection[0] << "\n";
