@@ -176,21 +176,22 @@ float lres_k[2] = { 1.0, 1.0};
 
 //DATA
 //GammaGamma
-//TString cut = "abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) < 1.4442 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1 && (Flag_HBHENoiseFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 )";
+/*TString cut = "mGammaGamma>103 && mGammaGamma<160 && abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) < 1.4442 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1 && (Flag_HBHENoiseFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 ) && MR > 150.";
 
 //MC
 //GammaGamma
-//TString cut_mc = "abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) < 1.4442 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && mGammaGamma>103 && mGammaGamma<160 && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1";
-
+TString cut_mc = "mGammaGamma>103 && mGammaGamma<160 && abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) < 1.4442 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1 && MR > 150.";
+*/
 
 //---------------
 //Zee control region
 //---------------
 //Data
-TString cut = "abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) < 1.4442 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && mGammaGamma > 75 && mGammaGamma < 120 && pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && (Flag_HBHENoiseFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 ) && MR > 150. && pTGammaGamma < 110 && abs(mbbH_L-125.)>=15 && abs(mbbZ_L-91.)>=15 && (  HLTDecision[84] ) && sigmaMoverM < 0.0085";
+
+TString cut = "abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) < 1.4442 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && mGammaGamma > 75 && mGammaGamma < 120 && pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && (Flag_HBHENoiseFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 )";
 
 //MC
-TString cut_mc = "abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) < 1.4442 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && mGammaGamma > 75 && mGammaGamma < 120 && pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && MR > 150. && pTGammaGamma < 110 && abs(mbbH_L-125.)>=15 && abs(mbbZ_L-91.)>=15 && sigmaMoverM < 0.0085";
+TString cut_mc = "abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) < 1.4442 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && mGammaGamma > 75 && mGammaGamma < 120 && pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && MR > 150.";
 
 
 //---------------------
@@ -203,17 +204,12 @@ TString cut_mc = "abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) < 1.4442 && ( 
 //TString triggerCut_80X = "&& (  HLTDecision[27] || HLTDecision[44] || HLTDecision[45] || HLTDecision[217] )";
 //TString triggerCut_76X = "&& (  HLTDecision[27] || HLTDecision[44] || HLTDecision[45] || HLTDecision[217] )";
 
-//TString triggerCut_80X = "&& (  HLTDecision[84] )";
-//TString triggerCut_76X = "&& (  HLTDecision[84] )";
+TString triggerCut_80X = "&& (  HLTDecision[84] )";
+TString triggerCut_76X = "&& (  HLTDecision[84] )";
 
-TString triggerCut_80X = "&& ( 1 )";
-TString triggerCut_76X = "&& ( 1 )";
+//TString triggerCut_80X = "&& ( 1 )";
+//TString triggerCut_76X = "&& ( 1 )";
 
-
-//--------------------------------
-//D i p h o t o n  M a s s   C u t 
-//--------------------------------
-TString mggCut = "1";
 
 #define _debug 1
 
@@ -225,26 +221,13 @@ int main ( int argc, char* argv[] )
   //Map Containing the lists for different processes 
   std::map< std::string, std::string > mapList;
   std::string inputFile = ParseCommandLine( argc, argv, "-inputFile=" );
+
   if (  inputFile == "" )
     {
       std::cerr << "[ERROR]: please provide an input file using --inputFile=<path_to_file>" << std::endl;
       return -1;
     }
   
-  std::string analysisTag = ParseCommandLine( argc, argv, "-analysisTag=" );
-  if ( analysisTag == "" )
-    {
-      std::cerr << "[ERROR]: please provide the analysisTag. Use --analysisTag=<Razor2015_76X,Razor2016_80X>" << std::endl;
-      return -1;
-    } 
-
-
-  std::string treeType = ParseCommandLine( argc, argv, "-treeType=" );
-  if (  treeType == "" )
-    {
-      std::cout << "[WARNING]: please provide a valid treeType, use --treeType=<inclusive/category>" << std::endl;
-      treeType = "inclusive";
-    }
 
   //provides shape comparison
   std::string shapeOnly = ParseCommandLine( argc, argv, "-shapeOnly=" );
@@ -254,28 +237,10 @@ int main ( int argc, char* argv[] )
       std::cout << "[INFO]: re-scaling all histograms to unity" << std::endl;
       _shapeOnly = true;
     }
-  //uses k-factors, defined above
-  std::string useKF = ParseCommandLine( argc, argv, "-useKF=" );
-  bool _useKF = false;
-  if (  useKF == "yes" )
-    {
-      std::cout << "[INFO]: Using k-factor(s) hardcoded in main application" << std::endl;
-      _useKF = true;
-    }
-
-  //plots mc and signal shapes 
-  std::string signalPlot = ParseCommandLine( argc, argv, "-signalPlot=" );
-  bool _signalPlot = false;
-  if (  signalPlot == "yes" )
-    {
-      std::cout << "[INFO]: Will produce MC and signal shape plots" << std::endl;
-      _signalPlot = true;
-    }
   
   std::cout << "=================================" << std::endl;
   std::cout << "===========set parameters========" << std::endl;
   std::cout << "[INFO]: input file: " << inputFile << std::endl;
-  std::cout << "[INFO]: analysisTag: " << analysisTag << std::endl;
   std::cout << "=================================" << std::endl;
   
   FillMapList( mapList, inputFile );
@@ -302,11 +267,6 @@ int main ( int argc, char* argv[] )
   int map_size = mapList.size();
   const int nprocesses = 2;//mc+data
   //check nprocesses and map_size consistency
-  if( map_size != nprocesses )
-    {
-      std::cerr << "[FATAL ERROR]: map size and nprocesses values are inconsistent!!, Please change nprocesses to map size: " << map_size << std::endl;
-      exit( EXIT_FAILURE );
-    }
   const int nplots = 4;
   // double k_f = 1.78*1.05;//Difference in data/mc normalization
   //double k_f = 1.62*1.05;//Difference in data/mc normalization
@@ -314,19 +274,19 @@ int main ( int argc, char* argv[] )
   double k_f = 2.0014889911;
   double lumi = 0;
   
-  if (analysisTag == "Razor2015_76X") lumi = 2300;
+  //if (analysisTag == "Razor2015_76X") lumi = 2300;
   //if (analysisTag == "Razor2016_80X") lumi = 4000;
-  if (analysisTag == "Razor2016_80X") lumi = 36200.;
+  //if (analysisTag == "Razor2016_80X") lumi = 36200.;
   
   std::cout << "[INFO]: running inclusive tree mode" << std::endl;
   int ctr = 0;
   Histos histos[nprocesses];
-  for( const auto& process : Process() )
+  for( const auto& process : mapList )
     {
-      std::string processName = GetProcessString( process );
+      std::string processName = process.first;
       std::cout << "[INFO] PROCESS: " << processName << " ,process #: " << ctr << std::endl;
       //DY control region
-      if ( !(process == Process::data || process == Process::dy) ) continue;
+      //if ( !(process == Process::data || process == Process::dy) ) continue;
 
       //Diphoton
       
@@ -350,7 +310,9 @@ int main ( int argc, char* argv[] )
       //need to create temporary root file to store cutTree
       TFile* tmp = new TFile("tmp.root","recreate");
 
-	  
+      //-------------------
+      //CHECK CHAINING
+      //-------------------
       if ( chain == NULL )
 	{
 	  std::cout << "[WARNING]: Empty selected tree in process: " << processName << std::endl;
@@ -359,29 +321,19 @@ int main ( int argc, char* argv[] )
       //------------------------
       //A p p l y i n g  C u t s
       //------------------------
-      if ( process == Process::data )
-	{
-	  TString myCut = cut;
-	  if (analysisTag == "Razor2016_80X") myCut = cut+triggerCut_80X;
-	  if (analysisTag == "Razor2015_76X") myCut = cut+triggerCut_76X;
-	  std::cout << "CUT--> " << myCut << std::endl; 
-	  cutTree = (TTree*)chain->CopyTree( myCut );
-	}
-      else
-	{
-	  TString myCut = cut;
-	  if (analysisTag == "Razor2016_80X") myCut = cut_mc+triggerCut_80X;
-	  if (analysisTag == "Razor2015_76X") myCut = cut_mc+triggerCut_76X;
-	  std::cout << "CUT--> " << myCut << std::endl; 
-	  cutTree = (TTree*)chain->CopyTree( myCut ); 
-	}
-	  
+      TString myCut = cut;
+      myCut = cut+triggerCut_80X;
+      std::cout << "CUT--> " << myCut << std::endl; 
+      cutTree = (TTree*)chain->CopyTree( myCut );
+      //-------------------
+      //CHECK CUT RESULT
+      //-------------------
       if ( cutTree == NULL )
 	{
 	  std::cout << "[WARNING]: Empty selected tree in process: " << processName << std::endl;
 	  continue;
 	}
-
+      
       std::cout << "[INFO]: reduced TTree has been created" << std::endl;
       //------------------------------------------------
       //C r e a t in g   S e l e c t i o n   O b j e c t
@@ -391,94 +343,67 @@ int main ( int argc, char* argv[] )
       //Creating Histos
       hggclass->Loop();
       //Assigning Histos
-      histos[ctr].process = process;
+      //histos[ctr].process = process;
       //-----------------------------
       //Assigning Histograms to Array
       //-----------------------------
-      std::cout << "DEB3" << std::endl;
       for ( const auto& htmp : HistoTypes() )
 	{
 	  std::cout << GetHistoTypesString( htmp ) << std::endl;
 	  TH1F h_scale = hggclass->GetHisto( htmp );
 	  histos[ctr].AssignHisto( htmp, h_scale );
 	}
-      std::cout << "DEB4" << std::endl;
       ctr++;
       delete hggclass;
     }
+  
+  
   //---------------
   //P l o t t i n g
   //---------------
-  std::cout << "PLOTTING" << std::endl;
-  for ( const auto& htmp : HistoTypes() ) {
-    std::string histoName = GetHistoTypesString( htmp );
-    //std::cout << "histoName: " << histoName << std::endl;
-    stack = new THStack( "hs" , "Hgg Stack " );
-    leg = new TLegend( 0.7, 0.58, 0.93, 0.89, NULL, "brNDC" );
-    leg2 = new TLegend( 0.7, 0.58, 0.93, 0.89, NULL, "brNDC" );
-    bool _isFirstMC = true;
-    //std::cout << "deb1: " << histoName << std::endl;
-    float NormFactor = 1.0;//Scale mc to unity if required
-    for (  int i  = 0; i < nprocesses; i++ )
-      {
-	TH1F* tmp_h = new TH1F( histos[i].GetHisto( htmp ) );
-	TH1D* h_s = GetStyledHisto( (TH1D*)tmp_h, histos[i].process );
-	if ( histos[i].process == Process::data )
-	  {
-	    data = new TH1D ( *h_s );
-	    if ( _shapeOnly ) data->Scale(1.0/data->Integral());
-	  }
-	else if ( histos[i].process != Process::signal )
-	  {
-	    h_s->Scale( lumi );
-	    if ( _useKF && (histos[i].process == Process::gammaJet || histos[i].process == Process::qcd || histos[i].process == Process::diphoton) ) h_s->Scale( k_f );
-	    //if ( _useKF  ) h_s->Scale( k_f );
-	    std::cout << "stacking " << GetProcessString( histos[i].process ) << std::endl;
-	    if ( mc == NULL || _isFirstMC )
-	      {
-		mc = new TH1D( *h_s );
-		_isFirstMC = false;
-	      }
-	    else
-	      {
-		mc->Add( h_s );
-	      }
-	  }
-	else
-	  {
-	    signal = new TH1D ( *h_s );
-	    if ( _shapeOnly ) signal->Scale(1.0/signal->Integral());
-	  }
-	//std::cout << i << " " << GetProcessString( histos[i].process ) << std::endl;
-	//if ( histos[i].process == Process::data )std::cout << "histo: " << histoName << "data->" << data->Integral() << std::endl;
-	//else std::cout << histoName << "-> " << mc->Integral() << std::endl;
-	      
-	AddLegend( h_s, leg, histos[i].process );
-	if (  histos[i].process != Process::data ) AddLegend( h_s, leg2, histos[i].process );
-      }
-    std::cout << "===================================" << std::endl;
-    std::cout << "data-> " << data->Integral() << std::endl;
-    std::cout << "MC-> " << mc->Integral() << std::endl;
-    std::cout << "===================================" << std::endl;
-    NormFactor = mc->Integral();
-    if ( _shapeOnly ) mc->Scale(1.0/NormFactor);
-    for (  int i  = 0; i < nprocesses; i++ ) {
-      TH1F* tmp_h = new TH1F( histos[i].GetHisto( htmp ) );
-      TH1D* h_s = GetStyledHisto( (TH1D*)tmp_h, histos[i].process );
-      h_s->Scale( lumi );
+  std::cout << "[INFO]: Now Plotting" << std::endl;
+  for ( const auto& htmp : HistoTypes() )
+    {
+      std::string histoName = GetHistoTypesString( htmp );
+      //std::cout << "histoName: " << histoName << std::endl;
+      leg = new TLegend( 0.7, 0.58, 0.93, 0.89, NULL, "brNDC" );
+      leg2 = new TLegend( 0.7, 0.58, 0.93, 0.89, NULL, "brNDC" );
+      TH1D* HistosPlot[nprocesses];
+      
+      for (  int i  = 0; i < nprocesses; i++ )
+	{
+	  TH1F* tmp_h = new TH1F( histos[i].GetHisto( htmp ) );
+	  TH1D* h_s = GetStyledHisto( (TH1D*)tmp_h, histos[i].process );
 
-      if ( _useKF && (histos[i].process == Process::gammaJet || histos[i].process == Process::qcd|| histos[i].process == Process::diphoton) ) h_s->Scale( k_f );
-      //if ( _useKF ) h_s->Scale( k_f );
-
-      if ( _shapeOnly ) h_s->Scale(1.0/NormFactor);
-      if ( histos[i].process != Process::data && histos[i].process != Process::signal ) stack->Add( h_s, "histo" );
-    }
-
-    //Make Plots
-    if ( _signalPlot ) MakeStackPlotSignal( stack, signal, histoName, "plots/" + histoName + "_" + "Signal", leg2 );
-    MakeStackPlot( stack, data, mc, histoName, "plots/" + histoName + "_" + "INCLUSIVE", leg );
-	  
-  } //loop over histograms
+	  h_s->SetMarkerStyle(20);
+	  h_s->SetStats(0);
+	  switch (i)
+	    {
+	    case 0:
+	      h_s->SetLineColor(kBlue);
+	      h_s->SetMarkerColor(kBlue);
+	      break;
+	    case 1:
+	      h_s->SetLineColor(kRed);
+	      h_s->SetMarkerColor(kRed);
+	      break;
+	    default:
+	      h_s->SetLineColor(kBlack);
+	      h_s->SetMarkerColor(kBlack);
+	      break;
+	    }
+	  leg->AddEntry( h_s, Form("process_%d", i), "lep" );
+	  HistosPlot[i] = h_s;
+	}
+      
+      std::cout << "===================================" << std::endl;
+      std::cout << "===================================" << std::endl;
+      //NormFactor = hi->Integral();
+      //if ( _shapeOnly ) mc->Scale(1.0/NormFactor);
+      //Make Plots
+      PlotSameCanvas( HistosPlot, nprocesses, histoName, "plots/" + histoName + "_" + "INCLUSIVE", leg );
+      //MakeStackPlot( stack, data, mc, histoName, "plots/" + histoName + "_" + "INCLUSIVE", leg );	  
+    } //loop over histograms
 
   std::cout << "deleting hggclass object" << std::endl;
   //delete hggclass;

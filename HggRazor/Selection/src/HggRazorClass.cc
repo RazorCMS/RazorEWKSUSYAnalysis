@@ -463,7 +463,11 @@ void HggRazorClass::Loop()
 	}
       else if ( this->processName == "diphoton" || this->processName == "dy" )
 	{ 
-	  w = weight*pileupWeight*triggerEffWeight*photonEffSF;	 
+	  //w = weight*pileupWeight*photonEffSF*triggerEffSFWeight;
+	  w = weight*pileupWeight*photonEffSF*triggerEffWeight*triggerEffSFWeight;
+	  //w = weight*pileupWeight*photonEffSF;
+	  //w = weight*pileupWeight*triggerEffWeight;
+	  //w = weight*pileupWeight;
 	  // std::cout <<  "process " << this->processName << " : " << w << " = " 
 	  // 	    << weight << " * " 
 	  // 	    << pileupWeight << " * " 
