@@ -40,9 +40,9 @@ void MakeSignificancePlot( int option = 0) {
     //**************************
     //highPt Category
     y[0] = -1000;
-    y[1] = 3.4;
+    y[1] = 2.5;
     y[2] = 0.2;
-    y[3] = -1.5;
+    y[3] = -1.4;
     y[4] = -0.4;
     y[5] = -1.6;
     y[6] = 1.9;
@@ -51,7 +51,7 @@ void MakeSignificancePlot( int option = 0) {
     //hbb category  
     y[9] = 1.0;
     //highres category
-    y[10] = -0.1;
+    y[10] = -0.2;
     y[11] = 1.7;
     y[12] = 0.0;
     y[13] = 0.5;
