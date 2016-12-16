@@ -54,6 +54,7 @@ HggRazorSystematics::~HggRazorSystematics()
   if ( this->NEvents != NULL ) delete NEvents;
   if ( this->SumScaleWeights != NULL ) delete SumScaleWeights;
   if ( this->SumPdfWeights != NULL ) delete SumPdfWeights;
+  //if ( this->ISRHist != NULL ) delete ISRHist;
   
   if ( _debug ) std::cout << "[DEBUG]: Finishing Destructor" << std::endl;
 };
@@ -239,12 +240,13 @@ void HggRazorSystematics::Loop()
       return;
     }
   
-  if ( this->processName == "signal") {
-    if ( this->ISRHist == NULL ) {
-      std::cerr << "[ERROR]: ISRHist has not been set for the signal process" << std::endl;
-      return;
+  if ( this->processName == "signal")
+    {
+      if ( this->ISRHist == NULL ) {
+	std::cerr << "[ERROR]: ISRHist has not been set for the signal process" << std::endl;
+	return;
+      }
     }
-  }
 
   if ( _debug ) std::cout << "[DEBUG]: Setting N_events and N_facScale" << std::endl;
   
@@ -268,25 +270,32 @@ void HggRazorSystematics::Loop()
   //Signal ISR Correction
   //****************************************************
   double ISRCorrection[7] = { 1, 0.882, 0.792, 0.702, 0.648, 0.601, 0.515};
-  if( this->processName == "signal" ) {
-    if ( this->ISRHist ) {
-      double tmpTotal = 0;
-      for (int i = 1; i<= 7; i++) tmpTotal += this->ISRHist->GetBinContent(i);
-      double tmpCorrTotal = 0;
-      for (int i = 1; i <= 7; i++) tmpCorrTotal += ISRCorrection[i-1] * this->ISRHist->GetBinContent(i);
-      for (int i = 0; i < 7; i++) ISRCorrection[i] = ISRCorrection[i]*tmpTotal/tmpCorrTotal;
-      
-      std::cout << "[DEBUG] : total = " << tmpTotal << " , tmpCorrTotal = " << tmpCorrTotal 
-		<< " , Original Bin 1 = " << this->ISRHist->GetBinContent(1) << " , "
-		<< " ISRCorrection[0] = " << ISRCorrection[0] << "\n";
-
-    } else {
-      std::cout << "[ERROR] : ISRHist has not been loaded.\n";
+  if( this->processName == "signal" )
+    {
+      if ( this->ISRHist ) {
+	if ( _debug ) std::cout << "[DEBUG]: beginning ISR setup 0" << std::endl;
+	double tmpTotal = 0;
+	for (int i = 1; i <= 7; i++) tmpTotal += this->ISRHist->GetBinContent(i);
+	double tmpCorrTotal = 0;
+	if ( _debug ) std::cout << "[DEBUG]: beginning ISR setup 1" << std::endl;
+	for (int i = 1; i <= 7; i++) tmpCorrTotal += ISRCorrection[i-1] * this->ISRHist->GetBinContent(i);
+	if ( _debug ) std::cout << "[DEBUG]: beginning ISR setup 2" << std::endl;
+	for (int i = 0; i < 7; i++) ISRCorrection[i] = ISRCorrection[i]*tmpTotal/tmpCorrTotal;
+	if ( _debug ) std::cout << "[DEBUG]: beginning ISR setup 3" << std::endl;
+	
+	std::cout << "[DEBUG] : total = " << tmpTotal << " , tmpCorrTotal = " << tmpCorrTotal 
+		  << " , Original Bin 1 = " << this->ISRHist->GetBinContent(1) << " , "
+		  << " ISRCorrection[0] = " << ISRCorrection[0] << "\n";
+	
+      }
+      else
+	{
+	  std::cout << "[ERROR] : ISRHist has not been loaded.\n";
+	}
     }
-  }
+  
 
-
-
+  if ( _debug ) std::cout << "[DEBUG]: Passed the ISR setup" << std::endl;
   Long64_t nentries = fChain->GetEntriesFast();
   Long64_t nbytes = 0, nb = 0;
   double total_in = 0, total_rm = 0;
@@ -307,14 +316,20 @@ void HggRazorSystematics::Loop()
       }
 
       float commonW = 0;
-      if (_analysisTag == "Razor2015_76X") {
-	commonW = this->Lumi*weight*pileupWeight*btagCorrFactor*photonEffSF*ISRCorrValue;
-      } else if (_analysisTag == "Razor2016_80X") {
-	commonW = this->Lumi*weight*pileupWeight*btagCorrFactor*triggerEffWeight*photonEffSF*ISRCorrValue;
-      } else {
-	std::cout << "Analysis Tag " << _analysisTag << " not recognized. Error!\n";
-	return;
-      }
+      if (_analysisTag == "Razor2015_76X")
+	{
+	  commonW = this->Lumi*weight*pileupWeight*btagCorrFactor*photonEffSF*ISRCorrValue;
+	}
+      else if (_analysisTag == "Razor2016_80X")
+	{
+	  //commonW = this->Lumi*weight*pileupWeight*btagCorrFactor*triggerEffWeight*photonEffSF*ISRCorrValue;
+	  commonW = this->Lumi*weight*pileupWeight*btagCorrFactor*triggerEffSFWeight*photonEffSF*ISRCorrValue;
+	}
+      else
+	{
+	  std::cout << "Analysis Tag " << _analysisTag << " not recognized. Error!\n";
+	  return;
+	}
       
       h2p->Fill( MR, fmin(t1Rsq,0.999), commonW );	      
       h2p_Err->Fill( MR, fmin(t1Rsq,0.999), commonW*commonW );

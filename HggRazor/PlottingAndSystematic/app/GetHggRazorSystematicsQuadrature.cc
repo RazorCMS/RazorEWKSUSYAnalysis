@@ -178,8 +178,7 @@ int main( int argc, char* argv[] )
     } 
   else if ( analysisTag == "Razor2016_80X" ) 
     {
-      //for 80X MC, trigger table doesn't exist. so don't apply triggers.
-      cut = cut + categoryCutString + metFilterCut;
+      cut = cut + categoryCutString + triggerCut + metFilterCut;
     } 
   else 
     {

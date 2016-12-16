@@ -184,7 +184,7 @@ int main( int argc, char* argv[] )
     cut = cut + categoryCutString + triggerCut+ metFilterCut;  
   } else if ( analysisTag == "Razor2016_80X" ) {
     //for 80X MC, trigger table doesn't exist. so don't apply triggers.
-    cut = cut + categoryCutString + metFilterCut;
+    cut = cut + categoryCutString + triggerCut + metFilterCut;
   } else {
     std::cout << "Analysis Tag " << analysisTag << " not recognized. Error!\n";
     return -1;
@@ -194,8 +194,6 @@ int main( int argc, char* argv[] )
   std::cout << "===========================================================================" << std::endl;
   std::cout << "[INFO]: cut--> " << cut << std::endl;
   std::cout << "===========================================================================" << std::endl;
-
-
 
   
   std::ifstream ifs( inputList, std::ifstream::in );
@@ -333,6 +331,7 @@ int main( int argc, char* argv[] )
   std::map< std::string, TH2Poly* > smhMapTotalErr;
   std::string process, rootFileName;
   int ctr = 0;
+  std::cout << "[INFO]: reading process file" << std::endl;
   while ( ifs.good() )
     {
       ifs >> process >> rootFileName;
@@ -355,6 +354,12 @@ int main( int argc, char* argv[] )
       if ( process != "signal" ) assert( SumScaleWeights );
       TH1F* SumPdfWeights   = (TH1F*)fin->Get("SumPdfWeights");
       if ( process != "signal" ) assert( SumPdfWeights );
+      TH1F* NISRJets;
+      if ( process == "signal" )
+	{
+	  NISRJets = (TH1F*)fin->Get("NISRJets");
+	  assert( NISRJets );
+	}
       
       TFile* tmp = new TFile("tmp.root", "RECREATE");
       TTree* cutTree = tree->CopyTree( cut );
@@ -373,6 +378,7 @@ int main( int argc, char* argv[] )
       hggSys->SetNeventsHisto( NEvents );
       hggSys->SetFacScaleWeightsHisto( SumScaleWeights );
       hggSys->SetPdfWeightsHisto( SumPdfWeights );
+      if ( process == "signal" ) hggSys->SetISRHisto( NISRJets );
       hggSys->Loop();
       for ( auto tmp: myVectBinning )
 	{
