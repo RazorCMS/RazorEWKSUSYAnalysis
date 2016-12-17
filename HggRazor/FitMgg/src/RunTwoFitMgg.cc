@@ -1867,6 +1867,10 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   if ( combinedBinNumber > 13 ) {
       combinedBinNumber -= 5;
   }
+  
+  const float highres_sigmaMoverM_corr = 0.155;
+  const float lowres_sigmaMoverM_corr = 0.131;
+  
   if ( !_signalOnly )
     {
       ofs << "imax 1 number of bins\njmax 2 number of processes minus 1\nkmax * number of nuisance parameters\n";
@@ -1890,9 +1894,9 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
       ofs << "PdfNorm\t\t\t\tlnN\t\t-\t\t0.948/1.062\t\t-\n";
       
       if ( category == "highres" ) {
-	ofs << "SigmaMoverMEfficiency\t\t\t\tlnN\t\t0.947/1.053\t\t0.947/1.053\t\t-\n";
+	ofs << "SigmaMoverMEfficiency\t\t\t\tlnN\t\t" << 1./(1.+highres_sigmaMoverM_corr) << "/" << (1.+2.*highres_sigmaMoverM_corr)/(1.+highres_sigmaMoverM_corr) << "\t\t" << 1./(1.+highres_sigmaMoverM_corr) << "/" << (1.+2.*highres_sigmaMoverM_corr)/(1.+highres_sigmaMoverM_corr) << "\t\t-\n";
       } else if (category == "lowres" ) {
-	ofs << "SigmaMoverMEfficiency\t\t\t\tlnN\t\t1.167/0.833\t\t1.167/0.833\t\t-\n";
+	ofs << "SigmaMoverMEfficiency\t\t\t\tlnN\t\t" << (1.+2.*lowres_sigmaMoverM_corr)/(1.+lowres_sigmaMoverM_corr) << "/" << 1./(1.+lowres_sigmaMoverM_corr) << "\t\t" << (1.+2.*lowres_sigmaMoverM_corr)/(1.+lowres_sigmaMoverM_corr) << "/" << 1./(1.+lowres_sigmaMoverM_corr) << "\t\t-\n";
       }
 
       int totalSys = smh_sys.size();
