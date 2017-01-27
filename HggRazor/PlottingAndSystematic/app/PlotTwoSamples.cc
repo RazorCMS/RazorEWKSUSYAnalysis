@@ -16,9 +16,9 @@
 // D e f i n e  B i n n i n g
 //---------------------------
 //H
-//int HggRazorClass::n_mgg   = 38;
-//float HggRazorClass::mgg_l = 103.;
-//float HggRazorClass::mgg_h = 160.;
+int HggRazorClass::n_mgg   = 57;
+float HggRazorClass::mgg_l = 103.;
+float HggRazorClass::mgg_h = 160.;
 
 //HighMass Diphotons
 //int HggRazorClass::n_mgg   = 50;
@@ -26,9 +26,9 @@
 //float HggRazorClass::mgg_h = 1230.;
 
 //Z
-int HggRazorClass::n_mgg = 60;
-float HggRazorClass::mgg_l = 60.;
-float HggRazorClass::mgg_h = 120.;
+//int HggRazorClass::n_mgg = 60;
+//float HggRazorClass::mgg_l = 60.;
+//float HggRazorClass::mgg_h = 120.;
 
 int HggRazorClass::n_ptgg   = 52;
 float HggRazorClass::ptgg_l = 0.;
@@ -176,36 +176,36 @@ float lres_k[2] = { 1.0, 1.0};
 
 //DATA
 //GammaGamma
-/*TString cut = "mGammaGamma>103 && mGammaGamma<160 && abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) < 1.4442 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1 && (Flag_HBHENoiseFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 ) && MR > 150.";
+
+TString cut = "mGammaGamma>103 && mGammaGamma<160 && abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) < 1.4442 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1 && (Flag_HBHENoiseFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 )";
 
 //MC
 //GammaGamma
-TString cut_mc = "mGammaGamma>103 && mGammaGamma<160 && abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) < 1.4442 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1 && MR > 150.";
-*/
+TString cut_mc = "mGammaGamma>103 && mGammaGamma<160 && abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) < 1.4442 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && pho1passEleVeto == 1 && pho2passEleVeto == 1 && pho1passIso == 1 && pho2passIso == 1";
+
 
 //---------------
 //Zee control region
 //---------------
 //Data
-
-TString cut = "abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) < 1.4442 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && mGammaGamma > 75 && mGammaGamma < 120 && pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && (Flag_HBHENoiseFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 )";
+//TString cut = "abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) < 1.4442 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && mGammaGamma > 75 && mGammaGamma < 120 && pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && (Flag_HBHENoiseFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 )";
 
 //MC
-TString cut_mc = "abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) < 1.4442 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && mGammaGamma > 75 && mGammaGamma < 120 && pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && MR > 150.";
+//TString cut_mc = "abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) < 1.4442 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && mGammaGamma > 75 && mGammaGamma < 120 && pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && MR > 150.";
 
 
 //---------------------
 //T r i g g e r   C u t 
 //---------------------
 
-//TString triggerCut_80X = "&& (HLTDecision[82] || HLTDecision[83] || HLTDecision[93]) ";
-//TString triggerCut_76X = "&& (HLTDecision[82] || HLTDecision[83] || HLTDecision[93]) ";
+TString triggerCut_80X = "&& (HLTDecision[82] || HLTDecision[83] || HLTDecision[93]) ";
+TString triggerCut_76X = "&& (HLTDecision[82] || HLTDecision[83] || HLTDecision[93]) ";
 
 //TString triggerCut_80X = "&& (  HLTDecision[27] || HLTDecision[44] || HLTDecision[45] || HLTDecision[217] )";
 //TString triggerCut_76X = "&& (  HLTDecision[27] || HLTDecision[44] || HLTDecision[45] || HLTDecision[217] )";
 
-TString triggerCut_80X = "&& (  HLTDecision[84] )";
-TString triggerCut_76X = "&& (  HLTDecision[84] )";
+//TString triggerCut_80X = "&& (  HLTDecision[84] )";
+//TString triggerCut_76X = "&& (  HLTDecision[84] )";
 
 //TString triggerCut_80X = "&& ( 1 )";
 //TString triggerCut_76X = "&& ( 1 )";
@@ -347,6 +347,7 @@ int main ( int argc, char* argv[] )
       //-----------------------------
       //Assigning Histograms to Array
       //-----------------------------
+      histos[ctr].processName = processName;
       for ( const auto& htmp : HistoTypes() )
 	{
 	  std::cout << GetHistoTypesString( htmp ) << std::endl;
@@ -392,14 +393,14 @@ int main ( int argc, char* argv[] )
 	      h_s->SetMarkerColor(kBlack);
 	      break;
 	    }
-	  leg->AddEntry( h_s, Form("process_%d", i), "lep" );
+	  leg->AddEntry( h_s, histos[i].processName, "lep" );
 	  HistosPlot[i] = h_s;
+	  HistosPlot[i]->Scale( 1.0/HistosPlot[i]->Integral() );
 	}
       
       std::cout << "===================================" << std::endl;
       std::cout << "===================================" << std::endl;
-      //NormFactor = hi->Integral();
-      //if ( _shapeOnly ) mc->Scale(1.0/NormFactor);
+     
       //Make Plots
       PlotSameCanvas( HistosPlot, nprocesses, histoName, "plots/" + histoName + "_" + "INCLUSIVE", leg );
       //MakeStackPlot( stack, data, mc, histoName, "plots/" + histoName + "_" + "INCLUSIVE", leg );	  

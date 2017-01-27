@@ -31,7 +31,7 @@ const float bottomMargin = 0.12;
 TString CMSText = "CMS";
 TString extraText   = "Preliminary";
 //TString lumiText = "2.0 fb^{-1} (13 TeV)";
-TString lumiText = "36.2 fb^{-1} (13 TeV)";
+TString lumiText = "12.9 fb^{-1} (13 TeV)";
 //TString lumiText = "19.8 fb^{-1} (8 TeV)";
 
 bool MakeCustomMrRsq( TH2F* h, TString outName )
@@ -757,7 +757,8 @@ bool PlotSameCanvas( TH1D** histos, int nhistos, TString var, TString outName, T
   pad1->cd();
   
   histos[0]->SetTitle("");
-  histos[0]->Draw();
+  histos[0]->SetFillColor(kWhite);
+  histos[0]->Draw("hist");
   histos[0]->GetXaxis()->SetTitleSize( axisTitleSize );
   histos[0]->GetXaxis()->SetTitleOffset( axisTitleOffset );
   histos[0]->GetYaxis()->SetTitleSize( axisTitleSize );
@@ -773,8 +774,9 @@ bool PlotSameCanvas( TH1D** histos, int nhistos, TString var, TString outName, T
       leg->SetFillStyle(1001);
       leg->Draw();
     }
-  
-  histos[1]->Draw("sameE");
+
+  histos[1]->SetFillColor(kWhite);
+  histos[1]->Draw("same+hist");
   AddCMS( c );
 
   TPad *pad2 = new TPad("pad2","pad2", .0, .0, 1., 0.29);
@@ -798,7 +800,8 @@ bool PlotSameCanvas( TH1D** histos, int nhistos, TString var, TString outName, T
   ratio->GetYaxis()->SetTitleOffset( axisTitleOffsetRatioY );  
   ratio->SetMarkerColor( kBlue );
   ratio->SetLineColor( kBlue );
-  ratio->GetYaxis()->SetRangeUser( 0.0, 2.0 );
+  //ratio->GetYaxis()->SetRangeUser( 0.0, 2.0 );
+  ratio->GetYaxis()->SetRangeUser( 0.5, 1.5 );
   ratio->SetTitle("");
   ratio->GetYaxis()->SetTitle("data / mc");
   ratio->GetYaxis()->CenterTitle( true );
@@ -1027,8 +1030,8 @@ bool PlotSameCanvas( TH1D** histos, int nhistos, TString var, TString outName, T
     {
       ratio->GetXaxis()->SetTitle("#sigma_{M}/M");
       histos[0]->GetYaxis()->SetTitle("events / 0.0005");
-      histos[0]->SetMaximum( 1.3*histos[0]->GetMaximum() );
-      histos[0]->SetMinimum( 1e-5 );
+      histos[0]->SetMaximum( 1.5*histos[1]->GetMaximum() );
+      histos[0]->SetMinimum( 1e-10 );
       //pad1->SetLogy();
       pad1->Update();
     }

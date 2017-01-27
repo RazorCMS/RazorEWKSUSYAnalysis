@@ -1370,7 +1370,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
       ws->var(tagSignal+"_n1")->setVal( 2.9 );
       ws->var(tagSignal+"_alpha2")->setVal( 1.9 );
       ws->var(tagSignal+"_n2")->setVal( 3.2 );
-
+      if ( binNumber.Atof() == 8 ) ws->var(tagSignal+"_n2")->setVal( 1.8 );
       if ( binNumber.Atof() >= 14 )
 	{
 	  ws->var(tagSignal+"_sigmaCB")->setVal( 2 );
@@ -1416,7 +1416,8 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
       ws->var(tagSMH+"_alpha1")->setVal( 1.3 );
       ws->var(tagSMH+"_n1")->setVal( 4.4 );
       ws->var(tagSMH+"_alpha2")->setVal( 1.9 );
-      ws->var(tagSMH+"_n2")->setVal( 4.8 );
+      //ws->var(tagSMH+"_n2")->setVal( 4.8 );
+      ws->var(tagSMH+"_n2")->setVal( 2.8 );
       if ( binNumber.Atof() >= 14 )
 	{
 	  ws->var(tagSMH+"_sigmaCB")->setVal( 2 );

@@ -187,10 +187,10 @@ float lres_k[2] = { 1.0, 1.0};
 //Zee control region
 //---------------
 //Data
-TString cut = "abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) < 1.4442 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && mGammaGamma > 75 && mGammaGamma < 120 && pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && (Flag_HBHENoiseFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 ) && MR > 150. && pTGammaGamma < 110 && abs(mbbH_L-125.)>=15 && abs(mbbZ_L-91.)>=15 && (  HLTDecision[84] ) && sigmaMoverM < 0.0085";
+TString cut = "abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) < 1.4442 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && mGammaGamma > 75 && mGammaGamma < 120 && pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && (Flag_HBHENoiseFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 ) && MR > 150 && pTGammaGamma < 110 && abs(mbbH_L-125.)>=15 && abs(mbbZ_L-91.)>=15";
 
 //MC
-TString cut_mc = "abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) < 1.4442 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && mGammaGamma > 75 && mGammaGamma < 120 && pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && MR > 150. && pTGammaGamma < 110 && abs(mbbH_L-125.)>=15 && abs(mbbZ_L-91.)>=15 && sigmaMoverM < 0.0085";
+TString cut_mc = "abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) < 1.4442 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && mGammaGamma > 75 && mGammaGamma < 120 && pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && MR > 150 && pTGammaGamma < 110 && abs(mbbH_L-125.)>=15 && abs(mbbZ_L-91.)>=15";
 
 
 //---------------------
@@ -203,11 +203,11 @@ TString cut_mc = "abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) < 1.4442 && ( 
 //TString triggerCut_80X = "&& (  HLTDecision[27] || HLTDecision[44] || HLTDecision[45] || HLTDecision[217] )";
 //TString triggerCut_76X = "&& (  HLTDecision[27] || HLTDecision[44] || HLTDecision[45] || HLTDecision[217] )";
 
-//TString triggerCut_80X = "&& (  HLTDecision[84] )";
-//TString triggerCut_76X = "&& (  HLTDecision[84] )";
+TString triggerCut_80X = "&& (  HLTDecision[84] )";
+TString triggerCut_76X = "&& (  HLTDecision[84] )";
 
-TString triggerCut_80X = "&& ( 1 )";
-TString triggerCut_76X = "&& ( 1 )";
+//TString triggerCut_80X = "&& ( 1 )";
+//TString triggerCut_76X = "&& ( 1 )";
 
 
 //--------------------------------
@@ -316,7 +316,7 @@ int main ( int argc, char* argv[] )
   
   if (analysisTag == "Razor2015_76X") lumi = 2300;
   //if (analysisTag == "Razor2016_80X") lumi = 4000;
-  if (analysisTag == "Razor2016_80X") lumi = 36200.;
+  if (analysisTag == "Razor2016_80X") lumi = 36800.;
   
   std::cout << "[INFO]: running inclusive tree mode" << std::endl;
   int ctr = 0;

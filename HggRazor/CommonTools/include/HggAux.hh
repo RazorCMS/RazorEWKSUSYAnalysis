@@ -87,6 +87,7 @@ std::string GetFitFunctionString( FitFunction  fitf );
 struct Histos
 {
   Process process;
+  TString processName;
   TH1F mr;
   TH1F rsq;
   TH1F unrollHighPt;
