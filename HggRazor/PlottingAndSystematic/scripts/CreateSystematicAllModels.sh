@@ -1,4 +1,5 @@
 #! /bin/bash
+source ~/.bash_login
 
 while [[ $# -gt 1 ]]
 do

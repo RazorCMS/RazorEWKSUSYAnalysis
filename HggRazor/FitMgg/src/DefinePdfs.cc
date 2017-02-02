@@ -438,14 +438,14 @@ TString MakeDoubleExp(TString tag, RooRealVar& mgg, RooWorkspace& w)
   //------------------------------
   //C r e a t e  V a r i a b l e s
   //------------------------------
-  RooRealVar* alpha1 = new RooRealVar( tag + "_a1", "#alpha_{1}", 0.04, "" );
-  RooRealVar* alpha2 = new RooRealVar( tag + "_a2", "#alpha_{2}", 0.06, "" );
+  RooRealVar* alpha1 = new RooRealVar( tag + "_a1", "#alpha_{1}", 0.25, "" );
+  RooRealVar* alpha2 = new RooRealVar( tag + "_a2", "#alpha_{2}", 0.25, "" );
   alpha1->setConstant(kFALSE);
   alpha2->setConstant(kFALSE);
   //alpha1->setRange(-100,0);
   //alpha2->setRange(-100,0);
-  alpha1->setMin(0.0);
-  alpha2->setMin(0.0);
+  //alpha1->setMax(0.0);
+  //alpha2->setMax(0.0);
 
   //--------------------------------------------
   //Square variables to avoid rising exponential
@@ -453,7 +453,7 @@ TString MakeDoubleExp(TString tag, RooRealVar& mgg, RooWorkspace& w)
   RooFormulaVar* asq1 = new RooFormulaVar( tag + "_a1Sq", "#alpha^{2}_{1}", "-1*@0*@0", *alpha1);
   RooFormulaVar* asq2 = new RooFormulaVar( tag + "_a2Sq", "#alpha^{2}_{2}", "-1*@0*@0", *alpha2);
   RooRealVar* frac    = new RooRealVar( tag+"_frac", "frac", 0.5, .0, 1.0 );
-  RooRealVar* Nbkg    = new RooRealVar( tag+"_Nbkg", "N_{bkg}", 10, "events" );
+  RooRealVar* Nbkg    = new RooRealVar( tag+"_Nbkg", "N_{bkg}", 100, "events" );
   Nbkg->setConstant(kFALSE);
   
   //------------------
@@ -486,8 +486,8 @@ TString MakeDoubleExpNE(TString tag, RooRealVar& mgg, RooWorkspace& w)
   alpha2->setConstant(kFALSE);
   //alpha1->setRange(-100,0);
   //alpha2->setRange(-100,0);
-  alpha1->setMin(0.0);
-  alpha2->setMin(0.0);
+  //alpha1->setMin(0.0);
+  //alpha2->setMin(0.0);
 
   //--------------------------------------------
   //Square variables to avoid rising exponential

@@ -27,13 +27,16 @@
 #include "CommandLineInput.hh"
 #include "DefinePdfs.hh"
 
-const bool _debug = false;
+const bool _debug = true;
 
 float GetNs( std::string fname, int bin, std::string cat = "highpt" );
 float GetNsErr( std::string fname, int bin, std::string cat = "highpt" );
 //
 float GetSMH( std::string fname, int bin, std::string cat = "highpt" );
 float GetSMHErr( std::string fname, int bin, std::string cat = "highpt" );
+float GetSMH_PF( std::string fname, int bin, std::string cat = "highpt" );//postfit
+float GetSMHErr_PF( std::string fname, int bin, std::string cat = "highpt" );//postfit
+
 float GetNbkg( std::string fname, std::string f1, int bin, bool _err = false, std::string cat = "highpt" );
 float GetErrorFromToys(RooWorkspace *ws, RooFitResult *fr, TString pdfName, 
         unsigned int ntoys = 1000, int binNum = 0, bool plotBkgFuncs = false);
@@ -68,6 +71,8 @@ std::vector<float*> SetBinning(std::vector<Bin> bins, std::string category)
 float HggRazorSystematics::NR_kf = 1.0;
 int   HggRazorSystematics::n_PdfSys = 60;
 
+float HighRes_SF = 1.0/1.1834218302;
+float LowRes_SF  = 1./0.8841933224;
 
 int main( int argc, char* argv[] )
 {
@@ -80,7 +85,9 @@ int main( int argc, char* argv[] )
   
   std::vector<Bin> binVector;
   //std::ifstream input( "data/HggRazor2016Binning.txt", std::fstream::in );
-  std::ifstream input( "data/HggRazor2016Binning_ICHEP.txt", std::fstream::in );
+  //std::ifstream input( "data/HggRazor2016Binning_ICHEP.txt", std::fstream::in );
+  std::ifstream input( "data/HggRazor2016Binning_Moriond.txt", std::fstream::in );
+  
   if ( input.is_open() )
     {
       float x1, x2, y1, y2;
@@ -492,14 +499,20 @@ int main( int argc, char* argv[] )
 
 
 
-  std::cout << "\\begin{table*}[htb]\n\\scriptsize\n\\begin{center}\n\\caption{";
+  /*std::cout << "\\begin{table*}[htb]\n\\scriptsize\n\\begin{center}\n\\caption{";
   std::cout << categoryMode << " category binning. SM Higgs, and signal expected yields for an integrated luminosity correspondint to 6.3~$\\mathrm{fb}^{-1}$";
   std::cout << "\\label{tab:binning-highpt}}\n\\def\\arraystretch{1.5}\n\\begin{tabular}{|c|c|c|c|c|c|c|c|}\n\\hline\n$\\mathrm{M_{R}} (GeV)\\otimes\\mathrm{R^{2}}$";
   std::cout << " & ggH & ttH & vbfH & vH & bbH & non-resonant & Signal\\\\" << std::endl;
-  std::cout << "\\hline" << std::endl;
+  std::cout << "\\hline" << std::endl;*/
+
+  std::cout << "\\begin{table*}[htb]\n\\begin{center}\n\\caption{The predicted yields for the standard model Higgs background processes are shown for an integrated luminosity corresponding to 15.2~$\\mathrm{fb}^{-1}$ for each search region considered in this analysis. The contributions from each standard model Higgs process is shown separately, and the total is shown on the rightmost column along with its full uncertainty.\\label{tab:SMHBkgPrediction}}\n\\def\\arraystretch{1.5}";
+  std::cout << "\n\\begin{tabular}{|c|c|c|c|c|c|c|c|}\n\\hline\n& & \\multicolumn{5}{c|}{Expected SM Higgs Yield} & \\\\";
+  std::cout << "\n\\hline\n\\small";
+  std::cout << "\nBin & Category & ggH & $t\\bar{t}$H & VBF H & VH & bbH & Total \\\\\n\\hline\n";
   for ( auto tmp: myVectBinning )
     {
       int bin   = smhMapNominal["ggH"]->FindBin( tmp[0]+10, tmp[1]+0.0001 );
+
       float nom_ggH = smhMapNominal["ggH"]->GetBinContent( bin );
       float nom_ttH = smhMapNominal["ttH"]->GetBinContent( bin );
       float nom_vbfH = smhMapNominal["vbfH"]->GetBinContent( bin );
@@ -507,6 +520,26 @@ int main( int argc, char* argv[] )
       float nom_bbH = smhMapNominal["bbH"]->GetBinContent( bin );
       float nom_s  = nominalS->GetBinContent( bin );
 
+      //Applying sigmaMoverM SF
+      if ( categoryMode == "highres")
+	{
+	  nom_ggH = HighRes_SF*nom_ggH;
+	  nom_ttH = HighRes_SF*nom_ttH;
+	  nom_vbfH = HighRes_SF*nom_vbfH;
+	  nom_vH = HighRes_SF*nom_vH;
+	  nom_bbH = HighRes_SF*nom_bbH;
+	}
+      else if ( categoryMode == "lowres")
+	{
+	  nom_ggH  = LowRes_SF*nom_ggH;
+	  nom_ttH  = LowRes_SF*nom_ttH;
+	  nom_vbfH = LowRes_SF*nom_vbfH;
+	  nom_vH   = LowRes_SF*nom_vH;
+	  nom_bbH  = LowRes_SF*nom_bbH;
+	}
+      
+      float nom_SMH = nom_ggH + nom_ttH + nom_vbfH + nom_vH + nom_bbH;
+      
       /*
       //Adding systematic uncertainties
       float nom_ggH_U = sqrt( pow(smhMapTotalErr["ggH"]->GetBinContent( bin ),2) + pow(nom_ggH*0.04, 2) + pow(nom_ggH*0.05,2) + pow(nom_ggH*0.079,2) + pow(nom_ggH*0.071,2) );
@@ -519,12 +552,25 @@ int main( int argc, char* argv[] )
       if ( categoryMode == "hzbb" ) nom_vH_U = sqrt( pow(nom_vH_U,2) + pow(nom_vH*0.04,2) );
       float nom_s_U  = nominalS->GetBinError( bin );
       */
-      float nom_ggH_U = sqrt( smhMapNominalErr["ggH"]->GetBinContent( bin ) );
+
+
+      /*
+	float nom_ggH_U = sqrt( smhMapNominalErr["ggH"]->GetBinContent( bin ) );
       float nom_ttH_U = sqrt( smhMapNominalErr["ttH"]->GetBinContent( bin ) );
       float nom_vbfH_U = sqrt( smhMapNominalErr["vbfH"]->GetBinContent( bin ) );
       float nom_vH_U = sqrt( smhMapNominalErr["vH"]->GetBinContent( bin ) );
       float nom_bbH_U = sqrt( smhMapNominalErr["bbH"]->GetBinContent( bin ) );
       float nom_s_U  = nominalS->GetBinError( bin );
+      */
+
+      float nom_ggH_U = sqrt( smhMapTotalErr["ggH"]->GetBinContent( bin ) );
+      float nom_ttH_U = sqrt( smhMapTotalErr["ttH"]->GetBinContent( bin ) );
+      float nom_vbfH_U = sqrt( smhMapTotalErr["vbfH"]->GetBinContent( bin ) );
+      float nom_vH_U = sqrt( smhMapTotalErr["vH"]->GetBinContent( bin ) );
+      float nom_bbH_U = sqrt( smhMapTotalErr["bbH"]->GetBinContent( bin ) );
+      float nom_s_U  = nominalS->GetBinError( bin );
+      
+      float nom_SMH_U = sqrt( pow(nom_ggH_U,2) + pow(nom_ttH_U,2) + pow(nom_vbfH_U,2) + pow(nom_vH_U,2) + pow(nom_bbH_U,2));
       //----------------------------
       //Key string to find bin
       //----------------------------
@@ -538,20 +584,33 @@ int main( int argc, char* argv[] )
       float NsErr = GetNsErr( ss_fn.str(),  myMap2[ss.str()].bin, categoryMode );
       float Nbkg = GetNbkg( ss_fn.str(),  myMap2[ss.str()].f1, myMap2[ss.str()].bin, false, categoryMode );
       float NbkgErr = GetNbkg( ss_fn.str(),  myMap2[ss.str()].f1, myMap2[ss.str()].bin, true, categoryMode );
-      
-      TString line = Form("%0.f-%0.f $\\otimes$ %.3f-%.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f \\\\",
-			  tmp[0], tmp[2], tmp[1], tmp[3], nom_ggH, nom_ggH_U, nom_ttH, nom_ttH_U, nom_vbfH, nom_vbfH_U, nom_vH, nom_vH_U, nom_bbH, nom_bbH_U, Nbkg, NbkgErr, Ns, NsErr);
+
+      float Nsmh = GetSMH( ss_fn.str(),  myMap2[ss.str()].bin, categoryMode );
+      float NsmhErr = GetSMHErr( ss_fn.str(),  myMap2[ss.str()].bin, categoryMode );
+
+
+    
+      /*TString line = Form("%0.f-%0.f $\\otimes$ %.3f-%.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f \\\\",
+	tmp[0], tmp[2], tmp[1], tmp[3], nom_ggH, nom_ggH_U, nom_ttH, nom_ttH_U, nom_vbfH, nom_vbfH_U, nom_vH, nom_vH_U, nom_bbH, nom_bbH_U, Nbkg, NbkgErr, Ns, NsErr);*/
+      TString line = Form("%d & %s & %.2f & %.2f & %.2f & %.2f & %.2f & %.1f $\\pm$ %.1f \\\\", myMap2[ss.str()].bin, categoryMode.c_str(), nom_ggH, nom_ttH, nom_vbfH, nom_vH, nom_bbH, Nsmh, NsmhErr);
       std::cout << line << std::endl;
     }
   
   std::cout << "\\hline\n\\end{tabular}\n\\end{center}\n\\end{table*}" << std::endl;
 
      
-  std::cout << "\\begin{table*}[htb]\n\\footnotesize\n\\begin{center}\n\\caption{";
+  /*
+    std::cout << "\\begin{table*}[htb]\n\\footnotesize\n\\begin{center}\n\\caption{";
   std::cout << categoryMode << " category binning. SM Higgs, and signal expected yields for an integrated luminosity correspondint to 6.3~$\\mathrm{fb}^{-1}$";
   std::cout << "\\label{tab:binning-highpt}}\n\\def\\arraystretch{1.5}\n\\begin{tabular}{|c|c|c|c|}\n\\hline\n$\\mathrm{M_{R}} (GeV)\\otimes\\mathrm{R^{2}}$";
   std::cout << " & higgs & non-resonant & Signal\\\\" << std::endl;
   std::cout << "\\hline" << std::endl;
+  */
+
+  std::cout << "\\begin{table*}[h]\n\\begin{center}\n\\topcaption{The non-resonant background yields, SM Higgs background yields, best fit signal yields, and observed local significance are shown for the signal plus background fit in each search region bin. The uncertainties include both statistical and systematic components. The non-resonant background yields shown correspond to the yield within the window between $122$~GeV and $129$~GeV and is intended to better reflect the background under the signal peak. The observed significance for the bins in HighRes and LowRes categories are identical because they are the result of a simultaneous fit. The significance is computed using the profile likelihood, where the sign reflects whether an excess (positive sign) or deficit (negative sign) is observed.}\n\\small\n\\begin{tabular}{|cc|cccc|c|}\n\\hline";
+  
+  std::cout <<"\n           &          &                   & Yields        &                 &                        & Obs. Local \\\\";
+  std::cout << "\nBin        & Category &  Non-Resonant Bkg & Exp. SM Higgs & Fitted SM Higgs &  Best Fit Signal       & Significance   \\\\\n\\hline\n";
   for ( auto tmp: myVectBinning )
     {
       int bin   = smhMapNominal["ggH"]->FindBin( tmp[0]+10, tmp[1]+0.0001 );
@@ -582,7 +641,7 @@ int main( int argc, char* argv[] )
       ss << categoryMode << "_" << tmp[0] << "-" << tmp[2] << "_" << tmp[1] << "-" << tmp[3]; 
       std::stringstream ss_fn;
       ss_fn << fitResultDir << "/mlfit_bin" << myMap2[ss.str()].bin << ".root";
-      
+
       float Ns = GetNs( ss_fn.str(),  myMap2[ss.str()].bin, categoryMode );
       float NsErr = GetNsErr( ss_fn.str(),  myMap2[ss.str()].bin, categoryMode );
       
@@ -600,8 +659,25 @@ int main( int argc, char* argv[] )
       //--------------------
       float Nsmh = GetSMH( ss_fn.str(),  myMap2[ss.str()].bin, categoryMode );
       float NsmhErr = GetSMHErr( ss_fn.str(),  myMap2[ss.str()].bin, categoryMode );
-      TString line = Form("%0.f-%0.f $\\otimes$ %.3f-%.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f \\\\",
-      tmp[0], tmp[2], tmp[1], tmp[3], Nsmh, NsmhErr, Nbkg, NbkgErr, Ns, NsErr);
+
+      float Nsmh_pf = GetSMH_PF( ss_fn.str(),  myMap2[ss.str()].bin, categoryMode );
+      float NsmhErr_pf = GetSMHErr_PF( ss_fn.str(),  myMap2[ss.str()].bin, categoryMode );
+      
+
+      /*
+	TString line = Form("%0.f-%0.f $\\otimes$ %.3f-%.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f & %.3f $\\pm$ %.3f \\\\",
+	tmp[0], tmp[2], tmp[1], tmp[3], Nsmh, NsmhErr, Nbkg, NbkgErr, Ns, NsErr);
+      */
+      std::stringstream ss_sigma;
+      ss_sigma << fitResultDir << "/PL_nsigma_npvalue_uncapped_bin" << myMap2[ss.str()].bin << ".root";
+      TFile* fsigma = new TFile( ss_sigma.str().c_str(), "READ");
+      TTree* limit = (TTree*)fsigma->Get("limit");
+      double _limit;
+      limit->SetBranchAddress( "limit", &_limit );
+      limit->GetEntry(0);
+      delete fsigma;
+      TString line = Form("%d & %s & %.1f$\\pm$%.1f & %.1f$\\pm$%.1f & %.1f$\\pm$%.1f & %.1f$\\pm$%.1f & %.1f\\\\",
+			  myMap2[ss.str()].bin, categoryMode.c_str(), Nbkg, NbkgErr, Nsmh, NsmhErr, Nsmh_pf, NsmhErr_pf, Ns, NsErr, _limit);
       
       std::cout << line << std::endl;
     }
@@ -678,6 +754,33 @@ float GetSMHErr( std::string fname, int bin, std::string cat )
   TFile* fin = TFile::Open( fname.c_str(), "READ");
   //RooArgSet* norm_fit_s = (RooArgSet*) fin->Get("norm_fit_s");
   RooArgSet* norm_fit_s = (RooArgSet*) fin->Get("norm_prefit");
+  std::stringstream ss;
+  if ( cat == "highres" ) ss << "highResBin" << bin << "/SMH";
+  else if ( cat == "lowres" ) ss << "lowResBin" << bin << "/SMH";
+  else ss << "bin" << bin << "/SMH";
+  RooRealVar* ss2 = (RooRealVar*)norm_fit_s->find( ss.str().c_str() );
+  return ss2->getError();
+};
+
+float GetSMH_PF( std::string fname, int bin, std::string cat )
+{
+  TFile* fin = TFile::Open( fname.c_str(), "READ");
+  RooArgSet* norm_fit_s = (RooArgSet*) fin->Get("norm_fit_s");
+  //RooArgSet* norm_fit_s = (RooArgSet*) fin->Get("norm_prefit");
+
+  std::stringstream ss;
+  if ( cat == "highres" ) ss << "highResBin" << bin << "/SMH";
+  else if ( cat == "lowres" ) ss << "lowResBin" << bin << "/SMH";
+  else ss << "bin" << bin << "/SMH";
+  RooRealVar* ss2 = (RooRealVar*)norm_fit_s->find( ss.str().c_str() );
+  return ss2->getVal();
+};
+
+float GetSMHErr_PF( std::string fname, int bin, std::string cat )
+{
+  TFile* fin = TFile::Open( fname.c_str(), "READ");
+  RooArgSet* norm_fit_s = (RooArgSet*) fin->Get("norm_fit_s");
+  //RooArgSet* norm_fit_s = (RooArgSet*) fin->Get("norm_prefit");
   std::stringstream ss;
   if ( cat == "highres" ) ss << "highResBin" << bin << "/SMH";
   else if ( cat == "lowres" ) ss << "lowResBin" << bin << "/SMH";
@@ -864,6 +967,41 @@ float GetNbkg( std::string fname, std::string f1, int bin, bool _err, std::strin
       TString pdf = MakeModExpNE( Form("%s_Bkg_bin%d",f1.c_str(),realBin), mgg, *ws );
       ws->var( pdf + "_a" )->setVal( alpha->getVal() );
       ws->var( pdf + "_m" )->setVal( m->getVal() );
+      RooAbsReal* igx = ws->pdf( pdf )->createIntegral(mgg);
+      //std::cout << Nbkg->getVal() << " +/- " << Nbkg->getError() << std::endl;
+      RooAbsReal* igx_sig = ws->pdf( pdf )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("signal"));
+      //std::cout << Nbkg->getVal()*igx_sig->getVal() << " +/- " << Nbkg->getError()*igx_sig->getVal() << std::endl;
+      if ( _err ) {
+        return GetErrorFromToys( ws, fit_r, pdf, 10000, realBin );
+      }
+      //if ( _err ) return Nbkg->getError()*igx_sig->getVal();
+      return Nbkg->getVal()*igx_sig->getVal();
+    }
+  else if ( f1 == "doubleExp" )
+    {
+      int realBin = bin;
+      if ( cat == "lowres" ) realBin = realBin+5;
+      std::stringstream ssa1;
+      ssa1 << "doubleExp_Bkg_bin" << realBin << "_doubleExp_a1";
+      RooRealVar *alpha1 = (RooRealVar*)fit_r->floatParsFinal().find( ssa1.str().c_str() );
+      std::stringstream ssa2;
+      ssa2 << "doubleExp_Bkg_bin" << realBin << "_doubleExp_a2";
+      RooRealVar *alpha2 = (RooRealVar*)fit_r->floatParsFinal().find( ssa2.str().c_str() );
+      std::stringstream ssfrac;
+      ssfrac << "doubleExp_Bkg_bin" << realBin << "_doubleExp_frac";
+      RooRealVar *frac = (RooRealVar*)fit_r->floatParsFinal().find( ssfrac.str().c_str() );
+      
+      std::stringstream ss_2;
+      if ( cat == "highres" ) ss_2 << "shapeBkg_Bkg_highResBin" << bin << "__norm";
+      else if ( cat == "lowres" ) ss_2 << "shapeBkg_Bkg_lowResBin" << bin << "__norm";
+      else ss_2 << "shapeBkg_Bkg_bin" << bin << "__norm";
+      RooRealVar *Nbkg = (RooRealVar*)fit_r->floatParsFinal().find( ss_2.str().c_str() );
+      
+      
+      TString pdf = MakeDoubleExpNE( Form("%s_Bkg_bin%d",f1.c_str(),realBin), mgg, *ws );
+      ws->var( pdf + "_a1" )->setVal( alpha1->getVal() );
+      ws->var( pdf + "_a2" )->setVal( alpha2->getVal() );
+      ws->var( pdf + "_frac" )->setVal( frac->getVal() );
       RooAbsReal* igx = ws->pdf( pdf )->createIntegral(mgg);
       //std::cout << Nbkg->getVal() << " +/- " << Nbkg->getError() << std::endl;
       RooAbsReal* igx_sig = ws->pdf( pdf )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("signal"));
