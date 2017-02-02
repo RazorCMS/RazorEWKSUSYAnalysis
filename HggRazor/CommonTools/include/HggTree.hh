@@ -28,6 +28,7 @@ public :
    Float_t         pileupWeightUp;
    Float_t         pileupWeightDown;
    Float_t         triggerEffWeight;
+   Float_t         triggerEffSFWeight;
    Float_t         photonEffSF;
    Float_t         ISRSystWeightUp;
    Float_t         ISRSystWeightDown;
@@ -163,6 +164,7 @@ public :
    TBranch        *b_pileupWeightUp;   //!
    TBranch        *b_pileupWeightDown;   //!
    TBranch        *b_triggerEffWeight;   //!
+   TBranch        *b_triggerEffSFWeight;   //!
    TBranch        *b_photonEffSF;   //!
    TBranch        *b_ISRSystWeightUp;   //!
    TBranch        *b_ISRSystWeightDown;   //!
@@ -370,6 +372,7 @@ void HggTree::Init(TTree *tree)
    fChain->SetBranchAddress("pileupWeightUp", &pileupWeightUp, &b_pileupWeightUp);
    fChain->SetBranchAddress("pileupWeightDown", &pileupWeightDown, &b_pileupWeightDown);
    fChain->SetBranchAddress("triggerEffWeight", &triggerEffWeight, &b_triggerEffWeight);
+   fChain->SetBranchAddress("triggerEffSFWeight", &triggerEffSFWeight, &b_triggerEffSFWeight);
    fChain->SetBranchAddress("photonEffSF", &photonEffSF, &b_photonEffSF);
    fChain->SetBranchAddress("ISRSystWeightUp", &ISRSystWeightUp, &b_ISRSystWeightUp);
    fChain->SetBranchAddress("ISRSystWeightDown", &ISRSystWeightDown, &b_ISRSystWeightDown);

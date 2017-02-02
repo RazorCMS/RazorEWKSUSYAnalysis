@@ -41,7 +41,7 @@ const float topMargin    = 0.07;
 const float bottomMargin = 0.12;
 */
 
-const float lumi = 2.3;
+const float lumi = 26.4;
 //Axis
 const float axisTitleSize = 0.06;
 const float axisTitleOffset = .8;
@@ -63,7 +63,7 @@ const float bottomMargin = 0.12;
 //CMS STANDARD
 TString CMSText = "CMS";
 TString extraText   = "Preliminary";
-TString lumiText = "2.3 fb^{-1} (13 TeV)";
+TString lumiText = "26.4 fb^{-1} (13 TeV)";
 
 float lumix = 0.955;
 float lumiy = 0.945;
@@ -253,7 +253,7 @@ void MakeTable( std::map< std::pair<std::string,std::string>, double > mymap, TS
    return;
 };
 
-void MakeTable2( std::map< std::pair<std::string,std::string>, double > mymap, TString type , std::string categoryMode, std::string LowMRcut, std::string HighMRcut, std::string LowRSQcut, std::string HighRSQcut, std::string SoB, std::map<std::string, std::string> func_map, std::vector<std::string> v_func_name)
+void MakeTable2(  std::map< std::pair<std::string,std::string>, double > mymap, std::map< std::pair<std::string,std::string>, double > mymap_err, TString type , std::string categoryMode, std::string LowMRcut, std::string HighMRcut, std::string LowRSQcut, std::string HighRSQcut, std::string SoB, std::map<std::string, std::string> func_map, std::vector<std::string> v_func_name)
 //void MakeTable2( std::map< std::pair<std::string,std::string>, double > mymap, TString type )
 {
   int row_ctr = 0;
@@ -284,7 +284,7 @@ void MakeTable2( std::map< std::pair<std::string,std::string>, double > mymap, T
 	  	if ( row_ctr == 0 ) ss_fl << " & " << f2 <<"("<<func_map[f2]<<")"; 
 	  	std::pair< std::string, std::string > pair = std::make_pair( f1, f2 );
 	  	//std::cout << f1 << " " << f2 << " " << mymap[pair] << std::endl;
-	  	ss << " & " << mymap[pair]*100. << "\\%"; 
+	  	ss << " & (" << mymap[pair]*100. << "$\\pm$ "<< mymap_err[pair]*100. << ")\\%"; 
 	  
 		}
  	if ( row_ctr == 0 ) row_text.push_back( ss_fl.str() );
@@ -294,6 +294,98 @@ void MakeTable2( std::map< std::pair<std::string,std::string>, double > mymap, T
 		NumOfRow++;
 	}
       	row_ctr++;
+	}
+
+	//get the final function (after AIC and bias test)
+	bool isSelected = false;
+	std::string finalFunction = "";
+	std::string finalAIC = "";
+	std::vector<std::string> v_func_name_prefered_order;
+	v_func_name_prefered_order.push_back("singleExp");
+	v_func_name_prefered_order.push_back("singlePow");
+	v_func_name_prefered_order.push_back("modExp");
+	v_func_name_prefered_order.push_back("doubleExp");
+	v_func_name_prefered_order.push_back("doublePow");
+	v_func_name_prefered_order.push_back("poly2");
+	v_func_name_prefered_order.push_back("poly3");
+	v_func_name_prefered_order.push_back("poly4");
+	
+	int erased_N = 0;
+	for(int j=0;j<v_func_name_prefered_order.size();j++)
+	{
+		std::string f = v_func_name_prefered_order[j-erased_N];
+		bool in_list = false;
+		for (int i=0;i<v_func_name.size();i++)
+		{
+			std::string f_in = v_func_name[i];
+			if(f_in==f)
+			{
+			in_list = true;
+			}
+		}
+		if(!in_list)
+			{
+				v_func_name_prefered_order.erase(v_func_name_prefered_order.begin()+j-erased_N);
+				erased_N++;
+			}
+
+	}
+	for (int j=0;j<v_func_name_prefered_order.size();j++)
+	{
+		std::string f2 = v_func_name_prefered_order[j];
+		bool passBiasCut = true;
+		for (int i=0;i<v_func_name_prefered_order.size();i++)
+		{
+			std::string f1 = v_func_name_prefered_order[i];
+			std::pair<std::string, std::string> mypair = std::make_pair( f1, f2 );
+			if ( mymap.find( mypair ) == mymap.end() )
+                	{
+                	continue;
+                	}
+			std::pair< std::string, std::string > pair = std::make_pair( f1, f2 );
+			double t_bias = mymap[pair];
+			double t_bias_err = mymap_err[pair];
+			if(std::abs(t_bias)-std::abs(t_bias_err) > 0.26)
+			{
+				passBiasCut = false;
+			}		
+		}
+		if(passBiasCut && (!isSelected))
+		{
+			finalFunction = f2;
+			finalAIC = func_map[f2];
+			isSelected = true;
+		}
+	}
+	double max_bias=0.0;
+	double max_bias_err=0.0;
+	if(finalFunction!="")
+	{
+	for (int i=0;i<v_func_name.size();i++)
+	{
+		std::string f1 = v_func_name[i];
+               	std::pair<std::string, std::string> mypair = std::make_pair( f1, finalFunction );
+		if ( mymap.find( mypair ) == mymap.end() )
+                        {
+                        continue;
+                        }
+                        std::pair< std::string, std::string > pair = std::make_pair( f1, finalFunction );
+                        double t_bias = mymap[pair];
+                        double t_bias_err = mymap_err[pair];			
+
+		if(std::abs(t_bias)>std::abs(max_bias))
+		{
+		max_bias = t_bias;
+		max_bias_err =t_bias_err; 
+		}
+	}
+	}
+	std::string str_table_func = "Bias_output/function_list.list";
+	const char * file_Name_table_func = str_table_func.c_str();
+  	FILE* m_outfile_func = fopen(file_Name_table_func, "a");	
+	if(SoB=="0.0")
+	{
+		fprintf(m_outfile_func, "%-10s   %-10s   %-10s   %-10s   %-10s   %-10s   %-10s   (%-4.1f $\\pm$ %-4.1f)\\% \n", categoryMode.c_str(), LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(),finalFunction.c_str(),finalAIC.c_str(),max_bias*100.0, max_bias_err*100.0);
 	}
 /*
   for( const auto& fitf : FitFunction() )
@@ -339,7 +431,7 @@ void MakeTable2( std::map< std::pair<std::string,std::string>, double > mymap, T
   fprintf(m_outfile, "\\begin{table*}[h]\n\\begin{center}\n");
   fprintf(m_outfile,"\\topcaption{%s $<$ $M_R$ $<$ %s \\&\\& %s $<$ $R^2$ $<$ %s - %s, S/B = %s.} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), categoryMode.c_str(), SoB.c_str());
   fprintf(m_outfile, "\\begin{tabular}{");
-  for(int i=0;i<NumOfRow;i++)
+  for(int i=0;i<v_func_name.size();i++)
 	{
 	std::cout<<"|c";
 	fprintf(m_outfile, "|c");
@@ -374,7 +466,7 @@ for (int i=0;i<v_func_name.size();i++)
         std::string f2 = v_func_name[j];
 	fprintf(m_outfile_2,"\\begin{figure}[h] \n");
   	fprintf(m_outfile_2,"\\begin{center}\n");
-  	fprintf(m_outfile_2,"\\includegraphics[width=0.6\\textwidth]{figs/Bias_plots/%s_%s_%s/SoB_%s/doublecrystalBall_biasFits_%s_%s.pdf} \n",categoryMode.c_str(), LowMRcut.c_str(), LowRSQcut.c_str(),SoB.c_str(), f1.c_str(), f2.c_str());
+  	fprintf(m_outfile_2,"\\includegraphics[width=0.6\\textwidth]{figs/Bias_plots/%s_%s_%s/SoB_%s/doubleTailCrystalBall_biasFits_%s_%s.pdf} \n",categoryMode.c_str(), LowMRcut.c_str(), LowRSQcut.c_str(),SoB.c_str(), f1.c_str(), f2.c_str());
 	fprintf(m_outfile_2,"\\caption{%s $<$ $M_R$ $<$ %s \\&\\& %s $<$ $R^2$ $<$ %s - %s, S/B = %s. - f1=%s, f2=%s} \n", LowMRcut.c_str(),HighMRcut.c_str(), LowRSQcut.c_str(), HighRSQcut.c_str(), categoryMode.c_str(), SoB.c_str(), f1.c_str(), f2.c_str());
   	fprintf(m_outfile_2,"\\label{fig:Bias_%s_SoB_%s_%s_%s_%s_%s} \n", categoryMode.c_str(), SoB.c_str(), LowMRcut.c_str(),LowRSQcut.c_str(), f1.c_str(), f2.c_str());
   	fprintf(m_outfile_2,"\\end{center}\n");
@@ -387,7 +479,7 @@ for (int i=0;i<v_func_name.size();i++)
 };
 
 
-double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2", std::string outDir = "bias_plots", bool _status = false , std::string fitFunc = "singleGaus")
+double FitBias(double* mu_bias_err, TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2", std::string outDir = "bias_plots", bool _status = false , std::string fitFunc = "singleGaus")
 {
   TFile* f = new TFile( fname , "READ" );
 
@@ -409,18 +501,18 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2",
   if ( _status )
     {
       //tree->Draw("biasNorm>>hbias(200,-50, 50)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
-      tree->Draw("biasNorm>>hbias(24,-6.0, 6.0)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
-      tree->Draw("biasNorm>>hbias_P(12,0.0, 6.0)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
-      tree->Draw("biasNorm>>hbias_N(12,-6.0, 0.0)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
-      tree->Draw("biasNorm>>hbias_gaus(14,-3.0, 4.0)", "status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
+      tree->Draw("(-1.0*biasNorm)>>hbias(24,-6.0, 6.0)", "status3==0","goff");//""status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
+      tree->Draw("(-1.0*biasNorm)>>hbias_P(12,0.0, 6.0)", "status3==0","goff");//"status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
+      tree->Draw("(-1.0*biasNorm)>>hbias_N(12,-6.0, 0.0)", "status==0","goff");//"status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
+      tree->Draw("(-1.0*biasNorm)>>hbias_gaus(21,-4.0, 3.0)", "status3==0","goff");//"status==0 && covStatus==3 && status2==0 && covStatus2==3", "goff");
     }
   else
     {
-      //tree->Draw("biasNorm>>hbias(200,-50, 50)", "", "goff");
-      tree->Draw("biasNorm>>hbias(24,-6.0, 6.0)", "", "goff");
-      tree->Draw("biasNorm>>hbias_P(12,0.0, 6.0)", "", "goff");
-      tree->Draw("biasNorm>>hbias_N(12,-6.0, 0.0)", "", "goff");
-      tree->Draw("biasNorm>>hbias_gaus(14,-3.0, 4.0)", "", "goff");
+      //tree->Draw("(-1.0*biasNorm)>>hbias(200,-50, 50)", "", "goff");
+      tree->Draw("(-1.0*biasNorm)>>hbias(24,-6.0, 6.0)", "", "goff");
+      tree->Draw("(-1.0*biasNorm)>>hbias_P(12,0.0, 6.0)", "", "goff");
+      tree->Draw("(-1.0*biasNorm)>>hbias_N(12,-6.0, 0.0)", "", "goff");
+      tree->Draw("(-1.0*biasNorm)>>hbias_gaus(14,-4.0, 3.0)", "", "goff");
     }
   
   TH1F* hbias = (TH1F*)gDirectory->Get("hbias");
@@ -457,9 +549,16 @@ double FitBias( TString fname = "", TString f1 = "dumm1", TString f2 = "dummy2",
   double sigma1_DCB_value = 0.0;
   double sigma2_DCB_value = 0.0;
   double w1_DCB_value = 0.0;
+	
+  double mean_DTCB = 0.0;
+  double sigma_DTCB = 0.0;
+  double alpha_high_DTCB = 0.0;
+  double alpha_low_DTCB = 0.0;
+  double n_high_DTCB = 0.0;
+  double n_low_DTCB = 0.0;
 
 //crystal ball 
-TF1* myF_CB = new TF1("myF_CB", crystalball_function, -6.0, 4.0, 5 );
+TF1* myF_CB = new TF1("myF_CB", crystalball_function, -4.0, 6.0, 5 );
 //double crystalball_function(double *x, double *par) //(double x, double alpha, double n, double sigma, double mean)
 myF_CB->SetParameter(0, 0.1);	
 myF_CB->SetParameter(1, 1.5);	
@@ -469,9 +568,35 @@ myF_CB->SetParameter(3, hbias->GetMean());
 myF_CB->SetParameter(4, hbias->GetMaximum());	
 myF_CB->SetLineColor( kBlue );
 myF_CB->SetLineWidth( 3 );
+
+
+
+//double doubletailcrystalball_function(double *x, double *par) //(double mean, double sigma, double P_const, double alpha_high, double alpha_low, double n_high, double n_low)
+//0: mean
+//1: sigma
+//2: P_const
+//3: alpha_high
+//4: alpha_low
+//5: n_high
+//6: n_low
+TF1* myF_DTCB = new TF1("myF_DTCB", doubletailcrystalball_function, -3.0, 2.5, 7 );
+myF_DTCB->SetParameter(0, hbias_gaus->GetMean()); 
+myF_DTCB->SetParameter(1, hbias_gaus->GetStdDev());
+myF_DTCB->SetParameter(2, hbias->GetMaximum());
+myF_DTCB->SetParameter(3, 1.0);
+double limit_Max = std::numeric_limits<double>::infinity();
+myF_DTCB->SetParLimits(3, 0.0, limit_Max);	
+myF_DTCB->SetParameter(4, 1.0);
+myF_DTCB->SetParLimits(4, 0.0, limit_Max);		
+myF_DTCB->SetParameter(5, 1.0);
+myF_DTCB->SetParLimits(5, 0.0, limit_Max);	
+myF_DTCB->SetParameter(6, 1.0);
+myF_DTCB->SetParLimits(6, 0.0, limit_Max);	
+myF_DTCB->SetLineColor( kBlue );
+myF_DTCB->SetLineWidth( 3 );
  
 //double crystal ball 
-TF1* myF_DCB = new TF1("myF_DCB", doublecrystalball_function, -6.0, 4.0, 8 );
+TF1* myF_DCB = new TF1("myF_DCB", doublecrystalball_function, -4.0, 6.0, 8 );
 //0: alpha
 //1: n
 //2: sigma1
@@ -570,6 +695,26 @@ myF_SG->SetLineWidth( 3 );
 	alpha_DCB_value = myF_DCB->GetParameter(0);
 	w1_DCB_value = myF_DCB->GetParameter(6);
 	}
+//double doubletailcrystalball_function(double *x, double *par) //(double mean, double sigma, double P_const, double alpha_high, double alpha_low, double n_high, double n_low)
+//0: mean
+//1: sigma
+//2: P_const
+//3: alpha_high
+//4: alpha_low
+//5: n_high
+//6: n_low
+	 else if (fitFunc == "doubleTailCrystalBall")
+  	{
+	hbias->Fit( myF_DTCB, "LR");
+	mu_value[0] = myF_DTCB->GetParameter(0);
+        *mu_bias_err = myF_DTCB->GetParError(0);
+ 	sigma_DTCB = myF_DTCB->GetParameter(1);
+ 	alpha_high_DTCB = myF_DTCB->GetParameter(3);
+ 	alpha_low_DTCB = myF_DTCB->GetParameter(4);
+ 	n_high_DTCB = myF_DTCB->GetParameter(5);
+ 	n_low_DTCB = myF_DTCB->GetParameter(6);
+	
+	}
 
   //hbias->GetXaxis()->SetRangeUser( _xlow2sig, _xhigh2sig );
   hbias->GetXaxis()->SetRangeUser( -6.0, 6.0 );
@@ -611,7 +756,14 @@ myF_SG->SetLineWidth( 3 );
   TString _sigma2_DCB = Form("%.1f", 100.0*sigma2_DCB_value );
   TString _mean2_DCB = Form("%.1f", 100.0*mean2_DCB_value );
   TString _w1_DCB = Form("%.1f", w1_DCB_value );
-  
+ 
+
+  TString _sigma_DTCB = Form("%.1f", 100.0*sigma_DTCB );
+  TString _alpha_high_DTCB = Form("%.1f", alpha_high_DTCB );
+  TString _alpha_low_DTCB = Form("%.1f", alpha_low_DTCB );
+  TString _n_high_DTCB = Form("%.1f", n_high_DTCB );
+  TString _n_low_DTCB = Form("%.1f", n_low_DTCB );
+ 
   TLatex tex2;
   tex2.SetNDC();
   tex2.SetTextFont(52);
@@ -648,6 +800,18 @@ myF_SG->SetLineWidth( 3 );
   tex2.DrawLatex( 0.89, 0.48, "#alpha = " + _alpha_DCB );
   //tex2.DrawLatex( 0.89, 0.40, "#omega_{1} = " + _w1_DCB);
  }
+
+if(fitFunc == "doubleTailCrystalBall" )
+ {
+  tex2.DrawLatex( 0.89, 0.88, "#mu = " + _mu + " %");
+  tex2.DrawLatex( 0.89, 0.80, "   #sigma = " + _sigma_DTCB + " %");
+  tex2.DrawLatex( 0.89, 0.72, "   #alpha_{high} = " + _alpha_high_DTCB);
+  tex2.DrawLatex( 0.89, 0.64, "n_{high} = " + _n_high_DTCB);
+  tex2.DrawLatex( 0.89, 0.56, "#alpha_{low} = " + _alpha_low_DTCB);
+  tex2.DrawLatex( 0.89, 0.48, "n_{low} = " + _n_low_DTCB );
+  //tex2.DrawLatex( 0.89, 0.40, "#omega_{1} = " + _w1_DCB);
+ }
+
 
   TLatex latex;
   latex.SetNDC();
@@ -759,8 +923,33 @@ double doublecrystalball_function(double *x, double *par) //(double x, double al
 	}
 };
 
+double doubletailcrystalball_function(double *x, double *par) //(double mean, double sigma, double P_const, double alpha_high, double alpha_low, double n_high, double n_low)
+{
+        // evaluate the crystal ball function
+        double mean = par[0];
+	double sigma = par[1];
+	if (sigma <= 0.0)     return 0.;
+	double P_Const = par[2];
+	double alpha_high = std::abs(par[3]);
+	double alpha_low = std::abs(par[4]);
+	double n_high = std::abs(par[5]);
+	double n_low = std::abs(par[6]);
+	double t = (x[0] - mean)/sigma;
+	 
+	
+	if((t>-1.0*alpha_low)&&(t<alpha_high))
+	{
+		return P_Const*std::exp(-0.5*t*t);
+	}
 
+	if(t<-1.0*alpha_low)
+	{
+		return P_Const*std::exp(-0.5*alpha_low*alpha_low)/std::pow((alpha_low/n_low)*(n_low/alpha_low-alpha_low-t),n_low);	
+	}
+	if(t>alpha_high)
+	{
+		return P_Const*std::exp(-0.5*alpha_high*alpha_high)/std::pow((alpha_high/n_high)*(n_high/alpha_high-alpha_high+t),n_high);	
+	}
 
-
-
+};
 

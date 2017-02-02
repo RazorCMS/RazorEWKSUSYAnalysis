@@ -19,6 +19,7 @@ bool MakeCustomMrRsq( TH2F* h, TString outName );
 bool MakeStackPlot( THStack* s, TString var, TString outName, TLegend* leg = NULL );
 bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outName, TLegend* leg = NULL, TString label = "dummy" );
 bool MakeStackPlotSignal( THStack* s, TH1D* signal, TString var, TString outName, TLegend* leg, TString label = "dummy" );
+bool PlotSameCanvas( TH1D** histos, int nhistos, TString var, TString outName, TLegend* leg, TString label = "dummy" );
 //Create Histogram with style based in the process
 TH1D* GetStyledHisto( TH1D* h, Process process );
 bool SetHistoStyle( TH1D* h, Process process );

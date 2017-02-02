@@ -30,8 +30,8 @@ const float bottomMargin = 0.12;
 //CMS STANDARD
 TString CMSText = "CMS";
 TString extraText   = "Preliminary";
-TString lumiText = "2.0 fb^{-1} (13 TeV)";
-//TString lumiText = "27 pb^{-1} (13 TeV)";
+//TString lumiText = "2.0 fb^{-1} (13 TeV)";
+TString lumiText = "12.9 fb^{-1} (13 TeV)";
 //TString lumiText = "19.8 fb^{-1} (8 TeV)";
 
 bool MakeCustomMrRsq( TH2F* h, TString outName )
@@ -111,8 +111,8 @@ bool MakeStackPlot( THStack* s, TString var, TString outName, TLegend* leg )
     {
       s->GetXaxis()->SetRangeUser( 50., 150. );
       s->GetXaxis()->SetTitle("m_{#gamma#gamma} (GeV)");
-      s->GetYaxis()->SetTitle("events / 1.5 (GeV)");
-      s->SetMinimum( 0 );
+      s->GetYaxis()->SetTitle("events / 1 (GeV)");
+      s->SetMinimum( 1e-8 );
       s->SetMaximum( 2*s->GetMaximum() );
     }
   else if ( var == "ptgg" )
@@ -216,7 +216,7 @@ bool MakeStackPlotSignal( THStack* s, TH1D* signal, TString var, TString outName
       s->GetXaxis()->SetRangeUser( 50., 160. );
       signal->GetXaxis()->SetTitle("m_{#gamma#gamma} (GeV)");
       s->GetYaxis()->SetTitle("events / 1.0 (GeV)");
-      s->SetMinimum( 0 );
+      s->SetMinimum( 1e-8 );
       s->SetMaximum( 1.2*s->GetMaximum() );
     }
   else if ( var == "ptgg" )
@@ -451,7 +451,6 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
   if ( leg != NULL )
     {
       leg->SetBorderSize(0);
-      //leg->SetTextSize(0.03);
       leg->SetLineColor(1);
       leg->SetLineStyle(1);
       leg->SetLineWidth(1);
@@ -473,8 +472,6 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
   pad2->Draw();
   pad2->cd();
 
-  std::cout << var << " PLOT STACK" << std::endl;
-  //TH1D* MC = (TH1D*)s->GetHistogram();
   TH1D* ratio = new TH1D( *data );
   ratio->Divide( mc );
   ratio->SetMarkerStyle( 20 );
@@ -496,9 +493,6 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
 
   if( var == "rsq" )
     {
-      std::cout << "entering RSQ" << std::endl;
-      //s->GetXaxis()->SetRangeUser(0.0, 1.0);
-      //ratio->GetXaxis()->SetRangeUser(0.0, 1.0);
       ratio->GetXaxis()->SetTitle("R^{2}");
       s->SetMinimum( 1e-7 );
       s->SetMaximum( 1e4*s->GetMaximum() );
@@ -509,26 +503,19 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
     }
   else if ( var == "mr" )
     {
-      //s->GetXaxis()->SetRangeUser(0.0, 2000.0);
-      //ratio->GetXaxis()->SetRangeUser(0.0, 2000.0);
       ratio->GetXaxis()->SetTitle("M_{R} (GeV)");
       s->GetYaxis()->SetTitle("events / 50 (GeV)");
       s->SetMinimum( 1e-1 );
       s->SetMaximum( 1e4*mc->GetMaximum() );
       pad1->SetLogy();
       pad1->Update();
-      
     }
   else if ( var == "mgg" )
     {
       //s->GetXaxis()->SetRangeUser( 50., 160. );
       ratio->GetXaxis()->SetTitle("m_{#gamma#gamma} (GeV)");
-      s->GetYaxis()->SetTitle("events / 1.5 (GeV)");
-      s->SetMinimum( 0 );
-      s->SetMaximum( 1.5*s->GetMaximum() );
-
-      
-      s->SetMinimum( 1e-1 );
+      s->GetYaxis()->SetTitle("events / 1 (GeV)");
+      s->SetMinimum( 1e-10 );
       s->SetMaximum( 1.5*s->GetMaximum() );
       //pad1->SetLogy();
       pad1->Update();
@@ -724,9 +711,9 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
   else if ( var == "sigmaMoverM" )
     {
       ratio->GetXaxis()->SetTitle("#sigma_{M}/M");
-      s->GetYaxis()->SetTitle("events / ");
-      s->SetMaximum( 1.5*s->GetMaximum() );
-      s->SetMinimum( 1e-1 );
+      s->GetYaxis()->SetTitle("events / 0.0005");
+      s->SetMaximum( 1.3*s->GetMaximum() );
+      s->SetMinimum( 1e-5 );
       //pad1->SetLogy();
       pad1->Update();
     }
@@ -736,6 +723,324 @@ bool MakeStackPlot( THStack* s, TH1D* data, TH1D* mc, TString var, TString outNa
       //s->GetYaxis()->SetTitle("events");
       s->SetMaximum( 3.0*mc->GetMaximum() );
       s->SetMinimum( 1e-7 );
+    }
+  //pad1->SetLogy();
+  pad1->Update();
+  //pad1->SetLogy();
+  pad1->Update();
+  c->SaveAs( outName+".pdf" );
+  c->SaveAs( outName+".png" );
+  c->SaveAs( outName+".C" );
+  delete c;
+  return true;
+};
+
+bool PlotSameCanvas( TH1D** histos, int nhistos, TString var, TString outName, TLegend* leg, TString label )
+{
+  TCanvas* c = new TCanvas( "c", "c", 2119, 33, 800, 700 );
+  c->SetHighLightColor(2);
+  c->SetFillColor(0);
+  c->SetBorderMode(0);
+  c->SetBorderSize(2);
+  c->SetLeftMargin( leftMargin );
+  c->SetRightMargin( rightMargin );
+  c->SetTopMargin( topMargin );
+  c->SetBottomMargin( bottomMargin );
+  c->SetFrameBorderMode(0);
+  c->SetFrameBorderMode(0);
+
+  TPad *pad1 = new TPad("pad1","pad1", .0, 0.3, 1., 1.);
+  pad1->SetBottomMargin(0);
+  pad1->SetRightMargin( rightMargin );
+  pad1->SetLeftMargin( leftMargin );
+  pad1->Draw();
+  pad1->cd();
+  
+  histos[0]->SetTitle("");
+  histos[0]->SetFillColor(kWhite);
+  histos[0]->Draw("hist");
+  histos[0]->GetXaxis()->SetTitleSize( axisTitleSize );
+  histos[0]->GetXaxis()->SetTitleOffset( axisTitleOffset );
+  histos[0]->GetYaxis()->SetTitleSize( axisTitleSize );
+  histos[0]->GetYaxis()->SetTitleOffset( axisTitleOffset );
+    
+  if ( leg != NULL )
+    {
+      leg->SetBorderSize(0);
+      leg->SetLineColor(1);
+      leg->SetLineStyle(1);
+      leg->SetLineWidth(1);
+      leg->SetFillColor(0);
+      leg->SetFillStyle(1001);
+      leg->Draw();
+    }
+
+  histos[1]->SetFillColor(kWhite);
+  histos[1]->Draw("same+hist");
+  AddCMS( c );
+
+  TPad *pad2 = new TPad("pad2","pad2", .0, .0, 1., 0.29);
+  pad2->SetTopMargin(0.04);
+  pad2->SetTopMargin(0.008);
+  pad2->SetBottomMargin(0.4);
+  pad2->SetRightMargin( rightMargin );
+  pad2->SetLeftMargin( leftMargin );
+  pad2->SetGridy();
+  pad2->Draw();
+  pad2->cd();
+
+  TH1D* ratio = new TH1D( *histos[0] );
+  ratio->Divide( histos[1] );
+  ratio->SetMarkerStyle( 20 );
+  ratio->GetXaxis()->SetTitleSize( axisTitleSizeRatioX );
+  ratio->GetXaxis()->SetLabelSize( axisLabelSizeRatioX );
+  ratio->GetXaxis()->SetTitleOffset( axisTitleOffsetRatioX );
+  ratio->GetYaxis()->SetTitleSize( axisTitleSizeRatioY );
+  ratio->GetYaxis()->SetLabelSize( axisLabelSizeRatioY );
+  ratio->GetYaxis()->SetTitleOffset( axisTitleOffsetRatioY );  
+  ratio->SetMarkerColor( kBlue );
+  ratio->SetLineColor( kBlue );
+  //ratio->GetYaxis()->SetRangeUser( 0.0, 2.0 );
+  ratio->GetYaxis()->SetRangeUser( 0.5, 1.5 );
+  ratio->SetTitle("");
+  ratio->GetYaxis()->SetTitle("data / mc");
+  ratio->GetYaxis()->CenterTitle( true );
+  ratio->GetYaxis()->SetNdivisions( 10, false );
+  ratio->SetStats( 0 );
+  ratio->Draw("E");
+
+  if( var == "rsq" )
+    {
+      ratio->GetXaxis()->SetTitle("R^{2}");
+      histos[0]->SetMinimum( 1e-7 );
+      histos[0]->SetMaximum( 1e4*histos[0]->GetMaximum() );
+      histos[0]->GetYaxis()->SetTitle("events / 0.05");
+      pad1->SetLogy();
+      pad1->Update();
+      pad2->Update();
+    }
+  else if ( var == "mr" )
+    {
+      ratio->GetXaxis()->SetTitle("M_{R} (GeV)");
+      histos[0]->GetYaxis()->SetTitle("events / 50 (GeV)");
+      histos[0]->SetMinimum( 1e-1 );
+      histos[0]->SetMaximum( 1e4*histos[0]->GetMaximum() );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "mgg" )
+    {
+      //histos[0]->GetXaxis()->SetRangeUser( 50., 160. );
+      ratio->GetXaxis()->SetTitle("m_{#gamma#gamma} (GeV)");
+      histos[0]->GetYaxis()->SetTitle("events / 1 (GeV)");
+      histos[0]->SetMinimum( 1e-10 );
+      histos[0]->SetMaximum( 1.5*histos[0]->GetMaximum() );
+      //pad1->SetLogy();
+      pad1->Update();
+      ratio->GetYaxis()->SetRangeUser( 0.5, 1.5 );
+      pad2->Update();
+    }
+  else if ( var == "ptgg" )
+    {
+      ratio->GetXaxis()->SetTitle("p_{T}^{#gamma#gamma} (GeV)");
+      histos[0]->GetYaxis()->SetTitle("events / 10 (GeV)");
+      histos[0]->SetMaximum( 1e2*histos[0]->GetMaximum() );
+      histos[0]->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho1pt" )
+    {
+      ratio->GetXaxis()->SetTitle("p^{#gamma_{1}}_{T} (GeV)");
+      histos[0]->GetYaxis()->SetTitle("events / 10 (GeV)");
+      histos[0]->SetMaximum( 1e2*histos[0]->GetMaximum() );
+      histos[0]->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho1eta" )
+    {
+      ratio->GetXaxis()->SetTitle("|#eta|^{#gamma^{1}}");
+      histos[0]->GetYaxis()->SetTitle("events / 0.2");
+      histos[0]->SetMaximum( 2.0*histos[0]->GetMaximum() );
+      histos[0]->SetMinimum( 1e-1 );
+    }
+  else if ( var == "pho1phi" )
+    {
+      ratio->GetXaxis()->SetTitle("#phi^{#gamma^{1}}");
+      histos[0]->GetYaxis()->SetTitle("events / 0.2");
+      histos[0]->SetMaximum( 2.0*histos[0]->GetMaximum() );
+      histos[0]->SetMinimum( 1e-1 );
+    }
+  else if ( var == "pho1sigmaIetaIeta" )
+    {
+      ratio->GetXaxis()->SetTitle("#sigma_{i#etai#eta}^{#gamma^{1}}");
+      histos[0]->GetYaxis()->SetTitle("events / 0.0004");
+      histos[0]->SetMaximum( 1e1*histos[0]->GetMaximum() );
+      histos[0]->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho1r9" )
+    {
+      ratio->GetXaxis()->SetTitle("R^{#gamma^{1}}_{9}");
+      histos[0]->GetYaxis()->SetTitle("events / 0.03");
+      histos[0]->SetMaximum( 1e1*histos[0]->GetMaximum() );
+      histos[0]->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho1HoverE" )
+    {
+      ratio->GetXaxis()->SetTitle("H/E^{#gamma^{1}}");
+      histos[0]->GetYaxis()->SetTitle("events / 0.002");
+      histos[0]->SetMaximum( 1e1*histos[0]->GetMaximum() );
+      histos[0]->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho1sumChargedHadronPt" )
+    {
+      ratio->GetXaxis()->SetTitle("sumChargedHadronPt^{#gamma^{1}} (GeV)");
+      histos[0]->GetYaxis()->SetTitle("events / 0.1 (GeV)");
+      histos[0]->SetMaximum( 1e1*histos[0]->GetMaximum() );
+      histos[0]->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho1sumNeutralHadronEt" )
+    {
+      ratio->GetXaxis()->SetTitle("sumNeutralHadronEt^{#gamma^{1}} (GeV)");
+      histos[0]->GetYaxis()->SetTitle("events / 0.1 (GeV)");
+      histos[0]->SetMaximum( 1e1*histos[0]->GetMaximum() );
+      histos[0]->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho1sumPhotonEt" )
+    {
+      ratio->GetXaxis()->SetTitle("sumPhotonEt^{#gamma^{1}} (GeV)");
+      histos[0]->GetYaxis()->SetTitle("events / 0.1 (GeV)");
+      histos[0]->SetMaximum( 1e1*histos[0]->GetMaximum() );
+      histos[0]->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho1sigmaEoverE" )
+    {
+      ratio->GetXaxis()->SetTitle("(#sigma_{E}/E)^{#gamma_{1}}");
+      histos[0]->GetYaxis()->SetTitle("events / 0.0005");
+      histos[0]->SetMaximum( 1.3e0*histos[0]->GetMaximum() );
+      histos[0]->SetMinimum( 1e-1 );
+    }
+  else if ( var == "pho2pt" )
+    {
+      ratio->GetXaxis()->SetTitle("p^{#gamma_{2}}_{T} (GeV)");
+      histos[0]->GetYaxis()->SetTitle("events / 10 (GeV)");
+      histos[0]->SetMaximum( 1e2*histos[0]->GetMaximum() );
+      histos[0]->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho2eta" )
+    {
+      ratio->GetXaxis()->SetTitle("|#eta|^{#gamma^{2}}");
+      histos[0]->GetYaxis()->SetTitle("events / 0.2");
+      histos[0]->SetMaximum( 2.0*histos[0]->GetMaximum() );
+      histos[0]->SetMinimum( 1e-1 );
+    }
+  else if ( var == "pho2phi" )
+    {
+      ratio->GetXaxis()->SetTitle("#phi^{#gamma^{2}}");
+      histos[0]->GetYaxis()->SetTitle("events / 0.2");
+      histos[0]->SetMaximum( 2.0*histos[0]->GetMaximum() );
+      histos[0]->SetMinimum( 1e-1 );
+    }
+  else if ( var == "pho2sigmaIetaIeta" )
+    {
+      ratio->GetXaxis()->SetTitle("#sigma_{i#etai#eta}^{#gamma^{2}}");
+      histos[0]->GetYaxis()->SetTitle("events / 0.0004");
+      histos[0]->SetMaximum( 1e1*histos[0]->GetMaximum() );
+      histos[0]->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho2r9" )
+    {
+      ratio->GetXaxis()->SetTitle("R^{#gamma^{2}}_{9}");
+      histos[0]->GetYaxis()->SetTitle("events / 0.03");
+      histos[0]->SetMaximum( 1e1*histos[0]->GetMaximum() );
+      histos[0]->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho2HoverE" )
+    {
+      ratio->GetXaxis()->SetTitle("H/E^{#gamma^{2}}");
+      histos[0]->GetYaxis()->SetTitle("events / 0.02");
+      histos[0]->SetMaximum( 1e1*histos[0]->GetMaximum() );
+      histos[0]->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho2sumChargedHadronPt" )
+    {
+      ratio->GetXaxis()->SetTitle("sumChargedHadronPt^{#gamma^{2}} (GeV)");
+      histos[0]->GetYaxis()->SetTitle("events / 0.1 (GeV)");
+      histos[0]->SetMaximum( 1e1*histos[0]->GetMaximum() );
+      histos[0]->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho2sumNeutralHadronEt" )
+    {
+      ratio->GetXaxis()->SetTitle("sumNeutralHadronEt^{#gamma^{2}} (GeV)");
+      histos[0]->GetYaxis()->SetTitle("events / 0.1 (GeV)");
+      histos[0]->SetMaximum( 1e1*histos[0]->GetMaximum() );
+      histos[0]->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho2sumPhotonEt" )
+    {
+      ratio->GetXaxis()->SetTitle("sumPhotonEt^{#gamma^{2}} (GeV)");
+      histos[0]->GetYaxis()->SetTitle("events / 0.1 (GeV)");
+      histos[0]->SetMaximum( 1e1*histos[0]->GetMaximum() );
+      histos[0]->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "pho2sigmaEoverE" )
+    {
+      ratio->GetXaxis()->SetTitle("(#sigma_{E}/E)^{#gamma_{2}}");
+      histos[0]->GetYaxis()->SetTitle("events / 0.0005");
+      histos[0]->SetMaximum( 1.3e0*histos[0]->GetMaximum() );
+      histos[0]->SetMinimum( 1e-1 );
+    }
+  else if ( var == "njets" )
+    {
+      ratio->GetXaxis()->SetTitle("N_{jets}");
+      histos[0]->GetYaxis()->SetTitle("events");
+      histos[0]->SetMaximum( 1e2*histos[0]->GetMaximum() );
+      histos[0]->SetMinimum( 1e-1 );
+      pad1->SetLogy();
+      pad1->Update();
+    }
+  else if ( var == "sigmaMoverM" )
+    {
+      ratio->GetXaxis()->SetTitle("#sigma_{M}/M");
+      histos[0]->GetYaxis()->SetTitle("events / 0.0005");
+      histos[0]->SetMaximum( 1.5*histos[1]->GetMaximum() );
+      histos[0]->SetMinimum( 1e-10 );
+      //pad1->SetLogy();
+      pad1->Update();
+    }
+  else
+    {
+      //ratio->GetXaxis()->SetTitle( label );
+      //histos[0]->GetYaxis()->SetTitle("events");
+      histos[0]->SetMaximum( 3.0*histos[0]->GetMaximum() );
+      histos[0]->SetMinimum( 1e-7 );
     }
   //pad1->SetLogy();
   pad1->Update();

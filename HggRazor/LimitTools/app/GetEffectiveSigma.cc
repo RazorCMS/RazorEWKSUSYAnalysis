@@ -56,10 +56,11 @@ int main( int argc, char* argv[] )
   TFile* tmp = new TFile("tmp.root", "RECREATE");
   TTree* cutTree = tree->CopyTree( cut );
   
-  if (categoryMode == "highpt") cutTree->Draw("mGammaGamma>>h_mgg(228,103,160)", "weight*pileupWeight*(1)", "goff");
-  else if (categoryMode == "hzbb") cutTree->Draw("mGammaGamma>>h_mgg(95,103,160)", "weight*pileupWeight*(1)", "goff");
-  else if (categoryMode == "highres") cutTree->Draw("mGammaGamma>>h_mgg(228,103,160)", "weight*pileupWeight*(1)", "goff");
-  else if (categoryMode == "lowres") cutTree->Draw("mGammaGamma>>h_mgg(95,103,160)", "weight*pileupWeight*(1)", "goff");
+  if (categoryMode == "highpt") cutTree->Draw("mGammaGamma>>h_mgg(228,103,160)", "weight*pileupWeight*btagCorrFactor*triggerEffSFWeight*photonEffSF*(1)", "goff");
+  else if (categoryMode == "hzbb") cutTree->Draw("mGammaGamma>>h_mgg(95,103,160)", "weight*pileupWeight*btagCorrFactor*triggerEffSFWeight*photonEffSF*(1)", "goff");
+  else if (categoryMode == "highres") cutTree->Draw("mGammaGamma>>h_mgg(228,103,160)", "weight*pileupWeight*btagCorrFactor*triggerEffSFWeight*photonEffSF*(1)", "goff");
+  else if (categoryMode == "lowres") cutTree->Draw("mGammaGamma>>h_mgg(95,103,160)", "weight*pileupWeight*btagCorrFactor*triggerEffSFWeight*photonEffSF*(1)", "goff");
+  else if (categoryMode == "inclusive") cutTree->Draw("mGammaGamma>>h_mgg(95,103,160)", "weight*pileupWeight*btagCorrFactor*triggerEffSFWeight*photonEffSF*(1)", "goff");
   
   TH1F* h_mgg = (TH1F*)tmp->Get("h_mgg");
   double effSigma = GetEffSigma( h_mgg );

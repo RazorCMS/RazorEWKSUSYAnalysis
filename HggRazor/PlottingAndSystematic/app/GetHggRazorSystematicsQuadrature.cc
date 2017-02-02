@@ -120,7 +120,12 @@ int main( int argc, char* argv[] )
       return -1;
     } 
   
+  //----------------------
+  //SigmaMoverM correction
+  //----------------------
 
+  const float highres_sigmaMoverM_corr = 0.845;
+  const float lowres_sigmaMoverM_corr = 1.131;
 
   //-----------------
   //Load Binning
@@ -178,8 +183,7 @@ int main( int argc, char* argv[] )
     } 
   else if ( analysisTag == "Razor2016_80X" ) 
     {
-      //for 80X MC, trigger table doesn't exist. so don't apply triggers.
-      cut = cut + categoryCutString + metFilterCut;
+      cut = cut + categoryCutString + triggerCut + metFilterCut;
     } 
   else 
     {
@@ -511,7 +515,9 @@ int main( int argc, char* argv[] )
        misstagDown->SetBinContent( bin, misstagDown->GetBinContent( bin )/nom );
        misstagUpS->SetBinContent( bin, misstagUpS->GetBinContent( bin )/nomS );
        misstagDownS->SetBinContent( bin, misstagDownS->GetBinContent( bin )/nomS );
-       
+
+       if ( categoryMode == "highres") nominal->SetBinContent( bin, highres_sigmaMoverM_corr*nominal->GetBinContent( bin ) );
+       if ( categoryMode == "lowres") nominal->SetBinContent( bin, lowres_sigmaMoverM_corr*nominal->GetBinContent( bin ) );
        outf << tmp[4] << "\t" << categoryMode << "\t" << tmp[0] << "\t" << tmp[2] << " \t" << tmp[1] << "\t" << tmp[3] << "\t"
 	    << nominal->GetBinContent( bin ) << "\t"
 	    << JesUp->GetBinContent( bin ) << "\t" <<  JesDown->GetBinContent( bin ) << "\t"
@@ -542,6 +548,8 @@ int main( int argc, char* argv[] )
        if (tmp[5] == 8) totalFractionalUncertaintySqr += pow( 0.04 ,2); //for btag efficiency systematic
 
        //Signal
+       if ( categoryMode == "highres") nomS = highres_sigmaMoverM_corr*nomS;
+       if ( categoryMode == "lowres") nomS = lowres_sigmaMoverM_corr*nomS;
        outf <<  nomS << "\t"
 	    << JesUpS->GetBinContent( bin ) << "\t" <<  JesDownS->GetBinContent( bin ) << "\t"
 	    << ISRUpS->GetBinContent( bin ) << "\t" <<  ISRDownS->GetBinContent( bin ) << "\t"

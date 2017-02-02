@@ -145,6 +145,7 @@ int main( int argc, char* argv[] )
   std::ifstream ifs2;
   if ( secondInputCF != "" ) {
       ifs2.open( secondInputCF.c_str(), std::ifstream::in );
+      assert(ifs2);
   }
   
 
@@ -236,7 +237,9 @@ int main( int argc, char* argv[] )
 	      float MR_l2, MR_h2, Rsq_l2, Rsq_h2;
 	      int binNumber2;
 	      ifs2 >> binNumber2 >> category2 >> MR_l2 >> MR_h2 >> Rsq_l2 >> Rsq_h2 >> SMH2;
-
+	      std::cout << "File 2: " << category2 << " " << MR_l2 << " " << MR_h2 << " " 
+			    << Rsq_l2 << " " << Rsq_h2
+			    << std::endl;
 	      // make sure input is sane and warn if not
 	      if ( !(category == category2 && MR_l == MR_l2 && MR_h == MR_h2 && Rsq_l == Rsq_l2 && Rsq_h == Rsq_h2) )
 		{
@@ -272,6 +275,7 @@ int main( int argc, char* argv[] )
 	      ifs2 >> Signal2;
 	      // the next 70 items are the systematics on the signal (put in quotes, separated by spaces)
 	      for ( int i = 0; i < 70; i++ ) {
+	      //for ( int i = 0; i < 68; i++ ) {
 		ifs2 >> SIGNAL_SYS;
 		if ( SIGNAL_SYS == "nan" || SIGNAL_SYS == "-nan" || SIGNAL_SYS == "inf"  || SIGNAL_SYS == "-inf" ) SIGNAL_SYS_F = 0;
 		else SIGNAL_SYS_F = atof( SIGNAL_SYS.c_str() );

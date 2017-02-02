@@ -54,6 +54,7 @@ HggRazorSystematics::~HggRazorSystematics()
   if ( this->NEvents != NULL ) delete NEvents;
   if ( this->SumScaleWeights != NULL ) delete SumScaleWeights;
   if ( this->SumPdfWeights != NULL ) delete SumPdfWeights;
+  //if ( this->ISRHist != NULL ) delete ISRHist;
   
   if ( _debug ) std::cout << "[DEBUG]: Finishing Destructor" << std::endl;
 };
@@ -239,12 +240,13 @@ void HggRazorSystematics::Loop()
       return;
     }
   
-  if ( this->processName == "signal") {
-    if ( this->ISRHist == NULL ) {
-      std::cerr << "[ERROR]: ISRHist has not been set for the signal process" << std::endl;
-      return;
+  if ( this->processName == "signal")
+    {
+      if ( this->ISRHist == NULL ) {
+	std::cerr << "[ERROR]: ISRHist has not been set for the signal process" << std::endl;
+	return;
+      }
     }
-  }
 
   if ( _debug ) std::cout << "[DEBUG]: Setting N_events and N_facScale" << std::endl;
   
@@ -268,38 +270,32 @@ void HggRazorSystematics::Loop()
   //Signal ISR Correction
   //****************************************************
   double ISRCorrection[7] = { 1, 0.882, 0.792, 0.702, 0.648, 0.601, 0.515};
-  if( this->processName == "signal" ) {
-    if ( this->ISRHist ) {
-      double tmpTotal = 0;
-      for (int i = 1; i<= 7; i++) tmpTotal += this->ISRHist->GetBinContent(i);
-      double tmpCorrTotal = 0;
-      for (int i = 1; i <= 7; i++) tmpCorrTotal += ISRCorrection[i-1] * this->ISRHist->GetBinContent(i);
-      for (int i = 0; i < 7; i++) ISRCorrection[i] = ISRCorrection[i]*tmpTotal/tmpCorrTotal;
-      
-      std::cout << "[DEBUG] : total = " << tmpTotal << " , tmpCorrTotal = " << tmpCorrTotal 
-		<< " , Original Bin 1 = " << this->ISRHist->GetBinContent(1) << " , "
-		<< " ISRCorrection[0] = " << ISRCorrection[0] << "\n";
-
-    } else {
-      std::cout << "[ERROR] : ISRHist has not been loaded.\n";
+  if( this->processName == "signal" )
+    {
+      if ( this->ISRHist ) {
+	if ( _debug ) std::cout << "[DEBUG]: beginning ISR setup 0" << std::endl;
+	double tmpTotal = 0;
+	for (int i = 1; i <= 7; i++) tmpTotal += this->ISRHist->GetBinContent(i);
+	double tmpCorrTotal = 0;
+	if ( _debug ) std::cout << "[DEBUG]: beginning ISR setup 1" << std::endl;
+	for (int i = 1; i <= 7; i++) tmpCorrTotal += ISRCorrection[i-1] * this->ISRHist->GetBinContent(i);
+	if ( _debug ) std::cout << "[DEBUG]: beginning ISR setup 2" << std::endl;
+	for (int i = 0; i < 7; i++) ISRCorrection[i] = ISRCorrection[i]*tmpTotal/tmpCorrTotal;
+	if ( _debug ) std::cout << "[DEBUG]: beginning ISR setup 3" << std::endl;
+	
+	std::cout << "[DEBUG] : total = " << tmpTotal << " , tmpCorrTotal = " << tmpCorrTotal 
+		  << " , Original Bin 1 = " << this->ISRHist->GetBinContent(1) << " , "
+		  << " ISRCorrection[0] = " << ISRCorrection[0] << "\n";
+	
+      }
+      else
+	{
+	  std::cout << "[ERROR] : ISRHist has not been loaded.\n";
+	}
     }
-  }
+  
 
-
-
-  //--------------------------------
-  //Photon Trigger Efficiency
-  //--------------------------------
-  TFile *photonTriggerEffFile_LeadingLeg = TFile::Open("data/triggerEff/PhoHLTLeadingLegEffDenominatorLoose.root");
-  TFile *photonTriggerEffFile_TrailingLeg = TFile::Open("data/triggerEff/PhoHLTTrailingLegEffDenominatorLoose.root");
-  TH2D *photonTriggerEffHist_LeadingLeg = (TH2D*)photonTriggerEffFile_LeadingLeg->Get("hEffEtaPt");
-  TH2D *photonTriggerEffHist_TrailingLeg = (TH2D*)photonTriggerEffFile_TrailingLeg->Get("hEffEtaPt");
-
-  if(!(photonTriggerEffHist_LeadingLeg && photonTriggerEffHist_TrailingLeg) ) {
-    std::cout << "Error: Trigger efficiency files not loaded.\n";
-    return;
-  }
-
+  if ( _debug ) std::cout << "[DEBUG]: Passed the ISR setup" << std::endl;
   Long64_t nentries = fChain->GetEntriesFast();
   Long64_t nbytes = 0, nb = 0;
   double total_in = 0, total_rm = 0;
@@ -310,36 +306,9 @@ void HggRazorSystematics::Loop()
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
 
-      //**********************************************************
-      //compute trigger efficiency weight correction
-      //**********************************************************
-      double triggerEffWeight = 1.0;
-      double leadPhoPt=0;
-      double leadPhoEta=0;
-      double trailingPhoPt=0;
-      double trailingPhoEta=0;
-      if (pho1Pt > pho2Pt) {
-	leadPhoPt = pho1Pt;
-	leadPhoEta = pho1Eta;
-	trailingPhoPt = pho2Pt;
-	trailingPhoEta= pho2Eta;
-      } else {
-	leadPhoPt = pho2Pt;
-	leadPhoEta = pho2Eta;
-	trailingPhoPt = pho1Pt;
-	trailingPhoEta= pho1Eta;
-      }
 
-      double triggerEffLeadingLeg = 
-	photonTriggerEffHist_LeadingLeg->GetBinContent( photonTriggerEffHist_LeadingLeg->GetXaxis()->FindFixBin( fabs(leadPhoEta) ),
-							photonTriggerEffHist_LeadingLeg->GetYaxis()->FindFixBin( fmax( fmin(leadPhoPt,99.9), 20.01 ) )
-							);
-      double triggerEffTrailingLeg = 
-	photonTriggerEffHist_TrailingLeg->GetBinContent( photonTriggerEffHist_TrailingLeg->GetXaxis()->FindFixBin( fabs(trailingPhoEta) ),
-							 photonTriggerEffHist_TrailingLeg->GetYaxis()->FindFixBin( fmax( fmin(trailingPhoPt,99.9), 20.01 ) )
-							 );
-      triggerEffWeight = triggerEffLeadingLeg*triggerEffTrailingLeg;
-      //**********************************************************
+      //require diphoton trigger
+      if (!(HLTDecision[82] || HLTDecision[83] || HLTDecision[93])) continue;
 
       double ISRCorrValue = 1.0;
       if( this->processName == "signal" ) {
@@ -347,14 +316,20 @@ void HggRazorSystematics::Loop()
       }
 
       float commonW = 0;
-      if (_analysisTag == "Razor2015_76X") {
-	commonW = this->Lumi*weight*pileupWeight*btagCorrFactor*photonEffSF*ISRCorrValue;
-      } else if (_analysisTag == "Razor2016_80X") {
-	commonW = this->Lumi*weight*pileupWeight*btagCorrFactor*triggerEffWeight*photonEffSF*ISRCorrValue;
-      } else {
-	std::cout << "Analysis Tag " << _analysisTag << " not recognized. Error!\n";
-	return;
-      }
+      if (_analysisTag == "Razor2015_76X")
+	{
+	  commonW = this->Lumi*weight*pileupWeight*btagCorrFactor*photonEffSF*ISRCorrValue;
+	}
+      else if (_analysisTag == "Razor2016_80X")
+	{
+	  //commonW = this->Lumi*weight*pileupWeight*btagCorrFactor*triggerEffWeight*photonEffSF*ISRCorrValue;
+	  commonW = this->Lumi*weight*pileupWeight*btagCorrFactor*triggerEffSFWeight*photonEffSF*ISRCorrValue;
+	}
+      else
+	{
+	  std::cout << "Analysis Tag " << _analysisTag << " not recognized. Error!\n";
+	  return;
+	}
       
       h2p->Fill( MR, fmin(t1Rsq,0.999), commonW );	      
       h2p_Err->Fill( MR, fmin(t1Rsq,0.999), commonW*commonW );
