@@ -70,33 +70,34 @@ if __name__ == '__main__':
     nRebins = 1
     diagonalOffset = 150
     mgMin = 250
-    mgMax = 500
+    mgMax = 550
     mchiMin = 0
-    mchiMax = 250
+    mchiMax = 300
 
     binWidth = 50 # to be changed to 25
     
-    tfile = rt.TFile.Open('/Users/cmorgoth/Work/Moriond/HggRazor/RazorEWKSUSYAnalysis/HggRazor/SMS-Plotting/test_limit.root')
+    tfile = rt.TFile.Open('/afs/cern.ch/work/c/cpena/public/combineDiphotonHM/CMSSW_7_4_7/src/RazorEWKSUSYAnalysis/HggRazor/SMS-Plotting/smoothing/test_limit.root')
+
     #####################
     ##observed limit TH2F
     #####################
     xsecULRaw = tfile.Get('limit')
-    xsecUL = rt.TH2D(xsecULRaw.GetName()+'_fixRange',xsecULRaw.GetName()+'_fixRange',6,mgMin-binWidth/2.,mgMax+binWidth/2.,6,mchiMin-binWidth/2., mchiMax+binWidth/2.)
+    xsecUL = rt.TH2D(xsecULRaw.GetName()+'_fixRange',xsecULRaw.GetName()+'_fixRange',7,mgMin-binWidth/2.,mgMax+binWidth/2.,7,mchiMin-binWidth/2., mchiMax+binWidth/2.)
     ####################
     #Expected Limit TH2F
     ####################
     xsecULRaw_Exp = tfile.Get('limit_exp')
-    xsecUL_Exp = rt.TH2D(xsecULRaw_Exp.GetName()+'_fixRange',xsecULRaw_Exp.GetName()+'_fixRange',6,mgMin-binWidth/2.,mgMax+binWidth/2.,6,mchiMin-binWidth/2., mchiMax+binWidth/2.)
+    xsecUL_Exp = rt.TH2D(xsecULRaw_Exp.GetName()+'_fixRange',xsecULRaw_Exp.GetName()+'_fixRange',7,mgMin-binWidth/2.,mgMax+binWidth/2.,7,mchiMin-binWidth/2., mchiMax+binWidth/2.)
     ####################
     #ExpectedUp Limit TH2F
     ####################
     xsecULRaw_ExpUp = tfile.Get('limit_exp_up')
-    xsecUL_ExpUp = rt.TH2D(xsecULRaw_ExpUp.GetName()+'_fixRange',xsecULRaw_ExpUp.GetName()+'_fixRange',6,mgMin-binWidth/2.,mgMax+binWidth/2.,6,mchiMin-binWidth/2., mchiMax+binWidth/2.)
+    xsecUL_ExpUp = rt.TH2D(xsecULRaw_ExpUp.GetName()+'_fixRange',xsecULRaw_ExpUp.GetName()+'_fixRange',7,mgMin-binWidth/2.,mgMax+binWidth/2.,7,mchiMin-binWidth/2., mchiMax+binWidth/2.)
     ####################
     #ExpectedDown Limit TH2F
     ####################
     xsecULRaw_ExpD = tfile.Get('limit_exp_down')
-    xsecUL_ExpD = rt.TH2D(xsecULRaw_ExpD.GetName()+'_fixRange',xsecULRaw_ExpD.GetName()+'_fixRange',6,mgMin-binWidth/2.,mgMax+binWidth/2.,6,mchiMin-binWidth/2., mchiMax+binWidth/2.)
+    xsecUL_ExpD = rt.TH2D(xsecULRaw_ExpD.GetName()+'_fixRange',xsecULRaw_ExpD.GetName()+'_fixRange',7,mgMin-binWidth/2.,mgMax+binWidth/2.,7,mchiMin-binWidth/2., mchiMax+binWidth/2.)
     
     #Observed
     for i in range(1,xsecUL.GetNbinsX()+1):
@@ -147,10 +148,10 @@ if __name__ == '__main__':
         
     binWidth = 25
     
-    rebinXsecULFixRange = rt.TH2D(rebinXsecUL.GetName()+'_fixRange',rebinXsecUL.GetName()+'_fixRange',11,mgMin-binWidth/2.,mgMax+binWidth/2.,11,mchiMin-binWidth/2., mchiMax+binWidth/2.)
-    rebinXsecULFixRange_Exp = rt.TH2D(rebinXsecUL_Exp.GetName()+'_fixRange',rebinXsecUL_Exp.GetName()+'_fixRange',11,mgMin-binWidth/2.,mgMax+binWidth/2.,11,mchiMin-binWidth/2., mchiMax+binWidth/2.)
-    rebinXsecULFixRange_ExpUp = rt.TH2D(rebinXsecUL_ExpUp.GetName()+'_fixRange',rebinXsecUL_ExpUp.GetName()+'_fixRange',11,mgMin-binWidth/2.,mgMax+binWidth/2.,11,mchiMin-binWidth/2., mchiMax+binWidth/2.)
-    rebinXsecULFixRange_ExpD = rt.TH2D(rebinXsecUL_ExpD.GetName()+'_fixRange',rebinXsecUL_ExpD.GetName()+'_fixRange',11,mgMin-binWidth/2.,mgMax+binWidth/2.,11,mchiMin-binWidth/2., mchiMax+binWidth/2.)
+    rebinXsecULFixRange = rt.TH2D(rebinXsecUL.GetName()+'_fixRange',rebinXsecUL.GetName()+'_fixRange',13,mgMin-binWidth/2.,mgMax+binWidth/2.,13,mchiMin-binWidth/2., mchiMax+binWidth/2.)
+    rebinXsecULFixRange_Exp = rt.TH2D(rebinXsecUL_Exp.GetName()+'_fixRange',rebinXsecUL_Exp.GetName()+'_fixRange',13,mgMin-binWidth/2.,mgMax+binWidth/2.,13,mchiMin-binWidth/2., mchiMax+binWidth/2.)
+    rebinXsecULFixRange_ExpUp = rt.TH2D(rebinXsecUL_ExpUp.GetName()+'_fixRange',rebinXsecUL_ExpUp.GetName()+'_fixRange',13,mgMin-binWidth/2.,mgMax+binWidth/2.,13,mchiMin-binWidth/2., mchiMax+binWidth/2.)
+    rebinXsecULFixRange_ExpD = rt.TH2D(rebinXsecUL_ExpD.GetName()+'_fixRange',rebinXsecUL_ExpD.GetName()+'_fixRange',13,mgMin-binWidth/2.,mgMax+binWidth/2.,13,mchiMin-binWidth/2., mchiMax+binWidth/2.)
     
     for i in range(1,rebinXsecULFixRange.GetNbinsX()+1):
         for j in range(1,rebinXsecULFixRange.GetNbinsY()+1):
@@ -176,9 +177,9 @@ if __name__ == '__main__':
     #####################################################
 
     
-    xsecGluino =  rt.TH2D("xsecGluino","xsecGluino",11,mgMin-binWidth/2.,mgMax+binWidth/2.,11,mchiMin-binWidth/2., mchiMax+binWidth/2.)
-    xsecGluinoP =  rt.TH2D("xsecGluinoP","xsecGluinoP",11,mgMin-binWidth/2.,mgMax+binWidth/2.,11,mchiMin-binWidth/2., mchiMax+binWidth/2.)
-    xsecGluinoM =  rt.TH2D("xsecGluinoM","xsecGluinoM",11,mgMin-binWidth/2.,mgMax+binWidth/2.,11,mchiMin-binWidth/2., mchiMax+binWidth/2.)
+    xsecGluino =  rt.TH2D("xsecGluino","xsecGluino",13,mgMin-binWidth/2.,mgMax+binWidth/2.,13,mchiMin-binWidth/2., mchiMax+binWidth/2.)
+    xsecGluinoP =  rt.TH2D("xsecGluinoP","xsecGluinoP",13,mgMin-binWidth/2.,mgMax+binWidth/2.,13,mchiMin-binWidth/2., mchiMax+binWidth/2.)
+    xsecGluinoM =  rt.TH2D("xsecGluinoM","xsecGluinoM",13,mgMin-binWidth/2.,mgMax+binWidth/2.,13,mchiMin-binWidth/2., mchiMax+binWidth/2.)
     
     thyXsec = {}
     thyXsecErr = {}
@@ -193,6 +194,9 @@ if __name__ == '__main__':
         for j in xrange(1,xsecGluino.GetNbinsY()+1):
             xCen = xsecGluino.GetXaxis().GetBinCenter(i)
             yCen = xsecGluino.GetYaxis().GetBinCenter(j)
+            
+            if xCen > 500 or yCen > 250:
+                continue
             if xCen >= yCen+diagonalOffset+25 and xCen <= mgMax:
                 xsecVal = thyXsec[int(xCen)]
                 xsecErr =  thyXsecErr[int(xCen)]

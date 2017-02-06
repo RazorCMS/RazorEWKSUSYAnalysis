@@ -70,22 +70,22 @@ if __name__ == '__main__':
     nRebins = 1
     diagonalOffset = 150
     mgMin = 250
-    mgMax = 500
+    mgMax = 550
     mchiMin = 0
-    mchiMax = 250
+    mchiMax = 300
 
     binWidth = 50 # to be changed to 25
     
-    tfile = rt.TFile.Open('/Users/cmorgoth/Work/git/RazorEWKSUSYAnalysis/HggRazor/SMS-Plotting/test_limit.root')
-    xsecULRaw = tfile.Get('limit')
-    xsecUL = rt.TH2D(xsecULRaw.GetName()+'_fixRange',xsecULRaw.GetName()+'_fixRange',6,mgMin-binWidth/2.,mgMax+binWidth/2.,6,mchiMin-binWidth/2., mchiMax+binWidth/2.)
+    tfile = rt.TFile.Open('/afs/cern.ch/work/c/cpena/public/combineDiphotonHM/CMSSW_7_4_7/src/RazorEWKSUSYAnalysis/HggRazor/SMS-Plotting/smoothing/test_limit.root')
+    xsecULRaw = tfile.Get('limit_exp_up')
+    xsecUL = rt.TH2D(xsecULRaw.GetName()+'_fixRange',xsecULRaw.GetName()+'_fixRange',7,mgMin-binWidth/2.,mgMax+binWidth/2.,7,mchiMin-binWidth/2., mchiMax+binWidth/2.)
     
     for i in range(1,xsecUL.GetNbinsX()+1):
         for j in range(1,xsecUL.GetNbinsY()+1):
             xCen = xsecUL.GetXaxis().GetBinCenter(i)
             yCen = xsecUL.GetYaxis().GetBinCenter(j)
             xsecUL.SetBinContent(i,j,xsecULRaw.GetBinContent(xsecULRaw.FindBin(xCen,yCen)))
-            
+            print yCen, xCen, xsecULRaw.GetBinContent(xsecULRaw.FindBin(xCen,yCen))
     # do swiss cross average in real domain
     rebinXsecUL = rt.swissCrossInterpolate(xsecUL,"NE")
 
@@ -98,7 +98,7 @@ if __name__ == '__main__':
         
     binWidth = 25
     
-    rebinXsecULFixRange = rt.TH2D(rebinXsecUL.GetName()+'_fixRange',rebinXsecUL.GetName()+'_fixRange',11,mgMin-binWidth/2.,mgMax+binWidth/2.,11,mchiMin-binWidth/2., mchiMax+binWidth/2.)    
+    rebinXsecULFixRange = rt.TH2D(rebinXsecUL.GetName()+'_fixRange',rebinXsecUL.GetName()+'_fixRange',13,mgMin-binWidth/2.,mgMax+binWidth/2.,13,mchiMin-binWidth/2., mchiMax+binWidth/2.)    
     
     for i in range(1,rebinXsecULFixRange.GetNbinsX()+1):
         for j in range(1,rebinXsecULFixRange.GetNbinsY()+1):
@@ -114,7 +114,7 @@ if __name__ == '__main__':
 
 
     
-    xsecGluino =  rt.TH2D("xsecGluino","xsecGluino",11,mgMin-binWidth/2.,mgMax+binWidth/2.,11,mchiMin-binWidth/2., mchiMax+binWidth/2.)
+    xsecGluino =  rt.TH2D("xsecGluino","xsecGluino",13,mgMin-binWidth/2.,mgMax+binWidth/2.,13,mchiMin-binWidth/2., mchiMax+binWidth/2.)
     
     thyXsec = {}
     thyXsecErr = {}
@@ -129,6 +129,8 @@ if __name__ == '__main__':
         for j in xrange(1,xsecGluino.GetNbinsY()+1):
             xCen = xsecGluino.GetXaxis().GetBinCenter(i)
             yCen = xsecGluino.GetYaxis().GetBinCenter(j)
+            if xCen > 500 or yCen > 250:
+                continue
             if xCen >= yCen+diagonalOffset+25 and xCen <= mgMax:
                 xsecVal = thyXsec[int(xCen)]
                 xsecErr =  thyXsecErr[int(xCen)]
@@ -175,7 +177,7 @@ if __name__ == '__main__':
     for i in xrange(1, contour0.GetSize()):
         curv = contour0.After(curv)
         curv.SetLineWidth(3)
-        curv.SetLineColor(rt.kBlack)
+        curv.SetLineColor(rt.kRed)
         curv.Draw("lsame")
         if curv.GetN()>maxN:
             maxN = curv.GetN()
@@ -194,6 +196,7 @@ if __name__ == '__main__':
     rebinXsecULFixRange.Write()
     xsecGluino.Write()
     contourFinal.Write()
+    subXsecUL.Write("sub_2d")
     output.Close()
 
 

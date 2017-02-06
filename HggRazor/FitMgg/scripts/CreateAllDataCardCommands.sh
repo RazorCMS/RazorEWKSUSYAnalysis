@@ -59,7 +59,8 @@ for j in $(ls $inputfiledir);
 do
     name=`echo $j | awk -F "list_" '{print $2}' | awk -F ".txt" '{print $1}'`
     #echo $name
-    echo ./CreateDataCardCommands" --inputCF="$indir1$name".txt --secondInputCF="$indir2$name".txt --outputFile=MakeDataCards_"$extra_tag$name".sh --dataFile="$datafile" --smhFile="$smhfile" --signalFile="$sfile"/HggRazor_SMS-T2bH_"$name"_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_1pb_weighted.root --sModel="$name"_DataCards_"$extra_tag" --binningFile="$bfile --currentDir=$PWD
+    #echo ./CreateDataCardCommands" --inputCF="$indir1$name".txt --secondInputCF="$indir2$name".txt --outputFile=MakeDataCards_"$extra_tag$name".sh --dataFile="$datafile" --smhFile="$smhfile" --signalFile="$sfile"/HggRazor_SMS-T2bH_"$name"_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_1pb_weighted.root --sModel="$name"_DataCards_"$extra_tag" --binningFile="$bfile --currentDir=$PWD
+    echo ./CreateDataCardCommands" --inputCF="$indir1$name".txt --outputFile=MakeDataCards_"$extra_tag$name".sh --dataFile="$datafile" --smhFile="$smhfile" --signalFile="$sfile"/HggRazor_SMS-T2bH_"$name"_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_1pb_weighted.root --sModel="$name"_DataCards_"$extra_tag" --binningFile="$bfile --currentDir=$PWD
     echo bsub -q 8nh -e  $PWD/err/$name.err -o  $PWD/log/$name.out source MakeDataCards_$extra_tag$name.sh
 done
 
