@@ -76,7 +76,7 @@ if __name__ == '__main__':
 
     binWidth = 50 # to be changed to 25
     
-    tfile = rt.TFile.Open('/Users/cmorgoth/Work/git/RazorEWKSUSYAnalysis/HggRazor/SMS-Plotting/test_limit.root')
+    tfile = rt.TFile.Open('/Users/cmorgoth/Work/Moriond/HggRazor/RazorEWKSUSYAnalysis/HggRazor/SMS-Plotting/test_limit.root')
     #####################
     ##observed limit TH2F
     #####################

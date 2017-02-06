@@ -85,8 +85,8 @@ int main( int argc, char* argv[] )
   
   std::vector<Bin> binVector;
   //std::ifstream input( "data/HggRazor2016Binning.txt", std::fstream::in );
-  //std::ifstream input( "data/HggRazor2016Binning_ICHEP.txt", std::fstream::in );
-  std::ifstream input( "data/HggRazor2016Binning_Moriond.txt", std::fstream::in );
+  std::ifstream input( "data/HggRazor2016Binning_ICHEP.txt", std::fstream::in );
+  //std::ifstream input( "data/HggRazor2016Binning_Moriond.txt", std::fstream::in );
   
   if ( input.is_open() )
     {
