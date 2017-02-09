@@ -4,6 +4,7 @@
 #include <TTree.h>
 #include <TROOT.h>
 #include <TFile.h>
+#include <TCanvas.h>
 #include <RooWorkspace.h>
 #include <RooAbsPdf.h>
 #include <RooRealVar.h>
@@ -30,15 +31,16 @@
 #include <RooRandom.h>
 #include <RooDataHist.h>
 #include <RooHistPdf.h>
+
 //LOCAL INCLUDES
 #include "ToysAndIntegralFunctions.hh"
 
 double GetIntegral()
 {
   gROOT->Reset();
-  TFile* f = new TFile("workspace.root");
+  TFile* f = new TFile("scripts/workspace_global_fit.root");
   RooWorkspace* w = (RooWorkspace*)f->Get("w");
-  RooAbsPdf* myPdf = w->pdf("pdf_binbin9_nuis");
+  RooAbsPdf* myPdf = w->pdf("pdf_binch14_highResBin9_nuis");
   myPdf->Print();
   RooRealVar *mgg = w->var("mGammaGamma_bin9");
   mgg->Print("");
@@ -46,7 +48,7 @@ double GetIntegral()
   RooRealVar* mu_s = w->var("signal_bin9_DCB_muCB");
   RooRealVar* smh_jes = w->var("Photon_Trigger");
   
-  TFile* f2 = new TFile("HggRazorWorkspace_bin9.root");
+  TFile* f2 = new TFile("scripts/HggRazorWorkspace_bin9.root");
   RooWorkspace* myws = (RooWorkspace*)f2->Get("combineWS");
   RooAbsData *data = myws->data("data_bin9");
   data->Print();
@@ -58,6 +60,14 @@ double GetIntegral()
   std::cout << params->getRealValue("Photon_Trigger") << std::endl;
   params->Print();
   
+  TCanvas* c = new TCanvas( "c", "c", 2119, 33, 800, 700 );
+  c->SetHighLightColor(2);
+  c->SetFillColor(0);
+  c->SetBorderMode(0);
+  c->SetBorderSize(2);
+  c->SetFrameBorderMode(0);
+  c->SetFrameBorderMode(0);
+
   myPdf->plotOn(plot);
   mu->setVal(120);
   mu_s->setVal(120);
@@ -67,4 +77,5 @@ double GetIntegral()
   mu_s->setVal(124.618);
   myPdf->plotOn(plot,RooFit::LineColor(kRed));
   plot->Draw();
+  c->SaveAs("test.pdf");
 }
