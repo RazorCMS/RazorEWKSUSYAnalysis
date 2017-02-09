@@ -13,7 +13,7 @@ CPPFLAGS += -g -std=c++11
 
 TARGET = CreateCorrelation
 
-SRC = app/CreateCorrelation.cc src/ToysAndIntegralFunctions.cc  $(Aux)/src/CommandLineInput.cc
+SRC = app/CreateCorrelation.cc src/ToysAndIntegralFunctions.cc  $(Aux)/src/CommandLineInput.cc src/TTree_fit_sb.cc
 
 OBJ = $(SRC:.cc=.o)
 
