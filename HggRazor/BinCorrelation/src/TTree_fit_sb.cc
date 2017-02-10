@@ -46,7 +46,7 @@ void tree_fit_sb::Loop()
    }
 }
 
-void tree_fit_sb::void SetSystematics()
+void tree_fit_sb::SetSystematics()
 {
   systematics[0] = CMS_Lumi;
   systematics[1] = Photon_Trigger;
