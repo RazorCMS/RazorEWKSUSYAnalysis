@@ -19,7 +19,8 @@ public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
 
-// Fixed size dimensions of array or collections stored in the TTree if any.
+  TString FullWorkspaceName;
+  TString HggWorkspaceName;
   double systematics[217];
    // Declaration of leaf types
    Int_t           fit_status;
