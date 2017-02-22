@@ -5,6 +5,10 @@
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
+#include <RooRealVar.h>
+#include <RooMsgService.h>
+//#include <MsgTopic.h>
+#include <RooGlobalFunc.h>
 
 void tree_fit_sb::Loop()
 {
@@ -31,8 +35,10 @@ void tree_fit_sb::Loop()
 // METHOD2: replace line
 //    fChain->GetEntry(jentry);       //read all branches
 //by  b_branchname->GetEntry(ientry); //read only this branch
-   if (fChain == 0) return;
+  RooMsgService::instance().getStream(1).removeTopic(RooFit::NumIntegration) ;
+  if (fChain == 0) return;
 
+   TH1F* h = new TH1F("h", "", 100, 0, 1 );
    Long64_t nentries = fChain->GetEntriesFast();
 
    Long64_t nbytes = 0, nb = 0;
@@ -40,13 +46,110 @@ void tree_fit_sb::Loop()
       Long64_t ientry = LoadTree(jentry);
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
-      std::cout << "Photon_Trigger: " << Photon_Trigger << std::endl;
+      if ( jentry % 100 == 0 ) std::cout << "entry #" << jentry << std::endl;
+      //std::cout << "Photon_Trigger: " << Photon_Trigger << std::endl;
+      this->GetSystematics();
       this->SetSystematics();
+      
+      h->Fill( this->GetIntegral( "pdf_binch1_nuis", "mGammaGamma_bin0" ) );
+      this->GetIntegral( "pdf_binch2_nuis", "mGammaGamma_bin1" );
+      this->GetIntegral( "pdf_binch7_nuis", "mGammaGamma_bin2" );
+      this->GetIntegral( "pdf_binch8_nuis", "mGammaGamma_bin3" );
+      this->GetIntegral( "pdf_binch9_nuis", "mGammaGamma_bin4" );
+      this->GetIntegral( "pdf_binch10_nuis", "mGammaGamma_bin5" );
+      this->GetIntegral( "pdf_binch11_nuis", "mGammaGamma_bin6" );
+      this->GetIntegral( "pdf_binch12_nuis", "mGammaGamma_bin7" );
+      this->GetIntegral( "pdf_binch13_nuis", "mGammaGamma_bin8" );
+
+      this->GetIntegral( "pdf_binch14_highResBin9_nuis", "mGammaGamma_bin9" );
+      this->GetIntegral( "pdf_binch14_lowResBin9_nuis", "mGammaGamma_bin14" );
+      
+      this->GetIntegral( "pdf_binch3_highResBin10_nuis", "mGammaGamma_bin10" );
+      this->GetIntegral( "pdf_binch3_lowResBin10_nuis", "mGammaGamma_bin15" );
+      
+      this->GetIntegral( "pdf_binch4_highResBin11_nuis", "mGammaGamma_bin11" );
+      this->GetIntegral( "pdf_binch4_lowResBin11_nuis", "mGammaGamma_bin16" );
+      
+      this->GetIntegral( "pdf_binch5_highResBin12_nuis", "mGammaGamma_bin12" );
+      this->GetIntegral( "pdf_binch5_lowResBin12_nuis", "mGammaGamma_bin17" );
+      
+      this->GetIntegral( "pdf_binch6_highResBin13_nuis", "mGammaGamma_bin13" );
+      this->GetIntegral( "pdf_binch6_lowResBin13_nuis", "mGammaGamma_bin18" );
+      
+      
       // if (Cut(ientry) < 0) continue;
    }
-}
+   TFile *fout = new TFile("test_corr.root", "RECREATE");
+   h->Write();
+   fout->Close();
+};
+
+double tree_fit_sb::GetIntegral( TString pdfName, TString varName )
+{
+  RooAbsPdf* myPdf = ws->pdf( pdfName );
+  //RooArgSet *params = myPdf->getParameters(*data);
+  //std::cout << params->getRealValue("Photon_Trigger") << std::endl;
+  //params->Print();
+  RooRealVar *mgg = ws->var( varName );
+  //RooRealVar *mgg = w->var("mGammaGamma_bin9");
+  mgg->setMin( 103. );
+  mgg->setMax( 160. );
+  mgg->setUnit( "GeV" );
+  mgg->setBins(57);
+  mgg->setRange( "signal", 122, 129. );
+  mgg->setRange( "high", 135., 160. );
+  mgg->setRange( "low", 103., 120. );
+  mgg->setRange( "full", 103., 160. );
+  mgg->setRange( "Full", 103., 160. );
+
+  myPdf->createIntegral( *mgg );
+  RooAbsReal* igx = myPdf->createIntegral( *mgg );
+  //std::cout << Nbkg->getVal() << " +/- " << Nbkg->getError() << std::endl;
+  RooAbsReal* igx_sig = myPdf->createIntegral( *mgg, RooFit::NormSet(*mgg), RooFit::Range("signal"));
+  //std::cout << "sig: " << igx_sig->getVal() << std::endl;
+  return igx_sig->getVal();
+};
 
 void tree_fit_sb::SetSystematics()
+{
+  ws->var("CMS_Lumi")->setVal(systematics[0]);
+  ws->var("Photon_Trigger")->setVal(systematics[1]);
+  ws->var("SMH_JES")->setVal(systematics[2]);
+  ws->var("SMH_btag")->setVal(systematics[3]);
+  ws->var("SMH_misstag")->setVal(systematics[4]);
+  //facRenScale
+  for ( int i = 0; i <= 13; i++ )  ws->var(Form("SMH_facRenScale_bin%d", i))->setVal(systematics[5+i]);
+  //facScale
+  for ( int i = 0; i <= 13; i++ )  ws->var(Form("SMH_facScale_bin%d", i))->setVal(systematics[19+i]);
+  //renScale
+  for ( int i = 0; i <= 13; i++ )  ws->var(Form("SMH_renScale_bin%d", i))->setVal(systematics[33+i]);
+  //PDFs
+  for ( int i = 0; i <= 59; i++ )  ws->var(Form("SMH_pdf%d", i))->setVal(systematics[47+i]);
+
+  //-----------------------------------
+  //S i g n a l   S y s t e m a t i c s 
+  //-----------------------------------
+  ws->var("Signal_ISR")->setVal(systematics[107]);
+  ws->var("Signal_JES")->setVal(systematics[108]);
+  ws->var("Signal_btag")->setVal(systematics[109]);
+  ws->var("Signal_misstag")->setVal(systematics[110]);
+  
+  //facRenScale
+  for ( int i = 0; i <= 13; i++ )  ws->var(Form("Signal_facRenScale_bin%d", i))->setVal(systematics[111+i]);
+  //facScale
+  for ( int i = 0; i <= 13; i++ )  ws->var(Form("Signal_facScale_bin%d", i))->setVal(systematics[125+i]);
+  //renScale
+  for ( int i = 0; i <= 13; i++ )  ws->var(Form("Signal_renScale_bin%d", i))->setVal(systematics[139+i]);
+  //PDFs
+  for ( int i = 0; i <= 57; i++ )  ws->var(Form("Signal_pdf%d", i))->setVal(systematics[153+i]);
+  
+  ws->var("mu_Global")->setVal(systematics[213]);
+  ws->var("hzbb_mu_Global")->setVal(systematics[214]);
+  ws->var("highpt_mu_Global")->setVal(systematics[215]);
+  ws->var("lowres_mu_Global")->setVal(systematics[216]);
+};
+
+void tree_fit_sb::GetSystematics()
 {
   systematics[0] = CMS_Lumi;
   systematics[1] = Photon_Trigger;
