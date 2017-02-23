@@ -1953,15 +1953,18 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
 	    }
 	  else if ( isys == 4 )
 	    {
-	      ofs << "Signal_facScale_bin" << combinedBinNumber << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	      //ofs << "Signal_facScale_bin" << combinedBinNumber << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	      ofs << "Signal_facScale" << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
 	    }
 	  else if ( isys == 6 )
 	    {
-	      ofs << "Signal_renScale_bin" << combinedBinNumber << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	      //ofs << "Signal_renScale_bin" << combinedBinNumber << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	      ofs << "Signal_renScale" << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
 	    }
 	  else if ( isys == 8 )
 	    {
-	      ofs << "Signal_facRenScale_bin" << combinedBinNumber << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	      //ofs << "Signal_facRenScale_bin" << combinedBinNumber << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	      ofs << "Signal_facRenScale" << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
 	    }
 	  else if ( isys > 9 )
 	    {

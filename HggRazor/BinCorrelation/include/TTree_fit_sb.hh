@@ -11,7 +11,34 @@
 #include <TROOT.h>
 #include <TChain.h>
 #include <TFile.h>
-
+#include <RooWorkspace.h>
+#include <TCanvas.h>
+#include <RooWorkspace.h>
+#include <RooAbsPdf.h>
+#include <RooRealVar.h>
+#include <RooAbsData.h>
+#include <RooPlot.h>
+#include <RooArgSet.h>
+#include <RooWorkspace.h>
+#include <RooDataSet.h>
+#include <RooRealVar.h>
+#include <RooExponential.h>
+#include <RooAddPdf.h>
+#include <RooGaussian.h>
+#include <RooMinimizer.h>
+#include <RooFitResult.h>
+#include <RooPlot.h>
+#include <RooExtendPdf.h>
+#include <RooStats/SPlot.h>
+#include <RooStats/ModelConfig.h>
+#include <RooGenericPdf.h>
+#include <RooFormulaVar.h>
+#include <RooBernstein.h>
+#include <RooMinuit.h>
+#include <RooNLLVar.h>
+#include <RooRandom.h>
+#include <RooDataHist.h>
+#include <RooHistPdf.h>
 // Header file for the classes stored in the TTree if any.
 
 class tree_fit_sb {
@@ -22,6 +49,8 @@ public :
   TString FullWorkspaceName;
   TString HggWorkspaceName;
   double systematics[217];
+  RooWorkspace* ws;
+  RooWorkspace* ws_hgg;
    // Declaration of leaf types
    Int_t           fit_status;
    Double_t        mu;
@@ -1034,6 +1063,8 @@ public :
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
   virtual void SetSystematics();
+  virtual void GetSystematics();
+  double GetIntegral( TString pdfName, TString varName );
 };
 
 #endif
@@ -1052,6 +1083,11 @@ tree_fit_sb::tree_fit_sb(TTree *tree) : fChain(0)
 
    }
    Init(tree);
+   
+   TFile* fws = new TFile("scripts/workspace_global_fit.root");
+   ws = (RooWorkspace*)fws->Get("w");
+   TFile* fwshgg = new TFile("scripts/HggRazorWorkspace_bin9.root");
+   ws_hgg = (RooWorkspace*)fwshgg->Get("combineWS");
 }
 
 tree_fit_sb::~tree_fit_sb()

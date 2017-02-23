@@ -362,7 +362,7 @@ int main( int argc, char* argv[] )
   }
 
   outf << "combineCards.py HggRazorCombinedCard_bin*.txt > combineAll.txt\n"
-       << "combine -M Asymptotic combineAll.txt --minimizerStrategy=0 -n _combineAll\n"
+       << "combine -M Asymptotic combineAll.txt --minimizerStrategy=1 -n _combineAll\n"
        << "combine -M ProfileLikelihood --signif combineAll.txt -n _all.nsigma --setPhysicsModelParameterRanges r=-20,20 --uncapped=1\n"
        << "combine -M ProfileLikelihood --pvalue combineAll.txt -n _all.pvalue --setPhysicsModelParameterRanges r=-20,20 --uncapped=1\n"
        << "hadd PL_nsigma_npvalue_all.root higgsCombine_all.nsigma.ProfileLikelihood.mH120.root higgsCombine_all.pvalue.ProfileLikelihood.mH120.root"
