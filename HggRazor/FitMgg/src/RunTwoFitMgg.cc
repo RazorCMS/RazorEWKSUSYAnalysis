@@ -1869,7 +1869,12 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
       combinedBinNumber -= 5;
   }
   
-  const float highres_sigmaMoverM_corr = 0.155;
+  //correction is of the form N+ = nominal/(1+highres_sigmaMoverM_corr)
+  //correction is of the form N- = nominal*(1+2*highres_sigmaMoverM_corr)/(1+highres_sigmaMoverM_corr)
+  const float highres_sigmaMoverM_corr = -0.155;
+  //Caveat: the order in the datacard is inverted from highres since only one nuisance controls both fluctuations
+  //correction is of the form N+ = nominal*(1+2*lowres_sigmaMoverM_corr)/(1+lowres_sigmaMoverM_corr)
+  //correction is of the form N- = nominal/(1+lowres_sigmaMoverM_corr)
   const float lowres_sigmaMoverM_corr = 0.131;
   
   if ( !_signalOnly )
@@ -1895,7 +1900,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
       ofs << "PdfNorm\t\t\t\tlnN\t\t-\t\t0.948/1.062\t\t-\n";
       
       if ( category == "highres" ) {
-	ofs << "SigmaMoverMEfficiency\t\t\t\tlnN\t\t" << 1./(1.+highres_sigmaMoverM_corr) << "/" << (1.+2.*highres_sigmaMoverM_corr)/(1.+highres_sigmaMoverM_corr) << "\t\t" << 1./(1.+highres_sigmaMoverM_corr) << "/" << (1.+2.*highres_sigmaMoverM_corr)/(1.+highres_sigmaMoverM_corr) << "\t\t-\n";
+	ofs << "SigmaMoverMEfficiency\t\t\t\tlnN\t\t" << (1.+2.*highres_sigmaMoverM_corr)/(1.+highres_sigmaMoverM_corr) << "/" << 1./(1.+highres_sigmaMoverM_corr) << "\t\t" << (1.+2.*highres_sigmaMoverM_corr)/(1.+highres_sigmaMoverM_corr) << "/" << 1./(1.+highres_sigmaMoverM_corr) << "\t\t-\n";
       } else if (category == "lowres" ) {
 	ofs << "SigmaMoverMEfficiency\t\t\t\tlnN\t\t" << (1.+2.*lowres_sigmaMoverM_corr)/(1.+lowres_sigmaMoverM_corr) << "/" << 1./(1.+lowres_sigmaMoverM_corr) << "\t\t" << (1.+2.*lowres_sigmaMoverM_corr)/(1.+lowres_sigmaMoverM_corr) << "/" << 1./(1.+lowres_sigmaMoverM_corr) << "\t\t-\n";
       }

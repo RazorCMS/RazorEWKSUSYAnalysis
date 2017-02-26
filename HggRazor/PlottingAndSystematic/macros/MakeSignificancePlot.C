@@ -62,22 +62,22 @@ void MakeSignificancePlot( int option = 0) {
     //*********************************************
     //highPt Category
     y[0] = -1000;
-    y[1] = 1.3;
-    y[2] = -1.7;
+    y[1] = 0.7;
+    y[2] = -1.4;
     y[3] = -0.9;
-    y[4] = 0.1;
+    y[4] = 0.4;
     y[5] = 0.6;
-    y[6] = 1.3;
-    y[7] = 0.0;
-    y[8] = -0.6;
+    y[6] = 1.6;
+    y[7] = 0.1;
+    y[8] = -0.0;
     //hbb category  
-    y[9] = 1.1;
+    y[9] = 1.0;
     //highres category
     y[10] = -0.1;
-    y[11] = -0.7;
-    y[12] = -1.2;
-    y[13] = 0.5;
-    y[14] = 0.3;
+    y[11] = 0.1;
+    y[12] = -0.6;
+    y[13] = 0.4;
+    y[14] = 0.2;
 
   } else if (option == 1) {
     //use fitted signal yield / uncertainty
@@ -174,7 +174,7 @@ void MakeSignificancePlot( int option = 0) {
   tex->SetTextSize(0.040);
   tex->SetTextFont(42);
   tex->SetTextColor(kBlack);
-  tex->DrawLatex(0.7, 0.92, "36.8 fb^{-1} (13 TeV)");
+  tex->DrawLatex(0.7, 0.92, "35.9 fb^{-1} (13 TeV)");
   tex->DrawLatex(0.4, 0.92, "Razor H#rightarrow#gamma#gamma Search");
   tex->Draw();
   
