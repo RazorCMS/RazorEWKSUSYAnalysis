@@ -324,6 +324,7 @@ void HggRazorSystematics::Loop()
 	{
 	  //commonW = this->Lumi*weight*pileupWeight*btagCorrFactor*triggerEffWeight*photonEffSF*ISRCorrValue;
 	  commonW = this->Lumi*weight*pileupWeight*btagCorrFactor*triggerEffSFWeight*photonEffSF*ISRCorrValue;
+	  //commonW = this->Lumi*weight*pileupWeight*btagCorrFactor*triggerEffSFWeight*photonEffSF;
 	}
       else
 	{
