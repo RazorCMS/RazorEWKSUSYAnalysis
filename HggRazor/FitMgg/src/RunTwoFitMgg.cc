@@ -1871,11 +1871,11 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   
   //correction is of the form N+ = nominal/(1+highres_sigmaMoverM_corr)
   //correction is of the form N- = nominal*(1+2*highres_sigmaMoverM_corr)/(1+highres_sigmaMoverM_corr)
-  const float highres_sigmaMoverM_corr = -0.155;
+  const float highres_sigmaMoverM_corr = -0.139045;
   //Caveat: the order in the datacard is inverted from highres since only one nuisance controls both fluctuations
   //correction is of the form N+ = nominal*(1+2*lowres_sigmaMoverM_corr)/(1+lowres_sigmaMoverM_corr)
   //correction is of the form N- = nominal/(1+lowres_sigmaMoverM_corr)
-  const float lowres_sigmaMoverM_corr = 0.131;
+  const float lowres_sigmaMoverM_corr = 0.114096;
   
   if ( !_signalOnly )
     {

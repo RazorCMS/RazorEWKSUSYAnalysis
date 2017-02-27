@@ -123,9 +123,11 @@ int main( int argc, char* argv[] )
   //----------------------
   //SigmaMoverM correction
   //----------------------
-
-  const float highres_sigmaMoverM_corr = 0.845;
-  const float lowres_sigmaMoverM_corr = 1.131;
+  //(scale MC to data/MC ratio)
+  // correction is derived as (data-MC)/MC --> correction is 1+(data-MC)/MC;
+  
+  const float highres_sigmaMoverM_corr = 1.0 - 0.139045;//1.0+(data-MC)/MC
+  const float lowres_sigmaMoverM_corr = 1.0 + 0.114096;//1.0+(data-MC)/MC
 
   //-----------------
   //Load Binning
