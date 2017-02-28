@@ -528,8 +528,8 @@ int main( int argc, char* argv[] )
 	 {
 	   //pdf[ipdf]->SetBinContent( bin, pdf[ipdf]->GetBinContent( bin )/nom );
 	   //pdf[ipdf]->SetBinContent( bin, 0 ); //zero out pdf uncertainties for signal for now
-	   if ( ipdf < 59 ) outf << pdf[ipdf]->GetBinContent( bin ) << "\t";
-	   else outf << pdf[ipdf]->GetBinContent( bin ) << "\n";
+	   if ( ipdf < 59 ) outf << pdfS[ipdf]->GetBinContent( bin ) << "\t";
+	   else outf << pdfS[ipdf]->GetBinContent( bin ) << "\n";
 	 }
       
        std::cout << "Bin : " << bin << " " << tmp[0] << " " << tmp[1] << " " << tmp[2] << " " << tmp[3] << " : "
