@@ -225,39 +225,39 @@ int main( int argc, char* argv[] )
        return -1;
      } 
 
-  TH2Poly* nominal  = new TH2Poly("nominal_SMH", "", 150, 10000, 0, 1 );
+  TH2Poly* nominal;
   TH2Poly* nominalS = new TH2Poly("nominal_Signal", "", 150, 10000, 0, 1 );
 
   TH2Poly* ISRUpS   = new TH2Poly("ISRUpS", "", 150, 10000, 0, 1 );
   TH2Poly* ISRDownS = new TH2Poly("ISRDownS", "", 150, 10000, 0, 1 );
 
-  TH2Poly* facScaleUp    = new TH2Poly("facScaleUp", "", 150, 10000, 0, 1 );
-  TH2Poly* facScaleDown  = new TH2Poly("facScaleDown", "", 150, 10000, 0, 1 );
+  TH2Poly* facScaleUp;
+  TH2Poly* facScaleDown;
   TH2Poly* facScaleUpS   = new TH2Poly("facScaleUpS", "", 150, 10000, 0, 1 );
   TH2Poly* facScaleDownS = new TH2Poly("facScaleDownS", "", 150, 10000, 0, 1 );
   
-  TH2Poly* renScaleUp    = new TH2Poly("renScaleUp", "", 150, 10000, 0, 1 );
-  TH2Poly* renScaleDown  = new TH2Poly("renScaleDown", "", 150, 10000, 0, 1 );
+  TH2Poly* renScaleUp;
+  TH2Poly* renScaleDown;
   TH2Poly* renScaleUpS   = new TH2Poly("renScaleUpS", "", 150, 10000, 0, 1 );
   TH2Poly* renScaleDownS = new TH2Poly("renScaleDownS", "", 150, 10000, 0, 1 );
   
-  TH2Poly* facRenScaleUp    = new TH2Poly("facRenScaleUp", "", 150, 10000, 0, 1 );
-  TH2Poly* facRenScaleDown  = new TH2Poly("facRenScaleDown", "", 150, 10000, 0, 1 );
+  TH2Poly* facRenScaleUp;
+  TH2Poly* facRenScaleDown;
   TH2Poly* facRenScaleUpS   = new TH2Poly("facRenScaleUpS", "", 150, 10000, 0, 1 );
   TH2Poly* facRenScaleDownS = new TH2Poly("facRenScaleDownS", "", 150, 10000, 0, 1 );
   
-  TH2Poly* JesUp    = new TH2Poly("JesUp", "", 150, 10000, 0, 1 );
-  TH2Poly* JesDown  = new TH2Poly("JesDown", "", 150, 10000, 0, 1 );
+  TH2Poly* JesUp;
+  TH2Poly* JesDown;
   TH2Poly* JesUpS   = new TH2Poly("JesUpS", "", 150, 10000, 0, 1 );//signal
   TH2Poly* JesDownS = new TH2Poly("JesDownS", "", 150, 10000, 0, 1 );//signal
 
-  TH2Poly* btagUp    = new TH2Poly("btagUp", "", 150, 10000, 0, 1 );
-  TH2Poly* btagDown  = new TH2Poly("btagDown", "", 150, 10000, 0, 1 );
+  TH2Poly* btagUp;
+  TH2Poly* btagDown;
   TH2Poly* btagUpS   = new TH2Poly("btagUpS", "", 150, 10000, 0, 1 );//signal
   TH2Poly* btagDownS = new TH2Poly("btagDownS", "", 150, 10000, 0, 1 );//signal
 
-  TH2Poly* misstagUp    = new TH2Poly("misstagUp", "", 150, 10000, 0, 1 );
-  TH2Poly* misstagDown  = new TH2Poly("misstagDown", "", 150, 10000, 0, 1 );
+  TH2Poly* misstagUp;
+  TH2Poly* misstagDown;
   TH2Poly* misstagUpS   = new TH2Poly("misstagUpS", "", 150, 10000, 0, 1 );//signal
   TH2Poly* misstagDownS = new TH2Poly("misstagDownS", "", 150, 10000, 0, 1 );//signal
   
@@ -267,49 +267,65 @@ int main( int argc, char* argv[] )
   for ( int i = 0; i < 60; i++ )
     {
       TString pdfName = Form("pdf%d", i);
-      pdf[i]  = new TH2Poly( pdfName, "", 150, 10000, 0, 1 );
       pdfS[i] = new TH2Poly( pdfName+"S", "", 150, 10000, 0, 1 );
     }
+  
+  //---------------------------------
+  //Getting SMH root file with yields
+  //---------------------------------
+  TFile* fSMH;
+  if (categoryMode == "highpt") fSMH = new TFile("data/SMH_Moriond_FinalHistos/fullSys_highpt.root", "read");
+  else if (categoryMode == "hzbb") fSMH = new TFile("data/SMH_Moriond_FinalHistos/fullSys_hzbb.root", "read");
+  else if (categoryMode == "highres") fSMH = new TFile("data/SMH_Moriond_FinalHistos/fullSys_highres.root", "read");
+  else if (categoryMode == "lowres") fSMH = new TFile("data/SMH_Moriond_FinalHistos/fullSys_lowres.root", "read");
+
+  assert(fSMH);
+  //-------------------
+  //Getting SMH TH2Poly
+  //-------------------
+  nominal         = (TH2Poly*)fSMH->Get("SMH_nominal");
+  facScaleUp      = (TH2Poly*)fSMH->Get("facScaleUp");
+  facScaleDown    = (TH2Poly*)fSMH->Get("facScaleDown");
+  renScaleUp      = (TH2Poly*)fSMH->Get("renScaleUp");
+  renScaleDown    = (TH2Poly*)fSMH->Get("renScaleDown");
+  facRenScaleUp   = (TH2Poly*)fSMH->Get("facRenScaleUp");
+  facRenScaleDown = (TH2Poly*)fSMH->Get("facRenScaleDown");
+  JesUp           = (TH2Poly*)fSMH->Get("JesUp");
+  JesDown         = (TH2Poly*)fSMH->Get("JesDown");
+  btagUp          = (TH2Poly*)fSMH->Get("btagUp");
+  btagDown        = (TH2Poly*)fSMH->Get("btagDown");
+  misstagUp       = (TH2Poly*)fSMH->Get("misstagUp");
+  misstagDown     = (TH2Poly*)fSMH->Get("misstagDown");
+
+  for ( int i = 0; i < 60; i++ )
+    {
+      TString pdfName = Form("pdf%d", i);
+      pdf[i] = (TH2Poly*)fSMH->Get( pdfName );
+    }
+  
   std::map< std::pair<float,float>, float > sysMap;
   for ( auto tmp : myVectBinning )
     {
-      nominal->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       nominalS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       ISRUpS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       ISRDownS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
-      facScaleUp->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       facScaleUpS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
-      facScaleDown->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       facScaleDownS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
-      renScaleUp->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       renScaleUpS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
-      renScaleDown->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       renScaleDownS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
-      facRenScaleUp->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       facRenScaleUpS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
-      facRenScaleDown->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       facRenScaleDownS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
-      JesUp->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       JesUpS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
-      JesDown->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       JesDownS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
 
       //btag
-      btagUp->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       btagUpS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
-      btagDown->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       btagDownS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       //misstag
-      misstagUp->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       misstagUpS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
-      misstagDown->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       misstagDownS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       //pdf
-      for( int i = 0; i < 60; i++ )
-	{
-	  pdf[i]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
-	  pdfS[i]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
-	}
+      for( int i = 0; i < 60; i++ ) pdfS[i]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
     }
     
   std::string process, rootFileName;
@@ -401,49 +417,13 @@ int main( int argc, char* argv[] )
 	      facRenScaleDownS->SetBinContent( bin, facSys.second );
 
 	      //PDF
-	      for ( int ipdf = 0; ipdf < 60; ipdf++ )
-		{
-		  pdfS[ipdf]->SetBinContent( bin, hggSys->GetPdfSystematic( ipdf, tmp[0], tmp[1] ) );
-		  //pdfS[ipdf]->SetBinContent( bin, 0 );		 
-		}
+	      for ( int ipdf = 0; ipdf < 60; ipdf++ ) pdfS[ipdf]->SetBinContent( bin, hggSys->GetPdfSystematic( ipdf, tmp[0], tmp[1] ) );
 	    }
 	  else
 	    {
-	      nominal->SetBinContent( bin, nominal->GetBinContent(bin) + hggSys->GetNominalYield( tmp[0], tmp[1] ) );
-	      //facScale
-	      std::pair<float, float> facSys = hggSys->GetFacScaleSystematic( tmp[0], tmp[1] );
-	      float maxSys = std::max( fabs(facSys.first) , fabs(facSys.second) );
-	      facScaleUp->SetBinContent( bin, sqrt( pow( facScaleUp->GetBinContent(bin), 2 ) + pow( maxSys, 2 ) ) );
-	      facScaleDown->SetBinContent( bin, sqrt( pow( facScaleDown->GetBinContent(bin), 2 ) + pow( maxSys, 2 ) ) );
-	      //renScale
-	      facSys = hggSys->GetRenScaleSystematic( tmp[0], tmp[1] );
-	      maxSys = std::max( fabs(facSys.first) , fabs(facSys.second) );
-	      renScaleUp->SetBinContent( bin, sqrt( pow( renScaleUp->GetBinContent(bin), 2 ) + pow( maxSys, 2) ) );
-	      renScaleDown->SetBinContent( bin, sqrt( pow( renScaleDown->GetBinContent(bin), 2 ) + pow( maxSys, 2 ) ) );
-	      //facRenScale
-	      facSys = hggSys->GetFacRenScaleSystematic( tmp[0], tmp[1] );
-	      maxSys = std::max( fabs(facSys.first) , fabs(facSys.second) );
-	      facRenScaleUp->SetBinContent( bin, sqrt( pow( facRenScaleUp->GetBinContent(bin), 2 ) + pow( maxSys, 2 ) ) );
-	      facRenScaleDown->SetBinContent( bin, sqrt( pow( facRenScaleDown->GetBinContent(bin), 2 ) + pow( maxSys, 2 ) ) );
-	      //JES
-	      facSys = hggSys->GetJesSystematic( tmp[0], tmp[1] );
-	      JesUp->SetBinContent( bin, JesUp->GetBinContent(bin) + facSys.first );
-	      JesDown->SetBinContent( bin, JesDown->GetBinContent(bin) + facSys.second );
-
-	      //btag
-	      facSys = hggSys->GetBtagSystematic( tmp[0], tmp[1] );
-	      btagUp->SetBinContent( bin, btagUp->GetBinContent(bin) + facSys.first );
-	      btagDown->SetBinContent( bin, btagDown->GetBinContent(bin) + facSys.second );
-	      //misstag
-	      facSys = hggSys->GetMisstagSystematic( tmp[0], tmp[1] );
-	      misstagUp->SetBinContent( bin, misstagUp->GetBinContent(bin) + facSys.first );
-	      misstagDown->SetBinContent( bin, misstagDown->GetBinContent(bin) + facSys.second );
-	      //PDF
-	      for ( int ipdf = 0; ipdf < 60; ipdf++ )
-		{
-		  pdf[ipdf]->SetBinContent( bin, sqrt( pow( pdf[ipdf]->GetBinContent(bin), 2 ) + pow( hggSys->GetPdfSystematic( ipdf, tmp[0], tmp[1] ), 2 ) ) );		  
-		}
-	    }     
+	      std::cout << "[INFO]: ERROR!!!! PROCESS DIFFERENT FROM SIGNAL. Please Check your input list!!\nTerminating" << std::endl;
+	      exit(1);
+	    }
 	}
       
       hggSys->WriteOutput( Form("histoMR_Rsq_%d", rand()) );
@@ -487,39 +467,25 @@ int main( int argc, char* argv[] )
        ISRDownS->SetBinContent( bin, ISRDownS->GetBinContent(bin)/nomS );
 
        //Fac
-       facScaleUp->SetBinContent( bin, facScaleUp->GetBinContent(bin)/nom );
-       facScaleDown->SetBinContent( bin, facScaleDown->GetBinContent(bin)/nom );
        facScaleUpS->SetBinContent( bin, facScaleUpS->GetBinContent(bin)/nomS );
        facScaleDownS->SetBinContent( bin, facScaleDownS->GetBinContent(bin)/nomS );
        //Ren
-       renScaleUp->SetBinContent( bin, renScaleUp->GetBinContent(bin)/nom );
-       renScaleDown->SetBinContent( bin, renScaleDown->GetBinContent(bin)/nom );
        renScaleUpS->SetBinContent( bin, renScaleUpS->GetBinContent(bin)/nomS );
        renScaleDownS->SetBinContent( bin, renScaleDownS->GetBinContent(bin)/nomS );
        //facRen
-       facRenScaleUp->SetBinContent( bin, facRenScaleUp->GetBinContent(bin)/nom );
-       facRenScaleDown->SetBinContent( bin, facRenScaleDown->GetBinContent(bin)/nom );
        facRenScaleUpS->SetBinContent( bin, facRenScaleUpS->GetBinContent(bin)/nomS );
        facRenScaleDownS->SetBinContent( bin, facRenScaleDownS->GetBinContent(bin)/nomS );
        //JES
-       JesUp->SetBinContent( bin, JesUp->GetBinContent( bin )/nom );
-       JesDown->SetBinContent( bin, JesDown->GetBinContent( bin )/nom );
        JesUpS->SetBinContent( bin, JesUpS->GetBinContent( bin )/nomS );
        JesDownS->SetBinContent( bin, JesDownS->GetBinContent( bin )/nomS );
 
        //btag
-       btagUp->SetBinContent( bin, btagUp->GetBinContent( bin )/nom );
-       btagDown->SetBinContent( bin, btagDown->GetBinContent( bin )/nom );
        btagUpS->SetBinContent( bin, btagUpS->GetBinContent( bin )/nomS );
        btagDownS->SetBinContent( bin, btagDownS->GetBinContent( bin )/nomS );
        //misstag
-       misstagUp->SetBinContent( bin, misstagUp->GetBinContent( bin )/nom );
-       misstagDown->SetBinContent( bin, misstagDown->GetBinContent( bin )/nom );
        misstagUpS->SetBinContent( bin, misstagUpS->GetBinContent( bin )/nomS );
        misstagDownS->SetBinContent( bin, misstagDownS->GetBinContent( bin )/nomS );
 
-       if ( categoryMode == "highres") nominal->SetBinContent( bin, highres_sigmaMoverM_corr*nominal->GetBinContent( bin ) );
-       if ( categoryMode == "lowres") nominal->SetBinContent( bin, lowres_sigmaMoverM_corr*nominal->GetBinContent( bin ) );
        outf << tmp[4] << "\t" << categoryMode << "\t" << tmp[0] << "\t" << tmp[2] << " \t" << tmp[1] << "\t" << tmp[3] << "\t"
 	    << nominal->GetBinContent( bin ) << "\t"
 	    << JesUp->GetBinContent( bin ) << "\t" <<  JesDown->GetBinContent( bin ) << "\t"
@@ -534,7 +500,6 @@ int main( int argc, char* argv[] )
 
        for( int ipdf = 0; ipdf < 60; ipdf++ )
 	 {
-	   pdf[ipdf]->SetBinContent( bin, pdf[ipdf]->GetBinContent( bin )/nom );
 	   outf << pdf[ipdf]->GetBinContent( bin ) << "\t";
 	   totalFractionalUncertaintySqr += pow( pdf[ipdf]->GetBinContent( bin ) ,2);
 	 }
@@ -563,8 +528,8 @@ int main( int argc, char* argv[] )
 	 {
 	   //pdf[ipdf]->SetBinContent( bin, pdf[ipdf]->GetBinContent( bin )/nom );
 	   //pdf[ipdf]->SetBinContent( bin, 0 ); //zero out pdf uncertainties for signal for now
-	   if ( ipdf < 59 ) outf << pdfS[ipdf]->GetBinContent( bin ) << "\t";
-	   else outf << pdfS[ipdf]->GetBinContent( bin ) << "\n";
+	   if ( ipdf < 59 ) outf << pdf[ipdf]->GetBinContent( bin ) << "\t";
+	   else outf << pdf[ipdf]->GetBinContent( bin ) << "\n";
 	 }
       
        std::cout << "Bin : " << bin << " " << tmp[0] << " " << tmp[1] << " " << tmp[2] << " " << tmp[3] << " : "
@@ -574,8 +539,9 @@ int main( int argc, char* argv[] )
 
    outf.close();
    
-   
-   TFile* sF = new TFile( Form("fullSys_%s_%d.root", categoryMode.c_str(), rand()), "recreate" );
+
+   /*
+   TFile* sF = new TFile( Form("fullSys_categoryMode_%d.root", rand()), "recreate" );
    nominal->Write("SMH_nominal");
    facScaleUp->Write("facScaleUp");
    facScaleDown->Write("facScaleDown");
@@ -591,7 +557,7 @@ int main( int argc, char* argv[] )
    misstagDown->Write("misstagDown");
    for( int ipdf = 0; ipdf < 60; ipdf++ ) pdf[ipdf]->Write();
    sF->Close();
-   
+   */
    return 0;
 };
 
