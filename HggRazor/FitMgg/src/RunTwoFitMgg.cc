@@ -1973,7 +1973,10 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
 	    }
 	  else if ( isys > 9 )
 	    {
-	      ofs << "Signal_pdf" << ctr << "\t\t\tlnN\t\t" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	      //--------------------
+	      //No signal PDF systematic as SUSY group prescription
+	      //--------------------
+	      //ofs << "Signal_pdf" << ctr << "\t\t\tlnN\t\t" << signal_sys.at(isys) << "\t\t-\t\t-\n";
 	      ctr++;
 	    }
 	}
@@ -2030,7 +2033,10 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
 	    }
 	  else if ( isys > 7 )
 	    {
-	      ofs << "Signal_pdf" << ctr << "\t\t\tlnN\t\t" << signal_sys.at(isys) << "\t\t-\n";
+	      //--------------------
+	      //No signal PDF systematic as SUSY group prescription
+	      //--------------------
+	      //ofs << "Signal_pdf" << ctr << "\t\t\tlnN\t\t" << signal_sys.at(isys) << "\t\t-\n";
 	      ctr++;
 	    }
 	}
