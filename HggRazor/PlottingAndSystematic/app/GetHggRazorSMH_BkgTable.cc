@@ -710,7 +710,7 @@ int main( int argc, char* argv[] )
 float GetNs( std::string fname, int bin, std::string cat )
 {
   TFile* fin = TFile::Open( fname.c_str(), "READ");
-  RooArgSet* norm_fit_s = (RooArgSet*) fin->Get("norm_fit_s");
+  RooArgSet* norm_fit_s = (RooArgSet*)fin->Get("norm_fit_s");
 
   //return norm_fit_s->getRealValue("bin11/signal");
   std::stringstream ss;
@@ -731,6 +731,31 @@ float GetNsErr( std::string fname, int bin, std::string cat )
   else if ( cat == "lowres" ) ss << "lowResBin" << bin << "/signal";
   else ss << "bin" << bin << "/signal";
   RooRealVar* ss2 = (RooRealVar*)norm_fit_s->find( ss.str().c_str() );
+  
+
+  RooFitResult* fitResult = (RooFitResult*)fin->Get("fit_s");
+  RooArgSet frArgSet = fitResult->floatParsFinal();
+  RooRealVar* r = (RooRealVar*)frArgSet.find("r");
+  double factor = ss2->getVal()/r->getVal();
+  if ( r->getVal() > 0 )
+    {
+      if ( r->getErrorLo() != 0.0 ) return fabs(factor*r->getErrorLo());
+    }
+  else
+    {
+      if ( r->getErrorHi() != 0.0 ) return fabs(factor*r->getErrorHi());
+    }
+  
+  return fabs(factor*r->getError());
+  //return r->getError();
+  /*
+  std::stringstream ss;
+  if ( cat == "highres" ) ss << "highResBin" << bin << "/signal";
+  else if ( cat == "lowres" ) ss << "lowResBin" << bin << "/signal";
+  else ss << "bin" << bin << "/signal";
+  RooRealVar* ss2 = (RooRealVar*)norm_fit_s->find( ss.str().c_str() );
+  return ss2->getError();
+  */
   return ss2->getError();
 };
 
