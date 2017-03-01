@@ -269,7 +269,8 @@ void HggRazorSystematics::Loop()
   //****************************************************
   //Signal ISR Correction
   //****************************************************
-  double ISRCorrection[7] = { 1, 0.882, 0.792, 0.702, 0.648, 0.601, 0.515};
+  //double ISRCorrection[7] = { 1, 0.882, 0.792, 0.702, 0.648, 0.601, 0.515};//ICHEP
+  double ISRCorrection[7] = { 1, 0.920, 0.821, 0.715, 0.662, 0.561, 0.511};//Moriond
   if( this->processName == "signal" )
     {
       if ( this->ISRHist ) {

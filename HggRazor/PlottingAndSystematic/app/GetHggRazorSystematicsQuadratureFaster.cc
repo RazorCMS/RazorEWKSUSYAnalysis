@@ -13,7 +13,7 @@
 #include "HggRazorSystematics.hh"
 #include "CommandLineInput.hh"
 
-const bool _debug = false;
+const bool _debug = true;
 
 
 
