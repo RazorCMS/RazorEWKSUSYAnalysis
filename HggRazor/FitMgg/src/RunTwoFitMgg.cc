@@ -1755,7 +1755,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   combine_ws->var( combineSignal+"_n2")->setVal( DCB_n1_s );
   //if ( binNumber.Atof() == 17 || binNumber.Atof() == 19 || binNumber.Atof() == 20 )
   //if ( binNumber.Atof() >= 0 )
-  if ( npoints_signal < 300 )//number of signal events less than 300, use SMH shape
+  if ( npoints_signal < 500 )//number of signal events less than 300, use SMH shape
     {
       //USE SMH SHAPE!!
       combine_ws->var( combineSignal+"_muCB")->setVal( DCB_mu_smh );

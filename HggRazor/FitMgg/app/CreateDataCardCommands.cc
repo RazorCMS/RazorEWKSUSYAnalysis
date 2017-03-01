@@ -164,6 +164,7 @@ int main( int argc, char* argv[] )
   Bkg_f1 = "singleExp";
   std::cerr << "[INFO]: opening configDataCard: "<< inputCF << std::endl;
   outf << "#! /bin/bash\ncd " << currentDir << "\neval `scramv1 run -sh`;\n";
+  //outf << "cd /afs/cern.ch/work/c/cpena/public/combineDiphotonHM/CMSSW_7_4_7/src/\neosmount eos\ncd -;\n";
   while( ifs.good() )
     {
       std::vector<float> smh_sys;

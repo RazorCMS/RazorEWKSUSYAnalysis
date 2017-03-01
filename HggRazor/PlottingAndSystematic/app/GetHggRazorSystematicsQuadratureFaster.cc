@@ -185,7 +185,8 @@ int main( int argc, char* argv[] )
     } 
   else if ( analysisTag == "Razor2016_80X" ) 
     {
-      cut = cut + categoryCutString + triggerCut + metFilterCut;
+      //cut = cut + categoryCutString + triggerCut + metFilterCut;//FullSim
+      cut = cut + categoryCutString;//FastSim
     } 
   else 
     {
@@ -459,7 +460,7 @@ int main( int argc, char* argv[] )
        int bin   = nominal->FindBin( tmp[0]+10, tmp[1]+0.0001 );
        float nom = nominal->GetBinContent( bin );
        float nomS = nominalS->GetBinContent( bin );
-
+       //std::cout << "nomS: " << nomS << std::endl;
        float totalFractionalUncertaintySqr = 0;
 
        //ISR systematic
