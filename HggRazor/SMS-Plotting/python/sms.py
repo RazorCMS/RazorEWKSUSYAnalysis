@@ -26,6 +26,7 @@ class sms():
         elif modelname.find("T2tb") != -1: self.T2tb()
         elif modelname.find("T2bw") != -1: self.T2bw()
         elif modelname.find("T2bH") != -1: self.T2bH()
+        elif modelname.find("TChiWH") != -1: self.TChiWH()
 
 
     def T2bH(self):
@@ -54,6 +55,32 @@ class sms():
         self.optX = True
         self.optY = True
         
+    def TChiWH(self):
+        # model name
+        self.modelname = "TChiWH"
+        # decay chain
+        self.label= "pp #rightarrow #tilde{#chi^{0}_{1}}#tilde{#chi^{\pm}_{1}}, #tilde{b} #rightarrow b#tilde{#chi}^{0}_{2} #rightarrow  bH#tilde{#chi}^{0}_{1}"
+        self.masslabel = "m_{#tilde{#chi}^{0}_{2}}-m_{#tilde{#chi}^{0}_{1}}=130 GeV"
+        # plot boundary. The top 1/4 of the y axis is taken by the legend
+        self.Xmin = 150
+        self.Xmax = 400
+        self.Ymin = 0
+        self.Ymax = 50
+        self.Zmax = 10
+        self.Zmin = 0.7
+        # produce sparticle
+        self.sParticle = "m_{#tilde{b}} [GeV]"
+        # LSP
+        self.LSP = "m_{#tilde{#chi}^{0}_{1}} [GeV]"
+        # diagonal position: mLSP = mSbotton - 150
+        self.diagX = array('d',[0,20000,self.Xmin])
+        self.diagY = array('d',[-150, 20000-150,self.Xmax])
+        #self.divX = 407
+        self.divX = 409
+        self.divY = 408
+        self.optX = True
+        self.optY = True
+
     def T1tttt(self):
         # model name
         self.modelname = "T1tttt"
