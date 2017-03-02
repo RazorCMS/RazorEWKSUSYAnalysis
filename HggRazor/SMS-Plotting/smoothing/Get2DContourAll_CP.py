@@ -511,6 +511,7 @@ if __name__ == '__main__':
     contourFinalExp.Write("exp")
     contourFinalExpUp.Write("expUp")
     contourFinalExpD.Write("expD")
+    subXsecUL.Write("debugObs")
     output.Close()
 
 
