@@ -123,9 +123,11 @@ int main( int argc, char* argv[] )
   //----------------------
   //SigmaMoverM correction
   //----------------------
-
-  const float highres_sigmaMoverM_corr = 0.845;
-  const float lowres_sigmaMoverM_corr = 1.131;
+  //(scale MC to data/MC ratio)
+  // correction is derived as (data-MC)/MC --> correction is 1+(data-MC)/MC;
+  
+  const float highres_sigmaMoverM_corr = 1.0 - 0.139045;//1.0+(data-MC)/MC
+  const float lowres_sigmaMoverM_corr = 1.0 + 0.114096;//1.0+(data-MC)/MC
 
   //-----------------
   //Load Binning
@@ -559,10 +561,10 @@ int main( int argc, char* argv[] )
        
        for( int ipdf = 0; ipdf < 60; ipdf++ )
 	 {
-	   pdf[ipdf]->SetBinContent( bin, pdf[ipdf]->GetBinContent( bin )/nom );
+	   //pdf[ipdf]->SetBinContent( bin, pdf[ipdf]->GetBinContent( bin )/nom );
 	   //pdf[ipdf]->SetBinContent( bin, 0 ); //zero out pdf uncertainties for signal for now
-	   if ( ipdf < 59 ) outf << pdf[ipdf]->GetBinContent( bin ) << "\t";
-	   else outf << pdf[ipdf]->GetBinContent( bin ) << "\n";
+	   if ( ipdf < 59 ) outf << pdfS[ipdf]->GetBinContent( bin ) << "\t";
+	   else outf << pdfS[ipdf]->GetBinContent( bin ) << "\n";
 	 }
       
        std::cout << "Bin : " << bin << " " << tmp[0] << " " << tmp[1] << " " << tmp[2] << " " << tmp[3] << " : "
@@ -573,7 +575,7 @@ int main( int argc, char* argv[] )
    outf.close();
    
    
-   TFile* sF = new TFile( Form("fullSys_%d.root", rand()), "recreate" );
+   TFile* sF = new TFile( Form("fullSys_%s_%d.root", categoryMode.c_str(), rand()), "recreate" );
    nominal->Write("SMH_nominal");
    facScaleUp->Write("facScaleUp");
    facScaleDown->Write("facScaleDown");

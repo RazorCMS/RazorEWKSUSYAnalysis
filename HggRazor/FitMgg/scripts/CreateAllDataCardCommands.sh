@@ -53,7 +53,7 @@ done
 #echo INPUT FILE  = $inputfiledir
 #echo OUTFILE PREFIX = $outfile
 
-extra_tag=Moriond_36p8ifb_Feb9_Summer16
+extra_tag=Moriond_35p9ifb_Feb22_Summer16_ReMiniAOD_NewSigmaMoverM_Correction_PDFbugFixed
 
 for j in $(ls $inputfiledir);
 do

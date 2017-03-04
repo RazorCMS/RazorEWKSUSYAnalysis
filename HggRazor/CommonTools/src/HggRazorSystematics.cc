@@ -269,7 +269,8 @@ void HggRazorSystematics::Loop()
   //****************************************************
   //Signal ISR Correction
   //****************************************************
-  double ISRCorrection[7] = { 1, 0.882, 0.792, 0.702, 0.648, 0.601, 0.515};
+  //double ISRCorrection[7] = { 1, 0.882, 0.792, 0.702, 0.648, 0.601, 0.515};//ICHEP
+  double ISRCorrection[7] = { 1, 0.920, 0.821, 0.715, 0.662, 0.561, 0.511};//Moriond
   if( this->processName == "signal" )
     {
       if ( this->ISRHist ) {
@@ -300,6 +301,7 @@ void HggRazorSystematics::Loop()
   Long64_t nbytes = 0, nb = 0;
   double total_in = 0, total_rm = 0;
   
+  std::cout << "Nentries: " << fChain->GetEntries() << std::endl;
   for (Long64_t jentry=0; jentry < nentries; jentry++ )
     {
       Long64_t ientry = LoadTree(jentry);
@@ -308,7 +310,8 @@ void HggRazorSystematics::Loop()
 
 
       //require diphoton trigger
-      if (!(HLTDecision[82] || HLTDecision[83] || HLTDecision[93])) continue;
+      //if (!(HLTDecision[82] || HLTDecision[83] || HLTDecision[93])) continue;//Ommit for FastSim
+
 
       double ISRCorrValue = 1.0;
       if( this->processName == "signal" ) {
@@ -322,8 +325,9 @@ void HggRazorSystematics::Loop()
 	}
       else if (_analysisTag == "Razor2016_80X")
 	{
-	  //commonW = this->Lumi*weight*pileupWeight*btagCorrFactor*triggerEffWeight*photonEffSF*ISRCorrValue;
-	  commonW = this->Lumi*weight*pileupWeight*btagCorrFactor*triggerEffSFWeight*photonEffSF*ISRCorrValue;
+	  //commonW = this->Lumi*weight*pileupWeight*btagCorrFactor*triggerEffSFWeight*photonEffSF*ISRCorrValue;//FullSim
+	  //commonW = this->Lumi*weight*pileupWeight*btagCorrFactor*triggerEffSFWeight*photonEffSF;
+	  commonW = this->Lumi*weight*pileupWeight*btagCorrFactor*triggerEffSFWeight*photonEffSF*triggerEffWeight;//FastSim
 	}
       else
 	{

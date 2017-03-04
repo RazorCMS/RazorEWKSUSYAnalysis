@@ -64,11 +64,32 @@ int main( int argc, char* argv[] )
   FillCrossSectionMap( xsecFile );
 
   TFile* fout = new TFile("test_limit.root", "recreate");
+  /*
+  //T2bH
   TH2F* h2_limit     = new TH2F("h2_limit", "", 15, -25, 725, 15, -25, 725);
   TH2F* h2_limit_exp = new TH2F("h2_limit_exp", "", 15, -25, 725, 15, -25, 725);
   TH2F* h2_limit_exp_up = new TH2F("h2_limit_exp_up", "", 15, -25, 725, 15, -25, 725);
   TH2F* h2_limit_exp_down = new TH2F("h2_limit_exp_down", "", 15, -25, 725, 15, -25, 725);
+  */
   
+  //-------------------
+  //TChiWH settings
+  //-------------------
+  double maxY = 712.5;
+  double maxX = 712.5;
+  double minY = -12.5;
+  double minX = -12.5;
+  double binWidthX = 25.;
+  double binWidthY = 25.;
+  int nbinsX = (int)(maxX-minX)/binWidthX;
+  int nbinsY = (int)(maxY-minY)/binWidthY;
+  
+  TH2F* h2_limit     = new TH2F("h2_limit", "", nbinsX, minX, maxX, nbinsY, minY, maxY);
+  TH2F* h2_limit_exp = new TH2F("h2_limit_exp", "", nbinsX, minX, maxX, nbinsY, minY, maxY);
+  TH2F* h2_limit_exp_up = new TH2F("h2_limit_exp_up", "", nbinsX, minX, maxX, nbinsY, minY, maxY);
+  TH2F* h2_limit_exp_down = new TH2F("h2_limit_exp_down", "", nbinsX, minX, maxX, nbinsY, minY, maxY);
+  
+
   std::ifstream ifs( inputList.c_str(), std::fstream::in );
   if ( ifs.is_open() )
     {
