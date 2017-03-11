@@ -296,18 +296,6 @@ void HggRazorSystematics::Loop()
     }
 
 
-  //---------------------------------------
-  //SigmaMoverM Reweighting 
-  //---------------------------------------
-  TFile* fsmom = new TFile("/Users/cmorgoth/Work/git/RazorEWKSUSYAnalysis/HggRazor/PlottingAndSystematic/data/SigmaMoverM_ZToHScaleFactor.root");
-  TH1F* hSigmaMoverM_reweight = (TH1F*)fsmom->Get("SigmaMoverM_ZToHScaleFactor");
-  if ( hSigmaMoverM_reweight == NULL )
-    {
-      std::cerr << "Missing SigmaMoverM reweighting histogram; please check location; the path is defined in /Users/cmorgoth/Work/git/RazorEWKSUSYAnalysis/HggRazor/CommonTools/src/HggRazorSystematics.cc" << std::endl;
-      return;
-    }
-  
-
   if ( _debug ) std::cout << "[DEBUG]: Passed the ISR setup" << std::endl;
   Long64_t nentries = fChain->GetEntriesFast();
   Long64_t nbytes = 0, nb = 0;
@@ -330,8 +318,6 @@ void HggRazorSystematics::Loop()
 	ISRCorrValue = ISRCorrection[std::min(NISRJets,6)];
       }
 
-      double SigmaMoverMreweight = hSigmaMoverM_reweight->GetBinContent(hSigmaMoverM_reweight->FindFixBin(sigmaMoverM +0.0000000000001));
-      std::cout << "SigmaMoverMreweight: " << SigmaMoverMreweight << std::endl;
       float commonW = 0;
       if (_analysisTag == "Razor2015_76X")
 	{
