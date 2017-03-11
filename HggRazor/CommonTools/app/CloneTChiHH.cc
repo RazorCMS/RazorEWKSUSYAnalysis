@@ -34,7 +34,7 @@ int main ( int argc, char* argv[] )
 	  TH1F*  SumScaleWeights= (TH1F*)oldFile->Get( Form("SumScaleWeights%s", m1.c_str()) );
 	  TH1F* SumPdfWeights = (TH1F*)oldFile->Get( Form("SumPdfWeights%s", m1.c_str()) );
 	  TH1F* NISRJets = (TH1F*)oldFile->Get( Form("NISRJets%s", m1.c_str()) );
-	  newFile = new TFile( Form("/afs/cern.ch/work/c/cpena/public/combineDiphotonHM/CMSSW_7_4_7/src/eos/eos/cms/store/group/phys_susy/razor/Run2Analysis/HggRazor/2016/V3p12_PhotonCorrDec06_JECSep23V3_20170219/FastsimSignal/combined/SMS-TChiHH_%s_tweaked_1pb_weighted.root", m1.c_str()), "RECREATE" );
+	  newFile = new TFile( Form("/afs/cern.ch/work/c/cpena/public/combineDiphotonHM/CMSSW_7_4_7/src/eos/cms/store/group/phys_susy/razor/Run2Analysis/HggRazor/2016/V3p12_PhotonCorrDec06_JECSep23V3_20170219/FastsimSignal/combined/SMS-TChiHH_%s_tweaked_1pb_weighted.root", m1.c_str()), "RECREATE" );
 	  tree->SetBranchStatus("*",1);
 	  TTree* newTree = tree->CloneTree();
 	  newTree->Write();
