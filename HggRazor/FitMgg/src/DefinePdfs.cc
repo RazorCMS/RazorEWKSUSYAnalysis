@@ -824,6 +824,18 @@ TString MakePoly3(TString tag, RooRealVar& mgg,RooWorkspace& w)
   RooRealVar *p0 = new RooRealVar(tag+"_p0","p_0",1.0,-100,100);
   RooRealVar *p1 = new RooRealVar(tag+"_p1","p_1",0,-100,100);
   RooRealVar *p2 = new RooRealVar(tag+"_p2","p_2",5,-100,100);
+
+  /*
+  RooRealVar *pC = new RooRealVar(tag+"_pC","C",1, "");
+  pC->setConstant(kFALSE);
+  RooRealVar *p0 = new RooRealVar(tag+"_p0","p_0",1.0, "");
+  p0->setConstant(kFALSE);
+  RooRealVar *p1 = new RooRealVar(tag+"_p1","p_1",0,"");
+  p1->setConstant(kFALSE);
+  RooRealVar *p2 = new RooRealVar(tag+"_p2","p_2",5,"");
+  p2->setConstant(kFALSE);
+  */
+
   RooRealVar *Nbkg   = new RooRealVar(tag+"_Nbkg","N_{bkg}",10,"events");
   Nbkg->setConstant(kFALSE);
   
@@ -833,6 +845,7 @@ TString MakePoly3(TString tag, RooRealVar& mgg,RooWorkspace& w)
   RooFormulaVar *p2mod = new RooFormulaVar(tag+"_p2mod","@0*@0",*p2);
   
   RooBernstein* bern = new RooBernstein(tag+"_pol3","",mgg,RooArgList(*pCmod,*p0mod,*p1mod,*p2mod));
+  //RooBernstein* bern = new RooBernstein(tag+"_pol3","",mgg,RooArgList(*pC,*p0,*p1,*p2));
   
   TString pdfName = tag+"_pol3_ext";
   w.import(*(new RooAddPdf( pdfName,"", RooArgList(*bern),RooArgList(*Nbkg))));
@@ -841,10 +854,20 @@ TString MakePoly3(TString tag, RooRealVar& mgg,RooWorkspace& w)
 };
 TString MakePoly3NE(TString tag, RooRealVar& mgg,RooWorkspace& w)
 {
-  RooRealVar *pC = new RooRealVar(tag+"_pol3_pC","C",1,-100,100);
+  /*RooRealVar *pC = new RooRealVar(tag+"_pol3_pC","C",1,-100,100);
   RooRealVar *p0 = new RooRealVar(tag+"_pol3_p0","p_0",1.0,-100,100);
   RooRealVar *p1 = new RooRealVar(tag+"_pol3_p1","p_1",0,-100,100);
   RooRealVar *p2 = new RooRealVar(tag+"_pol3_p2","p_2",5,-100,100);
+  RooRealVar *Nbkg   = new RooRealVar(tag+"_pol3_Nbkg","N_{bkg}",10,"events");
+  */
+  RooRealVar *pC = new RooRealVar(tag+"_pol3_pC","C",1, "");
+  pC->setConstant(kFALSE);
+  RooRealVar *p0 = new RooRealVar(tag+"_pol3_p0","p_0",1.0, "");
+  p0->setConstant(kFALSE);
+  RooRealVar *p1 = new RooRealVar(tag+"_pol3_p1","p_1",0,"");
+  p1->setConstant(kFALSE);
+  RooRealVar *p2 = new RooRealVar(tag+"_pol3_p2","p_2",5,"");
+  p2->setConstant(kFALSE);
   RooRealVar *Nbkg   = new RooRealVar(tag+"_pol3_Nbkg","N_{bkg}",10,"events");
   Nbkg->setConstant(kFALSE);
   
@@ -855,6 +878,7 @@ TString MakePoly3NE(TString tag, RooRealVar& mgg,RooWorkspace& w)
   
   TString pdfName = tag+"_pol3";
   RooBernstein* bern = new RooBernstein(pdfName,"",mgg,RooArgList(*pCmod,*p0mod,*p1mod,*p2mod));
+  //RooBernstein* bern = new RooBernstein(pdfName,"",mgg,RooArgList(*pC,*p0,*p1,*p2));
   
   w.import(*bern);//(new RooAddPdf( pdfName,"", RooArgList(*bern),RooArgList(*Nbkg))));
   

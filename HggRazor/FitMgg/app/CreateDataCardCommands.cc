@@ -164,6 +164,7 @@ int main( int argc, char* argv[] )
   Bkg_f1 = "singleExp";
   std::cerr << "[INFO]: opening configDataCard: "<< inputCF << std::endl;
   outf << "#! /bin/bash\ncd " << currentDir << "\neval `scramv1 run -sh`;\n";
+  //outf << "cd /afs/cern.ch/work/c/cpena/public/combineDiphotonHM/CMSSW_7_4_7/src/\neosmount eos\ncd -;\n";
   while( ifs.good() )
     {
       std::vector<float> smh_sys;
@@ -348,7 +349,7 @@ int main( int argc, char* argv[] )
   
   for (int i=0; i<binVector.size(); i++) {
     if (binVector[i].box == "highpt" || binVector[i].box == "hzbb" ) {
-      outf << "mv HggRazorCard_bin" << binVector[i].bin << ".txt" << " "
+      outf << "cp HggRazorCard_bin" << binVector[i].bin << ".txt" << " "
   	   << "HggRazorCombinedCard_bin" << binVector[i].bin << ".txt" 
   	   << "\n";
     } else if (binVector[i].box == "highres") {
@@ -361,7 +362,7 @@ int main( int argc, char* argv[] )
     }		  
   }
 
-  outf << "combineCards.py HggRazorCombinedCard_bin*.txt > combineAll.txt\n"
+  outf << "combineCards.py HggRazorCard_bin0.txt HggRazorCard_bin1.txt HggRazorCard_bin2.txt HggRazorCard_bin3.txt HggRazorCard_bin4.txt HggRazorCard_bin5.txt HggRazorCard_bin6.txt HggRazorCard_bin7.txt HggRazorCard_bin8.txt HggRazorCard_bin9.txt HggRazorCard_bin10.txt HggRazorCard_bin11.txt HggRazorCard_bin12.txt HggRazorCard_bin13.txt HggRazorCard_bin14.txt HggRazorCard_bin15.txt HggRazorCard_bin16.txt HggRazorCard_bin17.txt HggRazorCard_bin18.txt > combineAll.txt\n"
        << "combine -M Asymptotic combineAll.txt --minimizerStrategy=1 -n _combineAll\n"
        << "combine -M ProfileLikelihood --signif combineAll.txt -n _all.nsigma --setPhysicsModelParameterRanges r=-20,20 --uncapped=1\n"
        << "combine -M ProfileLikelihood --pvalue combineAll.txt -n _all.pvalue --setPhysicsModelParameterRanges r=-20,20 --uncapped=1\n"

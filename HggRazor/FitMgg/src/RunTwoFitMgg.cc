@@ -1755,7 +1755,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   combine_ws->var( combineSignal+"_n2")->setVal( DCB_n1_s );
   //if ( binNumber.Atof() == 17 || binNumber.Atof() == 19 || binNumber.Atof() == 20 )
   //if ( binNumber.Atof() >= 0 )
-  if ( npoints_signal < 300 )//number of signal events less than 300, use SMH shape
+  if ( npoints_signal < 500 )//number of signal events less than 300, use SMH shape
     {
       //USE SMH SHAPE!!
       combine_ws->var( combineSignal+"_muCB")->setVal( DCB_mu_smh );
@@ -1973,7 +1973,10 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
 	    }
 	  else if ( isys > 9 )
 	    {
-	      ofs << "Signal_pdf" << ctr << "\t\t\tlnN\t\t" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	      //--------------------
+	      //No signal PDF systematic as SUSY group prescription
+	      //--------------------
+	      //ofs << "Signal_pdf" << ctr << "\t\t\tlnN\t\t" << signal_sys.at(isys) << "\t\t-\t\t-\n";
 	      ctr++;
 	    }
 	}
@@ -2030,7 +2033,10 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
 	    }
 	  else if ( isys > 7 )
 	    {
-	      ofs << "Signal_pdf" << ctr << "\t\t\tlnN\t\t" << signal_sys.at(isys) << "\t\t-\n";
+	      //--------------------
+	      //No signal PDF systematic as SUSY group prescription
+	      //--------------------
+	      //ofs << "Signal_pdf" << ctr << "\t\t\tlnN\t\t" << signal_sys.at(isys) << "\t\t-\n";
 	      ctr++;
 	    }
 	}

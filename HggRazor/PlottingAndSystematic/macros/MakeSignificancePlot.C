@@ -76,7 +76,7 @@ void MakeSignificancePlot( int option = 0) {
     y[10] = -0.1;
     y[11] = 0.1;
     y[12] = -0.6;
-    y[13] = 0.4;
+    y[13] = 0.3;
     y[14] = 0.2;
 
   } else if (option == 1) {
