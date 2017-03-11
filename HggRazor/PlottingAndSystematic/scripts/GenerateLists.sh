@@ -1,8 +1,8 @@
 #! /bin/bash
 
-signalDir=/Users/cmorgoth/Work/Moriond/HggRazor/SamplesFeb19
-smhDir=/Users/cmorgoth/Work/Moriond/HggRazor/SamplesFeb19
-outDir=/Users/cmorgoth/Work/Moriond/HggRazor/RazorEWKSUSYAnalysis/HggRazor/PlottingAndSystematic/data/lists/MoriondFeb19
+signalDir=/afs/cern.ch/work/c/cpena/public/combineDiphotonHM/CMSSW_7_4_7/src/
+smhDir=/afs/cern.ch/work/c/cpena/public/combineDiphotonHM/CMSSW_7_4_7/src/
+outDir=/afs/cern.ch/work/c/cpena/public/combineDiphotonHM/CMSSW_7_4_7/src/RazorEWKSUSYAnalysis/HggRazor/PlottingAndSystematic/data/lists/MoriondMarch11
 
 for i in $(ls $signalDir/HggRazor_SMS-T2bH_mSbottom-* | awk -F -T2bH_ '{ print $2 }' | awk -F _TuneCUETP8M1 '{print $1}');
 do

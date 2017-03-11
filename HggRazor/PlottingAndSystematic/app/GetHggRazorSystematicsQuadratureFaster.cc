@@ -377,7 +377,7 @@ int main( int argc, char* argv[] )
       hggSys->Loop();
       for ( auto tmp: myVectBinning )
 	{
-	  int bin = nominal->FindBin( tmp[0]+10, tmp[1]+0.0001 );
+	  int bin = nominalS->FindBin( tmp[0]+10, tmp[1]+0.0001 );
 	  if ( currentProcess == "signal" )
 	    {
 	      nominalS->SetBinContent( bin, hggSys->GetNominalYield( tmp[0], tmp[1] ) );
@@ -418,7 +418,10 @@ int main( int argc, char* argv[] )
 	      facRenScaleDownS->SetBinContent( bin, facSys.second );
 
 	      //PDF
-	      for ( int ipdf = 0; ipdf < 60; ipdf++ ) pdfS[ipdf]->SetBinContent( bin, hggSys->GetPdfSystematic( ipdf, tmp[0], tmp[1] ) );
+	      for ( int ipdf = 0; ipdf < 60; ipdf++ ) 
+		{
+		  pdfS[ipdf]->SetBinContent( bin, hggSys->GetPdfSystematic( ipdf, tmp[0], tmp[1] ) );
+		}
 	    }
 	  else
 	    {
@@ -527,10 +530,8 @@ int main( int argc, char* argv[] )
        
        for( int ipdf = 0; ipdf < 60; ipdf++ )
 	 {
-	   //pdf[ipdf]->SetBinContent( bin, pdf[ipdf]->GetBinContent( bin )/nom );
-	   //pdf[ipdf]->SetBinContent( bin, 0 ); //zero out pdf uncertainties for signal for now
-	   if ( ipdf < 59 ) outf << pdfS[ipdf]->GetBinContent( bin ) << "\t";
-	   else outf << pdfS[ipdf]->GetBinContent( bin ) << "\n";
+	   if ( ipdf < 59 ) outf << pdfS[ipdf]->GetBinContent( bin )/nomS << "\t";
+	   else outf << pdfS[ipdf]->GetBinContent( bin )/nomS << "\n";
 	 }
       
        std::cout << "Bin : " << bin << " " << tmp[0] << " " << tmp[1] << " " << tmp[2] << " " << tmp[3] << " : "
