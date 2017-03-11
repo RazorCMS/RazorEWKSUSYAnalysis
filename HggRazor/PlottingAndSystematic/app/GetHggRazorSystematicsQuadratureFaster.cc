@@ -99,6 +99,16 @@ int main( int argc, char* argv[] )
     {
       std::cerr << "[ERROR]: please provide the analysisTag. Use --analysisTag=<Razor2015_76X,Razor2016_80X>" << std::endl;
       return -1;
+    }
+
+  //-----------------
+  //Signal Type
+  //-----------------
+  std::string signalType = ParseCommandLine( argc, argv, "-signalType=" );
+  if ( signalType == "" )
+    {
+      std::cerr << "[ERROR]: please provide the signalType. Use --signalType=<FullSim,FastSim>" << std::endl;
+      return -1;
     } 
   
   //-----------------
@@ -185,8 +195,13 @@ int main( int argc, char* argv[] )
     } 
   else if ( analysisTag == "Razor2016_80X" ) 
     {
-      //cut = cut + categoryCutString + triggerCut + metFilterCut;//FullSim
-      cut = cut + categoryCutString;//FastSim
+      if ( signalType == "FullSim" ) cut = cut + categoryCutString + triggerCut + metFilterCut;//FullSim
+      else if ( signalType == "FastSim" ) cut = cut + categoryCutString;//FastSim
+      else
+	{
+	  std::cerr << "[ERROR]: please provide a valid signalType: FullSim, FastSim" << std::endl;
+	  return -1;
+	}
     } 
   else 
     {
