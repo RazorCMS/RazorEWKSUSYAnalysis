@@ -23,6 +23,7 @@ TARGET7 = GetFWHM
 TARGET8 = PrintSignificanceHggRazor
 TARGET9 = PlotSignificanceHggRazor
 TARGET10 = GetSigmaMoverMeff
+TARGET11 = PlotLimitsTChi
 
 
 SRC  = app/CreateCE_CombinedCard.cc src/CountingExperiment.cc $(Aux)/src/CommandLineInput.cc $(CommonTools)/src/HggAux.cc
@@ -36,6 +37,7 @@ SRC7 = app/GetFWHM_FromFit.cc src/AssortedFunctions.cc $(Aux)/src/CommandLineInp
 SRC8 = app/PrintSignificanceHggRazor.cc $(Aux)/src/CommandLineInput.cc
 SRC9 = app/PlotSignificanceHggRazor.cc $(Aux)/src/CommandLineInput.cc
 SRC10 = app/GetSigmaMoverMeff.cc src/AssortedFunctions.cc $(Aux)/src/CommandLineInput.cc
+SRC11 = app/PlotLimitsTChi.cc $(Aux)/src/CommandLineInput.cc
 
 OBJ  = $(SRC:.cc=.o)
 OBJ1 = $(SRC1:.cc=.o)
@@ -48,8 +50,10 @@ OBJ7 = $(SRC7:.cc=.o)
 OBJ8 = $(SRC8:.cc=.o)
 OBJ9 = $(SRC9:.cc=.o)
 OBJ10 = $(SRC10:.cc=.o)
+OBJ11 = $(SRC11:.cc=.o)
 
-all : $(TARGET) $(TARGET1) $(TARGET2) $(TARGET3) $(TARGET4) $(TARGET5) $(TARGET6) $(TARGET7) $(TARGET8) $(TARGET9) $(TARGET10)
+
+all : $(TARGET) $(TARGET1) $(TARGET2) $(TARGET3) $(TARGET4) $(TARGET5) $(TARGET6) $(TARGET7) $(TARGET8) $(TARGET9) $(TARGET10) $(TARGET11)
 
 $(TARGET) : $(OBJ)
 	$(LD) $(CPPFLAGS) -o $(TARGET) $(OBJ) $(LDFLAGS)
@@ -117,9 +121,16 @@ $(TARGET10) : $(OBJ10)
 	@echo $<
 	@echo $^
 
+$(TARGET11) : $(OBJ11)
+	$(LD) $(CPPFLAGS) -o $(TARGET11) $(OBJ11) $(LDFLAGS)
+	@echo $@
+	@echo $<
+	@echo $^
+
+
 %.o : %.cc
 	$(CXX) $(CPPFLAGS) -o $@ -c $<
 	@echo $@
 	@echo $<
 clean :
-	rm -f *.o app/*.o src/*.o $(CommonTools)/src/*.o $(Aux)/src/*.o $(TARGET) $(TARGET1) $(TARGET2) $(TARGET3) $(TARGET4) $(TARGET5) $(TARGET6) $(TARGET7) $(TARGTE8) $(TARGET9) $(TARGET10) *~
+	rm -f *.o app/*.o src/*.o $(CommonTools)/src/*.o $(Aux)/src/*.o $(TARGET) $(TARGET1) $(TARGET2) $(TARGET3) $(TARGET4) $(TARGET5) $(TARGET6) $(TARGET7) $(TARGTE8) $(TARGET9) $(TARGET10) $(TARGET11) *~
