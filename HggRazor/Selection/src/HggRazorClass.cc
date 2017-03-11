@@ -442,6 +442,18 @@ void HggRazorClass::Loop()
       std::cerr << "[ERROR]: Histograms are not initialized" << std::endl;
       return;
     }
+
+  //---------------------------------------
+  //SigmaMoverM Reweighting 
+  //---------------------------------------
+  TFile* fsmom = new TFile("/Users/cmorgoth/Work/git/RazorEWKSUSYAnalysis/HggRazor/PlottingAndSystematic/data/SigmaMoverM_ZToHScaleFactor.root");
+  TH1F* hSigmaMoverM_reweight = (TH1F*)fsmom->Get("SigmaMoverM_ZToHScaleFactor");
+  if ( hSigmaMoverM_reweight == NULL )
+    {
+      std::cerr << "Missing SigmaMoverM reweighting histogram; please check location; the path is defined in /Users/cmorgoth/Work/git/RazorEWKSUSYAnalysis/HggRazor/CommonTools/src/HggRazorSystematics.cc" << std::endl;
+      return;
+    }
+  
   Long64_t nentries = fChain->GetEntriesFast();
   Long64_t nbytes = 0, nb = 0;
   double total_in = 0, total_rm = 0;
@@ -452,6 +464,10 @@ void HggRazorClass::Loop()
       
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
+
+      //SigmaMoverM Correction
+      double SigmaMoverMreweight = hSigmaMoverM_reweight->GetBinContent(hSigmaMoverM_reweight->FindFixBin(sigmaMoverM +0.0000000000001));
+      //std::cout << "SigmaMoverMreweight: " << SigmaMoverMreweight << std::endl;
 
       //**********************************************************
       //Calculate weights
@@ -464,7 +480,7 @@ void HggRazorClass::Loop()
       else if ( this->processName == "diphoton" || this->processName == "dy" )
 	{ 
 	  //w = weight*pileupWeight*photonEffSF*triggerEffSFWeight;
-	  w = weight*pileupWeight*photonEffSF*triggerEffWeight*triggerEffSFWeight;
+	  w = weight*pileupWeight*btagCorrFactor*triggerEffSFWeight*photonEffSF;
 	  //w = weight*pileupWeight*photonEffSF;
 	  //w = weight*pileupWeight*triggerEffWeight;
 	  //w = weight*pileupWeight;
@@ -476,7 +492,8 @@ void HggRazorClass::Loop()
 	}
       else 
 	{ 
-	  w = weight*pileupWeight*triggerEffWeight;
+	  //w = weight*pileupWeight*triggerEffWeight;
+	  w = weight*pileupWeight*btagCorrFactor*triggerEffSFWeight*photonEffSF;
 	  //std::cout <<  "other use weight: " << photonEffSF << " " << w  << "\n";
 	}
 
@@ -513,7 +530,7 @@ void HggRazorClass::Loop()
       
       h_mgg->Fill( mGammaGamma, w );
       h_ptgg->Fill( pTGammaGamma, w );
-      h_sigmaMoverM->Fill( sigmaMoverM, w );
+      h_sigmaMoverM->Fill( sigmaMoverM, w*SigmaMoverMreweight );
       
       h_mr->Fill( MR, w );
       h_rsq->Fill( t1Rsq, w );

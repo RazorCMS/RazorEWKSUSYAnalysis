@@ -187,11 +187,18 @@ float lres_k[2] = { 1.0, 1.0};
 //Zee control region
 //---------------
 //Data
+TString cut = "abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) < 1.4442 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && mGammaGamma > 75 && mGammaGamma < 120 && pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && (Flag_HBHENoiseFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 ) && MR > 150. && pTGammaGamma < 110 && abs(mbbH_L-125.)>=15 && abs(mbbZ_L-91.)>=15";
+
+//MC
+TString cut_mc = "abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) < 1.4442 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && mGammaGamma > 75 && mGammaGamma < 120 && pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && MR > 150. && pTGammaGamma < 110 && abs(mbbH_L-125.)>=15 && abs(mbbZ_L-91.)>=15";
+
+/*
+//Data
 TString cut = "abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) < 1.4442 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && mGammaGamma > 75 && mGammaGamma < 120 && pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && (Flag_HBHENoiseFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 ) && MR > 150. && pTGammaGamma < 110 && abs(mbbH_L-125.)>=15 && abs(mbbZ_L-91.)>=15 && sigmaMoverM >= 0.0085";
 
 //MC
 TString cut_mc = "abs( pho1SC_Eta ) < 1.4442 && abs( pho2SC_Eta ) < 1.4442 && ( pho1Pt > 40. || pho2Pt > 40. ) && pho1Pt > 25. && pho2Pt> 25. && mGammaGamma > 75 && mGammaGamma < 120 && pho1passEleVeto == 0 && pho2passEleVeto == 0 && pho1passIso == 1 && pho2passIso == 1 && MR > 150. && pTGammaGamma < 110 && abs(mbbH_L-125.)>=15 && abs(mbbZ_L-91.)>=15 && sigmaMoverM >= 0.0085";
-
+*/
 
 //---------------------
 //T r i g g e r   C u t 
@@ -321,6 +328,10 @@ int main ( int argc, char* argv[] )
   std::cout << "[INFO]: running inclusive tree mode" << std::endl;
   int ctr = 0;
   Histos histos[nprocesses];
+
+  TH1F* sigmaMoverM_data;
+  TH1F* sigmaMoverM_dy;
+  
   for( const auto& process : Process() )
     {
       std::string processName = GetProcessString( process );
@@ -402,10 +413,48 @@ int main ( int argc, char* argv[] )
 	  TH1F h_scale = hggclass->GetHisto( htmp );
 	  histos[ctr].AssignHisto( htmp, h_scale );
 	}
+      //TFile* fh = new TFile(Form("%s_histo.root",processName.c_str()), "recreate");
+      if ( processName == "data" ) sigmaMoverM_data = new TH1F( hggclass->GetHisto( HistoTypes::sigmaMoverM ) );
+      else if ( processName == "dy" ) sigmaMoverM_dy = new TH1F( hggclass->GetHisto( HistoTypes::sigmaMoverM ) );
+      //h_tmp->Write(processName.c_str());
+      //fh->Close();
       std::cout << "DEB4" << std::endl;
       ctr++;
       delete hggclass;
     }
+  //std::cout << "here" << std::endl;
+
+  //----------------------------------
+  //SigmaMoverM correction calculation
+  //----------------------------------
+
+  if ( sigmaMoverM_data != NULL ) sigmaMoverM_data->Scale( 1./sigmaMoverM_data->Integral() );//re-scale to unity to get eff directly
+  if ( sigmaMoverM_dy != NULL ) sigmaMoverM_dy->Scale( 1./sigmaMoverM_dy->Integral() );//re-scale to unity to get eff directly
+
+  if( sigmaMoverM_data != NULL && sigmaMoverM_dy != NULL )
+    {
+      int n_boundary_data = sigmaMoverM_data->FindFixBin(0.0085) - 1;
+      int n_boundary_dy   = sigmaMoverM_dy->FindFixBin(0.0085) - 1;
+      float eff_data_HR = sigmaMoverM_data->Integral(1,n_boundary_data);
+      float eff_dy_HR   = sigmaMoverM_dy->Integral(1,n_boundary_dy);
+      float eff_data_LR = 1. - eff_data_HR;
+      float eff_dy_LR   = 1. - eff_dy_HR;
+      std::cout << "-------------------------------------------" << std::endl;
+      std::cout << "-------------------------------------------" << std::endl;
+      std::cout << "data HR eff: " << eff_data_HR << "; dy HR eff: " << eff_dy_HR << std::endl;
+      std::cout << "HR data/mc correction --> " << eff_data_HR/eff_dy_HR << std::endl;
+      std::cout << "-------------------------------------------" << std::endl;
+      std::cout << "data LR eff: " << eff_data_LR << "; dy LR eff: " << eff_dy_LR << std::endl;
+      std::cout << "LR data/mc correction --> " << eff_data_LR/eff_dy_LR << std::endl;
+      std::cout << "-------------------------------------------" << std::endl;
+      std::cout << "-------------------------------------------" << std::endl;
+    }
+  
+  TFile* fh = new TFile("sigmaMoverM_histo.root", "recreate");
+  if ( sigmaMoverM_data != NULL ) sigmaMoverM_data->Write("data");
+  if ( sigmaMoverM_dy != NULL ) sigmaMoverM_dy->Write("dy");
+  fh->Close();
+  
   //---------------
   //P l o t t i n g
   //---------------
