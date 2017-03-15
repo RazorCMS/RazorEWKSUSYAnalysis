@@ -1,0 +1,91 @@
+imax 1 number of bins
+jmax 2 number of processes minus 1
+kmax * number of nuisance parameters
+----------------------------------------------------------------------------------------
+shapes Bkg		bin2	HggRazorWorkspace_bin2.root combineWS:singleExp_Bkg_bin2_sExp
+shapes SMH		bin2	HggRazorWorkspace_bin2.root combineWS:SMH_bin2_DCB
+shapes signal		bin2	HggRazorWorkspace_bin2.root combineWS:signal_bin2_DCB
+shapes data_obs		bin2	HggRazorWorkspace_bin2.root combineWS:data_bin2
+----------------------------------------------------------------------------------------
+bin		bin2
+observation	-1.0
+----------------------------------------------------------------------------------------
+bin						bin2		bin2		bin2
+process						signal		SMH		Bkg
+process						0		1		2
+rate						1		1		1
+----------------------------------------------------------------------------------------
+CMS_Lumi			lnN		1.026		1.026		-
+Photon_Trigger			lnN		1.05		1.05		-
+PdfNorm				lnN		-		0.948/1.062		-
+SMH_JES				lnN		-		0.958492/1.04243		-
+SMH_facScale_bin2			lnN		-		1.04067		-
+SMH_renScale_bin2			lnN		-		1.09838		-
+SMH_facRenScale_bin2			lnN		-		1.13472		-
+SMH_pdf0			lnN		-		1.00159		-
+SMH_pdf1			lnN		-		1.00106		-
+SMH_pdf2			lnN		-		1.00068		-
+SMH_pdf3			lnN		-		1.00183		-
+SMH_pdf4			lnN		-		1.00063		-
+SMH_pdf5			lnN		-		1.00101		-
+SMH_pdf6			lnN		-		1.00037		-
+SMH_pdf7			lnN		-		1.00252		-
+SMH_pdf8			lnN		-		1.00255		-
+SMH_pdf9			lnN		-		1.00203		-
+SMH_pdf10			lnN		-		1.00011		-
+SMH_pdf11			lnN		-		1.0017		-
+SMH_pdf12			lnN		-		1.00695		-
+SMH_pdf13			lnN		-		1.00035		-
+SMH_pdf14			lnN		-		1.00314		-
+SMH_pdf15			lnN		-		1.00324		-
+SMH_pdf16			lnN		-		1.00198		-
+SMH_pdf17			lnN		-		1.00286		-
+SMH_pdf18			lnN		-		1.00269		-
+SMH_pdf19			lnN		-		1.00214		-
+SMH_pdf20			lnN		-		1.0018		-
+SMH_pdf21			lnN		-		1.0013		-
+SMH_pdf22			lnN		-		1.00357		-
+SMH_pdf23			lnN		-		1.00311		-
+SMH_pdf24			lnN		-		1.00273		-
+SMH_pdf25			lnN		-		1.00173		-
+SMH_pdf26			lnN		-		1.00226		-
+SMH_pdf27			lnN		-		1.00299		-
+SMH_pdf28			lnN		-		1.00035		-
+SMH_pdf29			lnN		-		1.00039		-
+SMH_pdf30			lnN		-		1.00092		-
+SMH_pdf31			lnN		-		1.0024		-
+SMH_pdf32			lnN		-		1.00175		-
+SMH_pdf33			lnN		-		1.00145		-
+SMH_pdf34			lnN		-		1.00093		-
+SMH_pdf35			lnN		-		1.00047		-
+SMH_pdf36			lnN		-		1.00059		-
+SMH_pdf37			lnN		-		1.00048		-
+SMH_pdf38			lnN		-		1.00141		-
+SMH_pdf39			lnN		-		1.00056		-
+SMH_pdf40			lnN		-		1.00154		-
+SMH_pdf41			lnN		-		1.00031		-
+SMH_pdf42			lnN		-		1.00045		-
+SMH_pdf43			lnN		-		1.00023		-
+SMH_pdf44			lnN		-		1.00151		-
+SMH_pdf45			lnN		-		1.00069		-
+SMH_pdf46			lnN		-		1.00112		-
+SMH_pdf47			lnN		-		1.00018		-
+SMH_pdf48			lnN		-		1.00044		-
+SMH_pdf49			lnN		-		1.00025		-
+SMH_pdf50			lnN		-		1.00053		-
+SMH_pdf51			lnN		-		1.00024		-
+SMH_pdf52			lnN		-		1.00022		-
+SMH_pdf53			lnN		-		1.0004		-
+SMH_pdf54			lnN		-		1.00056		-
+SMH_pdf55			lnN		-		1.00026		-
+SMH_pdf56			lnN		-		1.00059		-
+SMH_pdf57			lnN		-		1.00049		-
+SMH_pdf58			lnN		-		1.00029		-
+SMH_pdf59			lnN		-		1.00026		-
+mu_Global			param		 0 1.25
+highpt_mu_Global			param		 0 1.25
+Signal_JES				lnN		0.942852/1.04369		-		-
+Signal_ISR			lnN		0.941245/1.05876		-		-
+Signal_facScale			lnN		1.03319/0.972114		-		-
+Signal_renScale			lnN		0.994701/1.00441		-		-
+Signal_facRenScale			lnN		1.02785/0.976518		-		-

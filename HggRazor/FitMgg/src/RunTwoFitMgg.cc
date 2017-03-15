@@ -1894,7 +1894,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
       ofs << "process\t\t\t\t\t\t0\t\t1\t\t2\n";
       ofs << "rate\t\t\t\t\t\t1\t\t1\t\t1\n";
       ofs << "----------------------------------------------------------------------------------------\n";
-      ofs << "CMS_Lumi\t\t\tlnN\t\t1.057\t\t1.057\t\t-\n";
+      ofs << "CMS_Lumi\t\t\tlnN\t\t1.026\t\t1.026\t\t-\n";
       ofs << "Photon_Trigger\t\t\tlnN\t\t1.05\t\t1.05\t\t-\n";
       //ofs << "ScaleNorm\t\t\tlnN\t\t-\t\t0.931/1.065\t\t-\n"; //instead allow scale variations to change xsection
       ofs << "PdfNorm\t\t\t\tlnN\t\t-\t\t0.948/1.062\t\t-\n";
