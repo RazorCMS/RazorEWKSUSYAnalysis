@@ -156,10 +156,9 @@ int main( int argc, char* argv[] )
   TH2Poly* nominal = new TH2Poly("nominal_SMH", "", 150, 10000, 0, 1 );
   for ( auto tmp : myVectBinning ) nominal->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
 
-  std::cout << "\\begin{table*}[h]\n\\begin{center}\n\\topcaption{The non-resonant background yields, SM Higgs background yields, best fit signal yields, and observed local significance are shown for the signal plus background fit in each search region bin. The uncertainties include both statistical and systematic components. The non-resonant background yields shown correspond to the yield within the window between $122$~GeV and $129$~GeV and is intended to better reflect the background under the signal peak. The observed significance for the bins in HighRes and LowRes categories are identical because they are the result of a simultaneous fit. The significance is computed using the profile likelihood, where the sign reflects whether an excess (positive sign) or deficit (negative sign) is observed.}\n\\small\n\\begin{tabular}{|cc|cccc|c|}\n\\hline";
+  std::cout << "\\begin{table*}[h]\n\\begin{center}\n\\caption{b-only vs approximation is observed.}\n\\small\n\\begin{tabular}{|ccccc|}\n\\hline";
   
-  std::cout <<"\n           &          &                   & Yields        &                 &                        & Obs. Local \\\\";
-  std::cout << "\nBin        & Category &  Non-Resonant Bkg & Exp. SM Higgs & Fitted SM Higgs &  Best Fit Signal       & Significance   \\\\\n\\hline\n";
+  std::cout << "\nBin        & Category & nominal &  b-only fit & approximation \\\\\n\\hline\n";
   for ( auto tmp: myVectBinning )
     {
       int bin   = nominal->FindBin( tmp[0]+10, tmp[1]+0.0001 );
@@ -224,8 +223,8 @@ int main( int argc, char* argv[] )
       limit->SetBranchAddress( "limit", &_limit );
       limit->GetEntry(0);
       delete fsigma;
-      TString line = Form("%d & %s & %.1f  & %.1f\\\\",
-			  myMap2[ss.str()].bin, categoryMode.c_str(), Nsmh_pf, smh_pf_theory );
+      TString line = Form("%d & %s & %.1f & %.1f  & %.1f\\\\",
+			  myMap2[ss.str()].bin, categoryMode.c_str(), Nsmh, Nsmh_pf, smh_pf_theory );
       
       std::cout << line << std::endl;
     }
