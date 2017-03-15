@@ -41,7 +41,7 @@ class sms():
         self.Ymin = 0
         self.Ymax = 400
         self.Zmax = 10
-        self.Zmin = 0.7
+        self.Zmin = 0.4
         # produce sparticle
         self.sParticle = "m_{#tilde{b}} [GeV]"
         # LSP

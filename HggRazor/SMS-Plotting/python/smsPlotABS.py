@@ -346,7 +346,8 @@ class smsPlotABS(object):
         #self.OBS['nominal'].Draw("LSAME") 
 
         self.EXP['minus'].Draw("LSAME")
-        self.EXP['nominal'].Draw("CSAME")
+        self.EXP['nominal'].SetMarkerStyle(20);
+        self.EXP['nominal'].Draw("LSAME")
         self.EXP['plus'].Draw("LSAME")
     
         self.OBS['minus'].Draw("CSAME")

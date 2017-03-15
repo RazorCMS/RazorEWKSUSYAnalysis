@@ -1,0 +1,97 @@
+Combination of highResBin12=HggRazorCard_bin12.txt  lowResBin12=HggRazorCard_bin17.txt
+imax 2 number of bins
+jmax 2 number of processes minus 1
+kmax 75 number of nuisance parameters
+----------------------------------------------------------------------------------------------------------------------------------
+shapes Bkg           highResBin12  HggRazorWorkspace_bin12.root combineWS:poly2_Bkg_bin12_pol2
+shapes SMH           highResBin12  HggRazorWorkspace_bin12.root combineWS:SMH_bin12_DCB
+shapes data_obs      highResBin12  HggRazorWorkspace_bin12.root combineWS:data_bin12
+shapes signal        highResBin12  HggRazorWorkspace_bin12.root combineWS:signal_bin12_DCB
+shapes Bkg           lowResBin12   HggRazorWorkspace_bin17.root combineWS:modExp_Bkg_bin17_mexp
+shapes SMH           lowResBin12   HggRazorWorkspace_bin17.root combineWS:SMH_bin17_DCB
+shapes data_obs      lowResBin12   HggRazorWorkspace_bin17.root combineWS:data_bin17
+shapes signal        lowResBin12   HggRazorWorkspace_bin17.root combineWS:signal_bin17_DCB
+----------------------------------------------------------------------------------------------------------------------------------
+bin          highResBin12  lowResBin12 
+observation  -1.0          -1.0        
+----------------------------------------------------------------------------------------------------------------------------------
+bin                                      highResBin12  highResBin12  highResBin12  lowResBin12   lowResBin12   lowResBin12 
+process                                  signal        Bkg           SMH           signal        Bkg           SMH         
+process                                  0             1             2             0             1             2           
+rate                                     1.0000        1.0000        1.0000        1.0000        1.0000        1.0000      
+----------------------------------------------------------------------------------------------------------------------------------
+CMS_Lumi                lnN              1.026         -             1.026         1.026         -             1.026       
+PdfNorm                 lnN              -             -             0.948/1.062   -             -             0.948/1.062 
+Photon_Trigger          lnN              1.05          -             1.05          1.05          -             1.05        
+SMH_JES                 lnN              -             -             0.948/1.008   -             -             0.951/1.012 
+SMH_facRenScale_bin12   lnN              -             -             1.19631       -             -             1.15838     
+SMH_facScale_bin12      lnN              -             -             1.00669       -             -             1.00254     
+SMH_pdf0                lnN              -             -             1.00008       -             -             1.00003     
+SMH_pdf1                lnN              -             -             1.00062       -             -             1.00067     
+SMH_pdf10               lnN              -             -             1.00015       -             -             1.00013     
+SMH_pdf11               lnN              -             -             1.00265       -             -             1.00284     
+SMH_pdf12               lnN              -             -             1.00129       -             -             1.00128     
+SMH_pdf13               lnN              -             -             1.00323       -             -             1.00334     
+SMH_pdf14               lnN              -             -             1.00053       -             -             1.00063     
+SMH_pdf15               lnN              -             -             1.00038       -             -             1.00015     
+SMH_pdf16               lnN              -             -             1.0007        -             -             1.00064     
+SMH_pdf17               lnN              -             -             1.0006        -             -             1.00078     
+SMH_pdf18               lnN              -             -             1.00075       -             -             1.00072     
+SMH_pdf19               lnN              -             -             1.00035       -             -             1.00044     
+SMH_pdf2                lnN              -             -             1.00044       -             -             1.00042     
+SMH_pdf20               lnN              -             -             1.00064       -             -             1.00067     
+SMH_pdf21               lnN              -             -             1.00044       -             -             1.00043     
+SMH_pdf22               lnN              -             -             1.00135       -             -             1.00102     
+SMH_pdf23               lnN              -             -             1.00154       -             -             1.0016      
+SMH_pdf24               lnN              -             -             1.00012       -             -             1.00021     
+SMH_pdf25               lnN              -             -             1.00068       -             -             1.00064     
+SMH_pdf26               lnN              -             -             1.00112       -             -             1.00114     
+SMH_pdf27               lnN              -             -             1.00072       -             -             1.00078     
+SMH_pdf28               lnN              -             -             1.00037       -             -             1.00027     
+SMH_pdf29               lnN              -             -             1.00012       -             -             1.00016     
+SMH_pdf3                lnN              -             -             1.00134       -             -             1.00142     
+SMH_pdf30               lnN              -             -             1.00032       -             -             1.00044     
+SMH_pdf31               lnN              -             -             1.00058       -             -             1.00055     
+SMH_pdf32               lnN              -             -             1.00032       -             -             1.00037     
+SMH_pdf33               lnN              -             -             1.00051       -             -             1.0004      
+SMH_pdf34               lnN              -             -             1.00066       -             -             1.0007      
+SMH_pdf35               lnN              -             -             1.00033       -             -             1.00035     
+SMH_pdf36               lnN              -             -             1.00014       -             -             1.00007     
+SMH_pdf37               lnN              -             -             1.00016       -             -             1.00014     
+SMH_pdf38               lnN              -             -             1.00009       -             -             1.00006     
+SMH_pdf39               lnN              -             -             1.0003        -             -             1.00032     
+SMH_pdf4                lnN              -             -             1.00114       -             -             1.00112     
+SMH_pdf40               lnN              -             -             1.00047       -             -             1.00037     
+SMH_pdf41               lnN              -             -             1.00042       -             -             1.00037     
+SMH_pdf42               lnN              -             -             1.00028       -             -             1.0005      
+SMH_pdf43               lnN              -             -             1.00014       -             -             1.0001      
+SMH_pdf44               lnN              -             -             1.00021       -             -             1.00008     
+SMH_pdf45               lnN              -             -             1.0003        -             -             1.00031     
+SMH_pdf46               lnN              -             -             1.00014       -             -             1.00013     
+SMH_pdf47               lnN              -             -             1.00026       -             -             1.00034     
+SMH_pdf48               lnN              -             -             1.00003       -             -             1.00004     
+SMH_pdf49               lnN              -             -             1.00024       -             -             1.00024     
+SMH_pdf5                lnN              -             -             1.00112       -             -             1.00101     
+SMH_pdf50               lnN              -             -             1.00047       -             -             1.00024     
+SMH_pdf51               lnN              -             -             1.00033       -             -             1.00025     
+SMH_pdf52               lnN              -             -             1.00009       -             -             1.00011     
+SMH_pdf53               lnN              -             -             1.00036       -             -             1.00029     
+SMH_pdf54               lnN              -             -             1.00014       -             -             1.00014     
+SMH_pdf55               lnN              -             -             1.0001        -             -             1.00008     
+SMH_pdf56               lnN              -             -             1.00003       -             -             1.00001     
+SMH_pdf57               lnN              -             -             1.00019       -             -             1.00028     
+SMH_pdf58               lnN              -             -             1.00018       -             -             1.00021     
+SMH_pdf59               lnN              -             -             1.00007       -             -             1.00006     
+SMH_pdf6                lnN              -             -             1.00044       -             -             1.00039     
+SMH_pdf7                lnN              -             -             1.00067       -             -             1.00072     
+SMH_pdf8                lnN              -             -             1.00179       -             -             1.00182     
+SMH_pdf9                lnN              -             -             1.00045       -             -             1.00049     
+SMH_renScale_bin12      lnN              -             -             1.18765       -             -             1.16384     
+SigmaMoverMEfficiency   lnN              0.880/1.120   -             0.880/1.120   1.195/0.805   -             1.195/0.805 
+Signal_ISR              lnN              1.017/0.983   -             -             1.013/0.987   -             -           
+Signal_JES              lnN              0.996/0.991   -             -             1.014/0.987   -             -           
+Signal_facRenScale      lnN              0.991/1.007   -             -             0.991/1.007   -             -           
+Signal_facScale         lnN              0.989/1.009   -             -             0.989/1.009   -             -           
+Signal_renScale         lnN              1.002/0.998   -             -             1.002/0.998   -             -           
+mu_Global     param  0 1.25
+lowres_mu_Global  param  0 1.25
