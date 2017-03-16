@@ -18,6 +18,7 @@ public:
   HggRazorSystematics( );
   HggRazorSystematics( TTree* tree );
   HggRazorSystematics( TTree* tree, TString processName, TString boxName, std::string analysisTag, bool info = false, bool debug = false );
+  HggRazorSystematics( TTree* tree, TString processName, TString boxName, std::string analysisTag, bool info, bool useISRPtCorrection, bool useGenMet, int NVtxBinMode, bool debug );
   ~HggRazorSystematics( );
 
   bool InitMrRsqTH2Poly( int mode = 0 );
@@ -50,6 +51,7 @@ public:
   bool SetBinningMap( std::map<std::pair<float, float>, std::vector<float>> myMap ){ this->binningMap = myMap; return true;};
   bool SetBinningVector( std::vector<float*> myVect ){ this->binningVect = myVect; return true;};
   bool SetISRHisto( TH1F* histo );
+  bool SetISRPtHisto( TH1F* histo );
   bool SetNeventsHisto( TH1F* histo );
   bool SetFacScaleWeightsHisto( TH1F* histo );
   bool SetPdfWeightsHisto( TH1F* histo );
@@ -65,6 +67,9 @@ private:
   std::string _analysisTag;
   bool _debug;
   bool _info;
+  bool _useGenMet;
+  int _NVtxBinMode; //-1 means no cut; 0: NVtx<20; 1: NVtx >= 20
+  bool _useISRPtCorrection;
   TString processName;
   TString boxName;
 
@@ -103,6 +108,7 @@ private:
   TH1F* SumScaleWeights;
   TH1F* SumPdfWeights;
   TH1F* ISRHist;
+  TH1F* ISRPtHist;
 
   // o u t p u t  r o o t  f i l e
   //------------------------------

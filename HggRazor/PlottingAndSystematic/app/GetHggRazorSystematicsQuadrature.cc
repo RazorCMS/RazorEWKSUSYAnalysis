@@ -13,7 +13,7 @@
 #include "HggRazorSystematics.hh"
 #include "CommandLineInput.hh"
 
-const bool _debug = false;
+const bool _debug = true;
 
 
 
@@ -120,6 +120,19 @@ int main( int argc, char* argv[] )
       return -1;
     } 
   
+  //-----------------
+  //EWK SUSY Signals
+  //-----------------
+  bool isEWKSUSYSignal = false;
+  std::string isEWKSUSYSignalString = ParseCommandLine( argc, argv, "-EWKSUSYSignal=" );
+  if ( isEWKSUSYSignalString == "" )
+    {
+      std::cerr << "[ERROR]: please specify if signal is EWK SUSY Signal. Use --EWKSUSYSignal=<0,1>" << std::endl;
+      return -1;
+    } 
+  if (isEWKSUSYSignalString == "1" || isEWKSUSYSignalString == "true" ) isEWKSUSYSignal = true;
+
+
   //----------------------
   //SigmaMoverM correction
   //----------------------
@@ -178,6 +191,11 @@ int main( int argc, char* argv[] )
   //TString triggerCut = "";
   //TString metFilterCut = "";
 
+  //For fastsim signals, turn off trigger and met filters
+  if (isEWKSUSYSignal) {
+    triggerCut = "";
+    metFilterCut = "";
+  }
 
   if ( analysisTag == "Razor2015_76X" ) 
     {
@@ -336,6 +354,8 @@ int main( int argc, char* argv[] )
       if ( process != "signal" ) assert( SumPdfWeights );     
       TH1F* ISRHist = (TH1F*)fin->Get("NISRJets");
       if ( process == "signal" ) assert( ISRHist );
+      TH1F* ISRPtHist = (TH1F*)fin->Get("PtISR");
+      if ( isEWKSUSYSignal && process == "signal" ) assert( ISRPtHist );
 
       TString tmpName = Form("tmp_%d.root", rand());
       TFile* tmp = new TFile( tmpName , "RECREATE");
@@ -346,7 +366,7 @@ int main( int argc, char* argv[] )
       //---------------------------
       //Create HggSystematic object
       //---------------------------
-      HggRazorSystematics* hggSys = new HggRazorSystematics( cutTree, currentProcess, binCategory, analysisTag, _debug, _debug );
+      HggRazorSystematics* hggSys = new HggRazorSystematics( cutTree, currentProcess, binCategory, analysisTag, _debug, true, false, -1, _debug );
       hggSys->SetLumi(lumi);
       //hggSys->PrintBinning();
       //hggSys->SetBinningMap( binningMap );
@@ -357,6 +377,7 @@ int main( int argc, char* argv[] )
       hggSys->SetFacScaleWeightsHisto( SumScaleWeights );
       hggSys->SetPdfWeightsHisto( SumPdfWeights );
       hggSys->SetISRHisto( ISRHist );
+      if ( isEWKSUSYSignal ) hggSys->SetISRPtHisto( ISRPtHist );
       hggSys->Loop();
       for ( auto tmp: myVectBinning )
 	{
