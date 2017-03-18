@@ -19,7 +19,7 @@ public:
   HggRazorSystematics( );
   HggRazorSystematics( TTree* tree );
   HggRazorSystematics( TTree* tree, TString processName, TString boxName, std::string analysisTag, bool info = false, bool debug = false );
-  HggRazorSystematics( TTree* tree, TString processName, TString boxName, std::string analysisTag, bool info, bool useISRPtCorrection, bool useGenMet, int NVtxBinMode, bool debug );
+  HggRazorSystematics( TTree* tree, TString processName, TString boxName, std::string analysisTag, bool info, bool useISRPtCorrection, bool debug );
   ~HggRazorSystematics( );
 
   void LoadNPVTarget(std::string filename);
@@ -71,8 +71,6 @@ private:
   std::string _analysisTag;
   bool _debug;
   bool _info;
-  bool _useGenMet;
-  int _NVtxBinMode; //-1 means no cut; 0: NVtx<20; 1: NVtx >= 20
   bool _useISRPtCorrection;
   TString processName;
   TString boxName;

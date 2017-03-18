@@ -372,7 +372,7 @@ int main( int argc, char* argv[] )
       //---------------------------
       //Create HggSystematic object
       //---------------------------
-      HggRazorSystematics* hggSys = new HggRazorSystematics( cutTree, currentProcess, binCategory, analysisTag, _debug, isEWKSUSYSignal, false, -1, _debug );
+      HggRazorSystematics* hggSys = new HggRazorSystematics( cutTree, currentProcess, binCategory, analysisTag, _debug, isEWKSUSYSignal, _debug );
       hggSys->SetLumi(lumi);
       //hggSys->PrintBinning();
       //hggSys->SetBinningMap( binningMap );

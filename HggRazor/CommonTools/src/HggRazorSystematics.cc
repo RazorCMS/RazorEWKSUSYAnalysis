@@ -16,7 +16,7 @@ HggRazorSystematics::HggRazorSystematics( TTree* tree ) : HggTree( tree ), _info
 
 };
 
-HggRazorSystematics::HggRazorSystematics( TTree* tree, TString processName, TString boxName, std::string analysisTag, bool info, bool debug ) : HggTree( tree ), _analysisTag(analysisTag), _info( info ), _useISRPtCorrection(false), _useGenMet( false ), _NVtxBinMode( -1 ), _debug( debug )
+HggRazorSystematics::HggRazorSystematics( TTree* tree, TString processName, TString boxName, std::string analysisTag, bool info, bool debug ) : HggTree( tree ), _analysisTag(analysisTag), _info( info ), _useISRPtCorrection(false), _debug( debug )
 {
   //processName
   if ( processName == "" )
@@ -40,7 +40,7 @@ HggRazorSystematics::HggRazorSystematics( TTree* tree, TString processName, TStr
 };
 
 
-HggRazorSystematics::HggRazorSystematics( TTree* tree, TString processName, TString boxName, std::string analysisTag, bool info, bool useISRPtCorrection, bool useGenMet, int NVtxBinMode, bool debug ) : HggTree( tree ), _analysisTag(analysisTag), _info( info ), _useISRPtCorrection(useISRPtCorrection), _useGenMet( useGenMet), _NVtxBinMode(NVtxBinMode), _debug( debug )
+HggRazorSystematics::HggRazorSystematics( TTree* tree, TString processName, TString boxName, std::string analysisTag, bool info, bool useISRPtCorrection, bool debug ) : HggTree( tree ), _analysisTag(analysisTag), _info( info ), _useISRPtCorrection(useISRPtCorrection), _debug( debug )
 {
   //processName
   if ( processName == "" )
@@ -424,13 +424,6 @@ void HggRazorSystematics::Loop()
       }
 
 
-      //Make NVtx bin selection for pileup systematics estimation
-      if (_NVtxBinMode == 0) {
-      	if (!(nPV < 20)) continue;
-      } else if (_NVtxBinMode == 1) {
-      	if (!(nPV >= 20)) continue;
-      }
-
       double ISRCorrValue = 1.0;
       if( this->processName == "signal" ) {
 	if (!_useISRPtCorrection) {
@@ -460,7 +453,6 @@ void HggRazorSystematics::Loop()
 	}
       
       double myRsq = t1Rsq;
-      if(_useGenMet) myRsq = genMetRsq;
 
       h2p->Fill( MR, fmin(myRsq,0.999), commonW );	      
       h2p_Err->Fill( MR, fmin(myRsq,0.999), commonW*commonW );
