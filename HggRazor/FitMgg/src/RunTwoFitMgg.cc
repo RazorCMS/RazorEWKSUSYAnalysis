@@ -1946,7 +1946,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
       //Signal Systematics
       //----------------------------------
       ctr = 0;
-      for( int isys = 0; isys < totalSys; isys++ )
+      for( int isys = 0; isys < signal_sys.size(); isys++ )
 	{
 	  if ( isys == 0 )
 	    {
@@ -1971,7 +1971,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
 	      //ofs << "Signal_facRenScale_bin" << combinedBinNumber << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
 	      ofs << "Signal_facRenScale" << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
 	    }
-	  else if ( isys > 9 )
+	  else if ( isys >= 10 && isys <= 69 )
 	    {
 	      //--------------------
 	      //No signal PDF systematic as SUSY group prescription
@@ -1979,6 +1979,21 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
 	      //ofs << "Signal_pdf" << ctr << "\t\t\tlnN\t\t" << signal_sys.at(isys) << "\t\t-\t\t-\n";
 	      ctr++;
 	    }
+	  else if ( isys == 70 ) 
+	    {
+	      if (signal_sys.at(isys) != 1.0) {
+		ofs << "Signal_FastsimMet" << "\t\t\tlnN\t\t" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	      }
+	    }
+	  else if ( isys == 71 ) 
+	    {
+	      if (signal_sys.at(isys) != 1.0) {
+		ofs << "Signal_FastsimPileup" << "\t\t\tlnN\t\t" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	      }
+	    } 
+	  else {
+	    //Weird: more than expected
+	  }
 	}
       
       if ( category == "hzbb" )

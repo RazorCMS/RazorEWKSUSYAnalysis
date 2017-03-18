@@ -216,7 +216,7 @@ int main( int argc, char* argv[] )
       // next is the signal yield
       ifs >> Signal;
       // the next 70 items are the systematics on the signal (put in quotes, separated by spaces)
-      for ( int i = 0; i < 70; i++ )
+      for ( int i = 0; i < 72; i++ )
 	{
 	  ifs >> SIGNAL_SYS;
 	  if ( SIGNAL_SYS == "nan" || SIGNAL_SYS == "-nan" || SIGNAL_SYS == "inf"  || SIGNAL_SYS == "-inf" ) SIGNAL_SYS_F = 0;
@@ -276,7 +276,6 @@ int main( int argc, char* argv[] )
 	      ifs2 >> Signal2;
 	      // the next 70 items are the systematics on the signal (put in quotes, separated by spaces)
 	      for ( int i = 0; i < 70; i++ ) {
-	      //for ( int i = 0; i < 68; i++ ) {
 		ifs2 >> SIGNAL_SYS;
 		if ( SIGNAL_SYS == "nan" || SIGNAL_SYS == "-nan" || SIGNAL_SYS == "inf"  || SIGNAL_SYS == "-inf" ) SIGNAL_SYS_F = 0;
 		else SIGNAL_SYS_F = atof( SIGNAL_SYS.c_str() );
@@ -306,8 +305,8 @@ int main( int argc, char* argv[] )
       for (int i=0; i<sig_sys.size()-1; i++) {
 	Signal_sys << sig_sys[i] << " ";
       }
-      Signal_sys << sig_sys[smh_sys.size()-1] << "\"";
-      
+      Signal_sys << sig_sys[sig_sys.size()-1] << "\"";
+
       Bkg_f1 = "singleExp";
       Bkg_f1 = mapBinNumberToBin[binNumber].f1;
       
