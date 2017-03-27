@@ -959,7 +959,7 @@ float GetNbkg( std::string fname, std::string f1, int bin, bool _err, std::strin
       TString pdf = MakePoly3NE( Form("%s_Bkg_bin%d",f1.c_str(),realBin), mgg, *ws );
       ws->var( pdf + "_p0" )->setVal( p0->getVal() );
       ws->var( pdf + "_p1" )->setVal( p1->getVal() );
-      ws->var( pdf + "_p2" )->setVal( p1->getVal() );
+      ws->var( pdf + "_p2" )->setVal( p2->getVal() );
       ws->var( pdf + "_pC" )->setVal( pC->getVal() );
       RooAbsReal* igx = ws->pdf( pdf )->createIntegral(mgg);
       //std::cout << Nbkg->getVal() << " +/- " << Nbkg->getError() << std::endl;

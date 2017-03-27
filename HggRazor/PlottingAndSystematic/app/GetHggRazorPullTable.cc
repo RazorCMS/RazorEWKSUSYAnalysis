@@ -211,7 +211,7 @@ int main( int argc, char* argv[] )
       // Use Cristian's Formula for postfit (b-only) SMH contribution
       //-------------------------------------------------------------
       //float smh_pf_theory = (Nobs/(Nobs+NsmhErr*NsmhErr))*Nsmh + (NsmhErr*NsmhErr/(Nobs+NsmhErr*NsmhErr))*(Nobs-Nbkg);
-      Nobs = Ns + Nbkg + Nsmh_sb;
+      //Nobs = Ns + Nbkg + Nsmh_sb;
       float smh_pf_theory = (Nobs/(Nobs+NsmhErr*NsmhErr))*Nsmh + (NsmhErr*NsmhErr/(Nobs+NsmhErr*NsmhErr))*(Nobs-Nbkg);
       //std::cout << "bin" << bin << " " << Nobs << " " << Ns + Nbkg + Nsmh_pf << std::endl;
       
@@ -223,7 +223,7 @@ int main( int argc, char* argv[] )
       limit->SetBranchAddress( "limit", &_limit );
       limit->GetEntry(0);
       delete fsigma;
-      TString line = Form("%d & %s & %.1f & %.1f  & %.1f\\\\",
+      TString line = Form("%d & %s & %.4f & %.4f  & %.4f\\\\",
 			  myMap2[ss.str()].bin, categoryMode.c_str(), Nsmh, Nsmh_pf, smh_pf_theory );
       
       std::cout << line << std::endl;
@@ -382,7 +382,7 @@ float GetNbkg( std::string fname, std::string f1, int bin, bool _err, std::strin
   RooFit::PrintLevel(5);
   RooMsgService::instance().setGlobalKillBelow(RooFit::FATAL);
   TFile* fin = TFile::Open( fname.c_str(), "READ");
-  RooFitResult* fit_r = (RooFitResult*)fin->Get("fit_s");
+  RooFitResult* fit_r = (RooFitResult*)fin->Get("fit_b");
   /*fin = TFile::Open( "/Users/cmorgoth/Work/git/RazorEWKSUSYAnalysis/HggRazor/FitMgg/MaxLikelihoodFits/sb300_lsp1_unblinded_6p3ifb_Fixed/HggRazorWorkspace_bin8.root", "READ");
   RooWorkspace* myws = (RooWorkspace*)fin->Get("combineWS");
   RooRealVar* mymgg = (RooRealVar*)myws->var("mGammaGamma_bin8");
@@ -405,7 +405,7 @@ float GetNbkg( std::string fname, std::string f1, int bin, bool _err, std::strin
   mgg.setMax( 160. );
   mgg.setUnit( "GeV" );
   mgg.setBins(57);
-  mgg.setRange( "signal", 122, 129. );
+  mgg.setRange( "signal", 122., 129. );
   mgg.setRange( "high", 135., 160. );
   mgg.setRange( "low", 103., 120. );
   mgg.setRange( "full", 103., 160. );
@@ -427,9 +427,10 @@ float GetNbkg( std::string fname, std::string f1, int bin, bool _err, std::strin
       
       TString pdf = MakeSingleExpNE( Form("%s_Bkg_bin%d",f1.c_str(),realBin), mgg, *ws );
       ws->var( pdf + "_a" )->setVal( alpha->getVal() );
-      RooAbsReal* igx = ws->pdf( pdf )->createIntegral(mgg);
+      RooAbsReal* igx = ws->pdf( pdf )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("Full"));
       //std::cout << Nbkg->getVal() << " +/- " << Nbkg->getError() << std::endl;
       RooAbsReal* igx_sig = ws->pdf( pdf )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("signal"));
+      std::cout << "bin" <<  bin << "alpha: " << alpha->getVal() << " Nbkg: " << Nbkg->getVal() << " total int: " << igx->getVal() << " window: " << igx_sig->getVal() << std::endl;
       //std::cout << Nbkg->getVal()*igx_sig->getVal() << " +/- " << Nbkg->getError()*igx_sig->getVal() << std::endl;
       if ( _err ) {
         return GetErrorFromToys( ws, fit_r, pdf, 10000, realBin );
@@ -522,12 +523,13 @@ float GetNbkg( std::string fname, std::string f1, int bin, bool _err, std::strin
       TString pdf = MakePoly3NE( Form("%s_Bkg_bin%d",f1.c_str(),realBin), mgg, *ws );
       ws->var( pdf + "_p0" )->setVal( p0->getVal() );
       ws->var( pdf + "_p1" )->setVal( p1->getVal() );
-      ws->var( pdf + "_p2" )->setVal( p1->getVal() );
+      ws->var( pdf + "_p2" )->setVal( p2->getVal() );
       ws->var( pdf + "_pC" )->setVal( pC->getVal() );
-      RooAbsReal* igx = ws->pdf( pdf )->createIntegral(mgg);
+      RooAbsReal* igx = ws->pdf( pdf )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("Full"));
       //std::cout << Nbkg->getVal() << " +/- " << Nbkg->getError() << std::endl;
       RooAbsReal* igx_sig = ws->pdf( pdf )->createIntegral(mgg, RooFit::NormSet(mgg), RooFit::Range("signal"));
       //std::cout << Nbkg->getVal()*igx_sig->getVal() << " +/- " << Nbkg->getError()*igx_sig->getVal() << std::endl;
+      std::cout << "bin" <<  bin << " Nbkg: " << Nbkg->getVal() << " total int: " << igx->getVal() << " window: " << igx_sig->getVal() << std::endl;
       if ( _err ) {
         return GetErrorFromToys( ws, fit_r, pdf, 10000, realBin );
       }
