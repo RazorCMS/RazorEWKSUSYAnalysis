@@ -8,6 +8,7 @@
 #include <TH2F.h>
 #include <TString.h>
 #include <TH2Poly.h>
+#include <TGraphErrors.h>
 //LOCAL INCLUDES
 #include "HggTree.hh"
 #include "HggAux.hh"
@@ -18,8 +19,10 @@ public:
   HggRazorSystematics( );
   HggRazorSystematics( TTree* tree );
   HggRazorSystematics( TTree* tree, TString processName, TString boxName, std::string analysisTag, bool info = false, bool debug = false );
+  HggRazorSystematics( TTree* tree, TString processName, TString boxName, std::string analysisTag, bool info, bool useISRPtCorrection, bool debug );
   ~HggRazorSystematics( );
 
+  void LoadNPVTarget(std::string filename);
   bool InitMrRsqTH2Poly( int mode = 0 );
   void Loop();
   void LoopNominal();
@@ -35,6 +38,7 @@ public:
   TH2Poly* GetNominalTH2Poly( ){ return this->h2p; };
   float GetNominalYield( float mr, float rsq );
   float GetNominalError( float mr, float rsq );
+  float GetGenMetSystematic( float mr, float rsq );
   float GetEff( float mr, float rsq );
   
   std::pair<float, float> GetISRSystematic( float mr, float rsq );
@@ -50,6 +54,8 @@ public:
   bool SetBinningMap( std::map<std::pair<float, float>, std::vector<float>> myMap ){ this->binningMap = myMap; return true;};
   bool SetBinningVector( std::vector<float*> myVect ){ this->binningVect = myVect; return true;};
   bool SetISRHisto( TH1F* histo );
+  bool SetISRPtHisto( TH1F* histo );
+  bool SetNPVHisto( TH1F* histo );
   bool SetNeventsHisto( TH1F* histo );
   bool SetFacScaleWeightsHisto( TH1F* histo );
   bool SetPdfWeightsHisto( TH1F* histo );
@@ -65,6 +71,7 @@ private:
   std::string _analysisTag;
   bool _debug;
   bool _info;
+  bool _useISRPtCorrection;
   TString processName;
   TString boxName;
 
@@ -97,12 +104,23 @@ private:
   //Mistag
   TH2Poly* h2p_misstagUp;
   TH2Poly* h2p_misstagDown;
-  
+  //GenMet
+  TH2Poly* h2p_genMet;
+  //Pileup
+  TH2Poly* h2p_pileupLowNPV;
+  TH2Poly* h2p_pileupHighNPV;
+  TH2Poly* h2p_pileupLowNPVErrSqr;
+  TH2Poly* h2p_pileupHighNPVErrSqr;
+
+
   //Systematic Histos(user must set these)
   TH1F* NEvents;
   TH1F* SumScaleWeights;
   TH1F* SumPdfWeights;
   TH1F* ISRHist;
+  TH1F* ISRPtHist;
+  TH1F* NPVHist;
+  TH1F* NPVTarget;
 
   // o u t p u t  r o o t  f i l e
   //------------------------------
