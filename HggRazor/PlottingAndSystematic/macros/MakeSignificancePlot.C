@@ -175,7 +175,7 @@ void MakeSignificancePlot( int option = 0) {
   tex->SetTextFont(42);
   tex->SetTextColor(kBlack);
   tex->DrawLatex(0.7, 0.92, "35.9 fb^{-1} (13 TeV)");
-  tex->DrawLatex(0.4, 0.92, "Razor H#rightarrow#gamma#gamma Search");
+  //tex->DrawLatex(0.4, 0.92, "Razor H#rightarrow#gamma#gamma Search");
   tex->Draw();
   
   TLatex *CMSLabel = new TLatex();
