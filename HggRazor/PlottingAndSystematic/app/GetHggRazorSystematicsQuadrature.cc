@@ -279,7 +279,9 @@ int main( int argc, char* argv[] )
   TH2Poly* misstagUpS   = new TH2Poly("misstagUpS", "", 150, 10000, 0, 1 );//signal
   TH2Poly* misstagDownS = new TH2Poly("misstagDownS", "", 150, 10000, 0, 1 );//signal
   
-  
+  TH2Poly* genMetS = new TH2Poly("genMet_Signal", "", 150, 10000, 0, 1 );//signal
+  TH2Poly* pileupS = new TH2Poly("pileup_Signal", "", 150, 10000, 0, 1 );//signal
+
   TH2Poly* pdf[60];
   TH2Poly* pdfS[60];
   for ( int i = 0; i < 60; i++ )
@@ -328,6 +330,8 @@ int main( int argc, char* argv[] )
 	  pdf[i]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
 	  pdfS[i]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
 	}
+      genMetS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+      pileupS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
     }
     
   std::string process, rootFileName;
@@ -356,6 +360,8 @@ int main( int argc, char* argv[] )
       if ( process == "signal" ) assert( ISRHist );
       TH1F* ISRPtHist = (TH1F*)fin->Get("PtISR");
       if ( isEWKSUSYSignal && process == "signal" ) assert( ISRPtHist );
+      TH1F* NPVHist = (TH1F*)fin->Get("NPV");
+      if ( isEWKSUSYSignal && process == "signal" ) assert( NPVHist );
 
       TString tmpName = Form("tmp_%d.root", rand());
       TFile* tmp = new TFile( tmpName , "RECREATE");
@@ -366,7 +372,7 @@ int main( int argc, char* argv[] )
       //---------------------------
       //Create HggSystematic object
       //---------------------------
-      HggRazorSystematics* hggSys = new HggRazorSystematics( cutTree, currentProcess, binCategory, analysisTag, _debug, true, false, -1, _debug );
+      HggRazorSystematics* hggSys = new HggRazorSystematics( cutTree, currentProcess, binCategory, analysisTag, _debug, isEWKSUSYSignal, _debug );
       hggSys->SetLumi(lumi);
       //hggSys->PrintBinning();
       //hggSys->SetBinningMap( binningMap );
@@ -377,6 +383,8 @@ int main( int argc, char* argv[] )
       hggSys->SetFacScaleWeightsHisto( SumScaleWeights );
       hggSys->SetPdfWeightsHisto( SumPdfWeights );
       hggSys->SetISRHisto( ISRHist );
+      hggSys->SetNPVHisto( NPVHist );
+      hggSys->LoadNPVTarget("root://eoscms:///eos/cms/store/group/phys_susy/razor/Run2Analysis/ScaleFactors/PileupWeights/NPVTarget_2016.root");
       if ( isEWKSUSYSignal ) hggSys->SetISRPtHisto( ISRPtHist );
       hggSys->Loop();
       for ( auto tmp: myVectBinning )
@@ -427,6 +435,11 @@ int main( int argc, char* argv[] )
 		  pdfS[ipdf]->SetBinContent( bin, hggSys->GetPdfSystematic( ipdf, tmp[0], tmp[1] ) );
 		  //pdfS[ipdf]->SetBinContent( bin, 0 );		 
 		}
+
+	      genMetS->SetBinContent( bin, hggSys->GetGenMetSystematic( tmp[0], tmp[1] ) );
+	      pileupS->SetBinContent( bin, hggSys->GetNominalError( tmp[0], tmp[1] ) );
+
+
 	    }
 	  else
 	    {
@@ -553,6 +566,9 @@ int main( int argc, char* argv[] )
 	 + pow( (fabs(renScaleUp->GetBinContent( bin )) + fabs(renScaleDown->GetBinContent( bin )))/2,2) 
 	 + pow( (fabs(facRenScaleUp->GetBinContent( bin )) + fabs(facRenScaleDown->GetBinContent( bin )))/2,2);
 
+       genMetS->SetBinContent( bin, genMetS->GetBinContent( bin )/nomS );
+       pileupS->SetBinContent( bin, pileupS->GetBinContent( bin )/nomS );
+
        for( int ipdf = 0; ipdf < 60; ipdf++ )
 	 {
 	   pdf[ipdf]->SetBinContent( bin, pdf[ipdf]->GetBinContent( bin )/nom );
@@ -585,8 +601,19 @@ int main( int argc, char* argv[] )
 	   //pdf[ipdf]->SetBinContent( bin, pdf[ipdf]->GetBinContent( bin )/nom );
 	   //pdf[ipdf]->SetBinContent( bin, 0 ); //zero out pdf uncertainties for signal for now
 	   if ( ipdf < 59 ) outf << pdfS[ipdf]->GetBinContent( bin )/nomS << "\t";
-	   else outf << pdfS[ipdf]->GetBinContent( bin )/nomS << "\n";
+	   else outf << pdfS[ipdf]->GetBinContent( bin )/nomS << "\t";
 	 }
+
+       //genMet systematics
+       if ( isEWKSUSYSignal ) {
+	 outf << genMetS->GetBinContent( bin ) << "\t";
+	 outf << pileupS->GetBinContent( bin ) << "\t";
+       } else {
+	 outf << "0.0" << "\t";
+	 outf << "0.0" << "\t";
+       }
+       
+       outf << "\n";
       
        std::cout << "Bin : " << bin << " " << tmp[0] << " " << tmp[1] << " " << tmp[2] << " " << tmp[3] << " : "
 	    << nom << " +/- " << 100*sqrt(totalFractionalUncertaintySqr) << "%\n";
@@ -610,7 +637,7 @@ int main( int argc, char* argv[] )
    btagDown->Write("btagDown");
    misstagUp->Write("misstagUp");
    misstagDown->Write("misstagDown");
-   for( int ipdf = 0; ipdf < 60; ipdf++ ) pdf[ipdf]->Write();
+  for( int ipdf = 0; ipdf < 60; ipdf++ ) pdf[ipdf]->Write();
    sF->Close();
    
    return 0;

@@ -868,9 +868,7 @@ TString MakePoly3NE(TString tag, RooRealVar& mgg,RooWorkspace& w)
   p1->setConstant(kFALSE);
   RooRealVar *p2 = new RooRealVar(tag+"_pol3_p2","p_2",5,"");
   p2->setConstant(kFALSE);
-  RooRealVar *Nbkg   = new RooRealVar(tag+"_pol3_Nbkg","N_{bkg}",10,"events");
-  Nbkg->setConstant(kFALSE);
-  
+    
   RooFormulaVar *pCmod = new RooFormulaVar(tag+"_pol3_pCmod","@0*@0",*pC);
   RooFormulaVar *p0mod = new RooFormulaVar(tag+"_pol3_p0mod","@0*@0",*p0);
   RooFormulaVar *p1mod = new RooFormulaVar(tag+"_pol3_p1mod","@0*@0",*p1);

@@ -73,10 +73,10 @@ void MakeSignificancePlot( int option = 0) {
     //hbb category  
     y[9] = 1.0;
     //highres category
-    y[10] = -0.1;
+    y[10] = -0.2;
     y[11] = 0.1;
     y[12] = -0.6;
-    y[13] = 0.3;
+    y[13] = 0.2;
     y[14] = 0.2;
 
   } else if (option == 1) {
@@ -175,7 +175,7 @@ void MakeSignificancePlot( int option = 0) {
   tex->SetTextFont(42);
   tex->SetTextColor(kBlack);
   tex->DrawLatex(0.7, 0.92, "35.9 fb^{-1} (13 TeV)");
-  tex->DrawLatex(0.4, 0.92, "Razor H#rightarrow#gamma#gamma Search");
+  //tex->DrawLatex(0.4, 0.92, "Razor H#rightarrow#gamma#gamma Search");
   tex->Draw();
   
   TLatex *CMSLabel = new TLatex();
@@ -185,7 +185,7 @@ void MakeSignificancePlot( int option = 0) {
   CMSLabel->SetTextColor(kBlack);
   CMSLabel->DrawLatex(0.1,0.92,"#bf{CMS}");
   CMSLabel->SetTextSize(0.045);
-  CMSLabel->DrawLatex(0.19,0.92,"Preliminary");
+  //CMSLabel->DrawLatex(0.19,0.92,"Preliminary");
   CMSLabel->Draw();
 
 

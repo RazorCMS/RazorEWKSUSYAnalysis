@@ -17,20 +17,23 @@ TARGET1 = TestSystematics
 TARGET2 = CloneTChiWH
 TARGET3 = CloneTChiHH
 TARGET4 = CloneTChiZH
+TARGET5 = PutLabelCMS
 
 SRC  = app/FitMgg.cc src/SusyHggMggFit.cc
 SRC1 = test/TestHggRazorSystematics.cc src/HggRazorSystematics.cc src/HggTree.cc src/HggAux.cc
 SRC2  = app/CloneTChiWH.cc
 SRC3  = app/CloneTChiHH.cc
 SRC4  = app/CloneTChiZH.cc
+SRC5  = app/PutLabelCMS.cc
 
 OBJ = $(SRC:.cc=.o)
 OBJ1 = $(SRC1:.cc=.o)
 OBJ2 = $(SRC2:.cc=.o)
 OBJ3 = $(SRC3:.cc=.o)
 OBJ4 = $(SRC4:.cc=.o)
+OBJ5 = $(SRC5:.cc=.o)
 
-all : $(TARGET) $(TARGET2) $(TARGET3) $(TARGET4)
+all : $(TARGET) $(TARGET2) $(TARGET3) $(TARGET4) $(TARGET5)
 
 $(TARGET) : $(OBJ)
 	$(LD) $(CPPFLAGS) -o $(TARGET) $(OBJ) $(LDFLAGS)
@@ -58,6 +61,12 @@ $(TARGET3) : $(OBJ3)
 
 $(TARGET4) : $(OBJ4)
 	$(LD) $(CPPFLAGS) -o $(TARGET4) $(OBJ4) $(LDFLAGS)
+	@echo $
+	@echo $<
+	@echo $^
+
+$(TARGET5) : $(OBJ5)
+	$(LD) $(CPPFLAGS) -o $(TARGET5) $(OBJ5) $(LDFLAGS)
 	@echo $
 	@echo $<
 	@echo $^
