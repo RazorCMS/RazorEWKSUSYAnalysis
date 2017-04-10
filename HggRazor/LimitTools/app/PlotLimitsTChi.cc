@@ -119,9 +119,9 @@ int main( int argc, char** argv )
 	  //	  std::cout << "fname: " << fname << std::endl;
 	  TFile* fin = new TFile( fname.c_str(), "READ" );
 	  if ( fin->IsZombie() ) continue;
-	  int low = fname.find("March20/");
+	  int low = fname.find("April8/");
 	  int high = fname.find("_Asymptotic.root");
-	  std::string mass = fname.substr( low+8, high-(low+8) );
+	  std::string mass = fname.substr( low+7, high-(low+7) );
 	  float _mass = atof( mass.c_str() );
 	  std::cout << "mass: " << _mass << std::endl;
 	  TTree* tree = (TTree*)fin->Get("limit");
@@ -175,7 +175,7 @@ int main( int argc, char** argv )
       //<< tmp.second.obs << std::endl;
 
 
-      std::cout << "mass: " << tmp.first << " xsec: " << xsecMap[tmp.first].first << std::endl;
+      std::cout << "mass: " << tmp.first << " " << tmp.second.exp0p5 << " xsec: " << xsecMap[tmp.first].first << std::endl;
       x[ctr]      = tmp.first;
       obsL[ctr]   = tmp.second.obs;
       expL[ctr]   = tmp.second.exp0p5;
@@ -267,8 +267,8 @@ int main( int argc, char** argv )
   gTwoS->GetYaxis()->SetTitle("#sigma^{95%}_{excl} [pb]");
 
   //gTwoS->GetYaxis()->SetRangeUser(0,20.6);
-  gTwoS->GetYaxis()->SetRangeUser(0,9);
-  gTwoS->GetXaxis()->SetRangeUser(125,400);
+  gTwoS->GetYaxis()->SetRangeUser(0,20);
+  gTwoS->GetXaxis()->SetRangeUser(120,400);
   
   gTwoS->Draw("AFC");
   gOneS->Draw("FC");

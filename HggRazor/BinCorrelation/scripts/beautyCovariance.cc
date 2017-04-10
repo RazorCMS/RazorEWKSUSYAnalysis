@@ -1,21 +1,22 @@
 {
+  
   gROOT->Reset();
   gStyle->SetPaintTextFormat(".1f");
   TFile* fin = new TFile("histos_correlation.root");
-  //TH1F* h = (TH1F*)fin->Get("corr");
-  TH1F* h = (TH1F*)fin->Get("cov");
+  TH1F* h = (TH1F*)fin->Get("corr");
+  //TH1F* h = (TH1F*)fin->Get("cov");
   
   h->SetStats(0);
   //h->SetTitle("Background Covariance Matrix");
   //h->SetTitle("Background Correlation Matrix");
   h->SetTitle("");
-  //corr->SetMinimum(-1);
-  //corr->SetMaximum(1);
-  h->SetMinimum(-4000);
-  h->SetMaximum(4000);
+  h->SetMinimum(-1);
+  h->SetMaximum(1);
+  //h->SetMinimum(-4000);
+  //h->SetMaximum(4000);
   gStyle->SetPaintTextFormat(".1f");
-  corr->SetMinimum(-4000);
-  corr->SetMaximum(4000);
+  //corr->SetMinimum(-4000);
+  //corr->SetMaximum(4000);
   //x-axis labels
   h->GetXaxis()->SetBinLabel( 1 , "Bin 0");
   h->GetXaxis()->SetBinLabel( 2 , "Bin 1");
@@ -57,8 +58,8 @@
   h->GetYaxis()->SetBinLabel( 17 , "Bin 11 LowRes");
   h->GetYaxis()->SetBinLabel( 18 , "Bin 12 LowRes");
   h->GetYaxis()->SetBinLabel( 19 , "Bin 13 LowRes");
-   corr->SetMinimum(-4000);
-   corr->SetMaximum(4000);
+  //corr->SetMinimum(-4000);
+  //corr->SetMaximum(4000);
   h->Draw("colz+text");
 
   const float lumi = 5;
@@ -120,7 +121,9 @@
   latex.DrawLatex(extrax, extray, extraText);
   
   TFile* fout = new TFile("CorrelationMatrixHggRazor.root", "Recreate");
-  h->Write("covariance");
+  h->Write("correlation");
+  //TFile* fout = new TFile("CovarianceMatrixHggRazor.root", "Recreate");
+  //h->Write("covariance");
   fout->Close();
   
 }
