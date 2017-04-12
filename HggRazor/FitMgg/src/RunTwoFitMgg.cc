@@ -1911,26 +1911,26 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
 	{
 	  if ( isys == 0 )
 	    {
-	      ofs << "SMH_JES\t\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	      if ( fabs(smh_sys.at(isys+1) - 1.0) > 0.0001 ) ofs << "SMH_JES\t\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
 	    }
 	  else if ( isys == 2 )
 	    {
 	      //ofs << "SMH_facScale_bin" << combinedBinNumber << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
-	      ofs << "SMH_facScale_bin" << combinedBinNumber << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "\t\t-\n";
+	      if ( fabs(smh_sys.at(isys+1) - 1.0) > 0.0001 ) ofs << "SMH_facScale" << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "\t\t-\n";
 	    }
 	  else if ( isys == 4 )
 	    {
 	      //ofs << "SMH_renScale_bin" << combinedBinNumber << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
-	      ofs << "SMH_renScale_bin" << combinedBinNumber << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "\t\t-\n";
-	    }
+	       if ( fabs(smh_sys.at(isys+1) - 1.0) > 0.0001 ) ofs << "SMH_renScale" << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "\t\t-\n";
+	    } 
 	  else if ( isys == 6 )
 	    {
 	      //ofs << "SMH_facRenScale_bin" << combinedBinNumber << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
-	      ofs << "SMH_facRenScale_bin" << combinedBinNumber << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "\t\t-\n";
+	      if ( fabs(smh_sys.at(isys+1) - 1.0) > 0.0001 ) ofs << "SMH_facRenScale" << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "\t\t-\n";
 	    }
 	  else if ( isys > 7 )
 	    {
-	      ofs << "SMH_pdf" << ctr << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys) << "\t\t-\n";
+	      if ( fabs(smh_sys.at(isys) - 1.0) > 0.0001 ) ofs << "SMH_pdf" << ctr << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys) << "\t\t-\n";
 	      ctr++;
 	    }
 	}
@@ -1950,26 +1950,26 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
 	{
 	  if ( isys == 0 )
 	    {
-	      ofs << "Signal_JES\t\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	      if ( fabs(signal_sys.at(isys) - 1.0) > 0.0001 && fabs(signal_sys.at(isys+1) - 1.0) > 0.0001 ) ofs << "Signal_JES\t\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
 	    }
 	  else if ( isys == 2 )
 	    {
-	      ofs << "Signal_ISR\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	      if ( fabs(signal_sys.at(isys) - 1.0) > 0.0001 && fabs(signal_sys.at(isys+1) - 1.0) > 0.0001 ) ofs << "Signal_ISR\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
 	    }
 	  else if ( isys == 4 )
 	    {
 	      //ofs << "Signal_facScale_bin" << combinedBinNumber << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
-	      ofs << "Signal_facScale" << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	      if ( fabs(signal_sys.at(isys) - 1.0) > 0.0001 && fabs(signal_sys.at(isys+1) - 1.0) > 0.0001 ) ofs << "Signal_facScale" << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
 	    }
 	  else if ( isys == 6 )
 	    {
 	      //ofs << "Signal_renScale_bin" << combinedBinNumber << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
-	      ofs << "Signal_renScale" << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	      if ( fabs(signal_sys.at(isys) - 1.0) > 0.0001 && fabs(signal_sys.at(isys+1) - 1.0) > 0.0001 ) ofs << "Signal_renScale" << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
 	    }
 	  else if ( isys == 8 )
 	    {
 	      //ofs << "Signal_facRenScale_bin" << combinedBinNumber << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
-	      ofs << "Signal_facRenScale" << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	      if ( fabs(signal_sys.at(isys) - 1.0) > 0.0001 && fabs(signal_sys.at(isys+1) - 1.0) > 0.0001 ) ofs << "Signal_facRenScale" << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
 	    }
 	  else if ( isys >= 10 && isys <= 69 )
 	    {

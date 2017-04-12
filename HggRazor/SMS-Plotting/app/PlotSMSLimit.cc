@@ -75,21 +75,35 @@ int main( int argc, char* argv[] )
   //-------------------
   //T2bH settings
   //-------------------
-  double maxY = 725;
-  double maxX = 725;
-  double minY = -25;
-  double minX = -25;
-  double binWidthX = 50.;
-  double binWidthY = 50.;
+  
+  /*
+    double maxY = 725;
+    double maxX = 725;
+    double minY = -25;
+    double minX = -25;
+    double binWidthX = 50.;
+    double binWidthY = 50.;
+    int nbinsX = (int)(maxX-minX)/binWidthX;
+    int nbinsY = (int)(maxY-minY)/binWidthY;
+  */
+  
+  //-------------------
+  //T2bH settings Trick
+  //-------------------
+  /*
+  double maxY = 750;
+  double maxX = 750;
+  double minY = -50;
+  double minX = -50;
+  double binWidthX = 100.;
+  double binWidthY = 100.;
   int nbinsX = (int)(maxX-minX)/binWidthX;
   int nbinsY = (int)(maxY-minY)/binWidthY;
-  
-
+  */
   
   //-------------------
   //TChiWH settings
   //-------------------
-  /*
   double maxY = 712.5;
   double maxX = 712.5;
   double minY = -12.5;
@@ -98,8 +112,8 @@ int main( int argc, char* argv[] )
   double binWidthY = 25.;
   int nbinsX = (int)(maxX-minX)/binWidthX;
   int nbinsY = (int)(maxY-minY)/binWidthY;
-  */
   
+
   TH2F* h2_limit     = new TH2F("h2_limit", "", nbinsX, minX, maxX, nbinsY, minY, maxY);
   TH2F* h2_limit_exp = new TH2F("h2_limit_exp", "", nbinsX, minX, maxX, nbinsY, minY, maxY);
   TH2F* h2_limit_exp_up = new TH2F("h2_limit_exp_up", "", nbinsX, minX, maxX, nbinsY, minY, maxY);

@@ -24,8 +24,6 @@ TARGET5 = GetHggRazorSystematicsQuadrature
 TARGET6 = GetHggRazorSMH_BkgTable 
 TARGET7 = GetHggRazorSMHeff
 TARGET8 = GetHggRazorSMH_BkgTableVar
-#TARGETA = CalStyleRemix
-#TARGETB = CompareHggMC
 TARGET9 = CompareHggVariables
 TARGET12 = GetSigmaMoverM_Correction
 TARGET13 = GetHggRazorSystematicsQuadratureFaster
@@ -42,8 +40,6 @@ SRC5 = app/GetHggRazorSystematicsQuadrature.cc $(CommonTools)/src/HggRazorSystem
 SRC6 = app/GetHggRazorSMH_BkgTable.cc $(CommonTools)/src/HggRazorSystematics.cc $(CommonTools)/src/HggTree.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc $(FitTools)/src/DefinePdfs.cc
 SRC7 = app/GetHggRazorSMHeff.cc $(CommonTools)/src/HggRazorSystematics.cc $(CommonTools)/src/HggTree.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc $(FitTools)/src/DefinePdfs.cc
 SRC8 = app/GetHggRazorSMH_BkgTableVar.cc $(CommonTools)/src/HggRazorSystematics.cc $(CommonTools)/src/HggTree.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc $(FitTools)/src/DefinePdfs.cc
-#SRCA =src/CalStyleRemix.cc
-#SRCB =src/CompareHggMC.cc src/CalStyleRemix.cc
 SRC9 = app/CompareHggVariables.cc src/CompareHggMC.cc src/CalStyleRemix.cc
 SRC12 = app/GetSigmaMoverM_Correction.cc $(CommonTools)/src/HggTree.cc $(Selection)/src/HggRazorClass.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc $(Aux)/src/TChainTools.cc $(Aux)/src/PlotCosmetics.cc
 SRC13 = app/GetHggRazorSystematicsQuadratureFaster.cc $(CommonTools)/src/HggRazorSystematics.cc $(CommonTools)/src/HggTree.cc $(CommonTools)/src/HggAux.cc $(Aux)/src/CommandLineInput.cc
@@ -60,8 +56,6 @@ OBJ5 = $(SRC5:.cc=.o)
 OBJ6 = $(SRC6:.cc=.o)
 OBJ7 = $(SRC7:.cc=.o)
 OBJ8 = $(SRC8:.cc=.o)
-#OBJA = $(SRCA:.cc=.o) 
-#OBJB = $(SRCB:.cc=.o) 
 OBJ9 = $(SRC9:.cc=.o) 
 OBJ12 = $(SRC12:.cc=.o)
 OBJ13 = $(SRC13:.cc=.o)
@@ -69,7 +63,6 @@ OBJ14 = $(SRC14:.cc=.o)
 
 all : $(TARGET) $(TARGET2) $(TARGET3) $(TARGET12) $(TARGET11) $(TARGET10) $(TARGET4) $(TARGET5) $(TARGET6) $(TARGET7) $(TARGET8) $(TARGETA) $(TARGETB) $(TARGET9) $(TARGET13) $(TARGET14)
 
-#comp : $(TARGETA) $(TARGETB) $(TARGET9)
 comp : $(TARGET9)
 
 $(TARGET) : $(OBJ)
@@ -162,4 +155,4 @@ $(TARGET14) : $(OBJ14)
 	@echo $@
 	@echo $<
 clean :
-	rm -f *.o app/*.o src/*.o $(Selection)/src/*.o $(CommonTools)/src/*.o $(Aux)/src/*.o $(TARGET) $(TARGET2) $(TARGET3) $(TARGET10) $(TARGET4) $(TARGET5) $(TARGET6) $(TARGET7) $(TARGET8) $(TARGET9) $(TARGETA) $(TARGETB) $(TARGET11) $(TARGET12) $(TARGET13) $(TARGET14) *~
+	rm -f *.o app/*.o src/*.o $(Selection)/src/*.o $(CommonTools)/src/*.o $(Aux)/src/*.o $(TARGET) $(TARGET2) $(TARGET3) $(TARGET10) $(TARGET4) $(TARGET5) $(TARGET6) $(TARGET7) $(TARGET8) $(TARGET9) $(TARGET11) $(TARGET12) $(TARGET13) $(TARGET14) *~
