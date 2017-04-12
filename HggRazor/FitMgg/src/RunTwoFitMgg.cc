@@ -2068,6 +2068,79 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   return ws;
 };
 
+RooWorkspace* MakeSignalBkgFit( RooDataSet* data, RooRealVar& mgg, float mu, TString mggName, bool _Nconstraint )
+{
+  RooWorkspace* ws = new RooWorkspace( "ws", "" );
+
+  mgg.setBins(57);
+  mgg.setRange( "signal", 122, 129. );
+  mgg.setRange("Full", 103., 160.);
+  
+  TString gauss = MakeSingleGaussNE("my_gauss", mgg, *ws);
+  TString sExp = MakeSingleExpNE("my_sExp", mgg, *ws);
+
+  //SMH contribution
+  double h_yield = 4.2;
+  double h_un    = h_yield*0.21;//30% uncertainty
+ 
+  //------------------------
+  //S+B model
+  //--------------------------
+  RooRealVar Nsmh( "sbModel_Nsmh", "N_{H}", h_yield, "" );
+  Nsmh.setConstant(kFALSE);
+  RooRealVar Nbkg( "sbModel_Nbkg", "N_{bkg}", 0, "" );
+  double npoints = data->sumEntries();
+  Nbkg.setVal(npoints);
+  Nbkg.setConstant(kFALSE);
+
+  //ws->var("my_gauss_SG_mu")->setConstant(kTRUE);
+  ws->var("my_gauss_SG_sigma")->setVal(1.3);
+  ws->var("my_gauss_SG_sigma")->setConstant(kTRUE);
+  
+  RooAddPdf* sbModel = new RooAddPdf( "sbModel", "sbModel", RooArgList( *ws->pdf(sExp), *ws->pdf(gauss) ), RooArgList( Nbkg, Nsmh ) );
+  
+  //ws->import( *sbModel );
+
+  //-----------------------
+  // Higgs Yield Constraint
+  //-----------------------
+  RooRealVar HiggsYield("HiggsYield","",h_yield);
+  RooRealVar HiggsUncertainty("HiggsUncertainty","",h_un);
+  RooGaussian HiggsConstraint("HiggsConstraint","", Nsmh,HiggsYield,HiggsUncertainty);
+  
+
+  //-------------------------------------
+  //P r o f i l e d   L i k e l i h o o d 
+  //-------------------------------------
+  /*
+    profile in Ns to obtain significance.
+  */
+  /*
+    RooArgSet poi   = RooArgSet( *ws->var("doubleGaussSB_gauss_Ns") );
+    RooAbsReal* nll = model->createNLL(data);
+    RooFormulaVar n2ll = RooFormulaVar("n2ll", "2*@0", RooArgList(*nll) );
+    RooAbsReal* p2ll = n2ll.createProfile( poi );
+  */
+  
+  //sbModel->fitTo( *data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Range("Full"), RooFit::ExternalConstraints(RooArgSet(HiggsConstraint)) );
+  RooFitResult* bres = sbModel->fitTo( *data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full"), RooFit::ExternalConstraints(RooArgSet(HiggsConstraint)) );
+  //RooFitResult* bres = sbModel->fitTo( *data, RooFit::Strategy(0), RooFit::Extended(kTRUE), RooFit::Save(kTRUE), RooFit::Range("Full") );
+  
+  //--------------------------------
+  // m o d e l   1   p l o t t i n g
+  //--------------------------------
+  RooPlot *fmgg = mgg.frame();
+  data->plotOn(fmgg);
+  sbModel->plotOn(fmgg,RooFit::LineColor(kRed),RooFit::Range("Full"),RooFit::NormRange("Full"));
+  //sbModel->plotOn(fmgg,RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
+  fmgg->SetName( "fullsb_fit_frame" );
+  ws->import( *sbModel );
+  ws->import( *bres );
+  ws->import( *fmgg );
+
+  return ws;
+  
+};
 
 RooWorkspace* MakeSignalBkgFit( TTree* tree, float forceSigma, bool constrainMu, float forceMu, TString mggName )
 {
