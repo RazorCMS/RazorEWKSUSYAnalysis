@@ -517,40 +517,40 @@ int main( int argc, char* argv[] )
        float totalFractionalUncertaintySqr = 0;
 
        //ISR systematic
-       ISRUpS->SetBinContent( bin, ISRUpS->GetBinContent(bin)/nomS );
-       ISRDownS->SetBinContent( bin, ISRDownS->GetBinContent(bin)/nomS );
+       ISRUpS->SetBinContent( bin, (nomS > 0) ? ISRUpS->GetBinContent(bin)/nomS: 0 );
+       ISRDownS->SetBinContent( bin, (nomS > 0) ? ISRDownS->GetBinContent(bin)/nomS: 0 );
 
        //Fac
        facScaleUp->SetBinContent( bin, facScaleUp->GetBinContent(bin)/nom );
        facScaleDown->SetBinContent( bin, facScaleDown->GetBinContent(bin)/nom );
-       facScaleUpS->SetBinContent( bin, facScaleUpS->GetBinContent(bin)/nomS );
-       facScaleDownS->SetBinContent( bin, facScaleDownS->GetBinContent(bin)/nomS );
+       facScaleUpS->SetBinContent( bin, (nomS > 0) ? facScaleUpS->GetBinContent(bin)/nomS : 0);
+       facScaleDownS->SetBinContent( bin, (nomS > 0) ? facScaleDownS->GetBinContent(bin)/nomS : 0 );
        //Ren
        renScaleUp->SetBinContent( bin, renScaleUp->GetBinContent(bin)/nom );
        renScaleDown->SetBinContent( bin, renScaleDown->GetBinContent(bin)/nom );
-       renScaleUpS->SetBinContent( bin, renScaleUpS->GetBinContent(bin)/nomS );
-       renScaleDownS->SetBinContent( bin, renScaleDownS->GetBinContent(bin)/nomS );
+       renScaleUpS->SetBinContent( bin, (nomS > 0) ? renScaleUpS->GetBinContent(bin)/nomS : 0 );
+       renScaleDownS->SetBinContent( bin, (nomS > 0) ? renScaleDownS->GetBinContent(bin)/nomS : 0 );
        //facRen
        facRenScaleUp->SetBinContent( bin, facRenScaleUp->GetBinContent(bin)/nom );
        facRenScaleDown->SetBinContent( bin, facRenScaleDown->GetBinContent(bin)/nom );
-       facRenScaleUpS->SetBinContent( bin, facRenScaleUpS->GetBinContent(bin)/nomS );
-       facRenScaleDownS->SetBinContent( bin, facRenScaleDownS->GetBinContent(bin)/nomS );
+       facRenScaleUpS->SetBinContent( bin, (nomS > 0) ? facRenScaleUpS->GetBinContent(bin)/nomS : 0 );
+       facRenScaleDownS->SetBinContent( bin, (nomS > 0) ? facRenScaleDownS->GetBinContent(bin)/nomS : 0 );
        //JES
        JesUp->SetBinContent( bin, JesUp->GetBinContent( bin )/nom );
        JesDown->SetBinContent( bin, JesDown->GetBinContent( bin )/nom );
-       JesUpS->SetBinContent( bin, JesUpS->GetBinContent( bin )/nomS );
-       JesDownS->SetBinContent( bin, JesDownS->GetBinContent( bin )/nomS );
+       JesUpS->SetBinContent( bin, (nomS > 0) ? JesUpS->GetBinContent( bin )/nomS : 0 );
+       JesDownS->SetBinContent( bin, (nomS > 0) ? JesDownS->GetBinContent( bin )/nomS : 0 );
 
        //btag
        btagUp->SetBinContent( bin, btagUp->GetBinContent( bin )/nom );
        btagDown->SetBinContent( bin, btagDown->GetBinContent( bin )/nom );
-       btagUpS->SetBinContent( bin, btagUpS->GetBinContent( bin )/nomS );
-       btagDownS->SetBinContent( bin, btagDownS->GetBinContent( bin )/nomS );
+       btagUpS->SetBinContent( bin, (nomS > 0) ? btagUpS->GetBinContent( bin )/nomS : 0 );
+       btagDownS->SetBinContent( bin, (nomS > 0) ? btagDownS->GetBinContent( bin )/nomS : 0 );
        //misstag
        misstagUp->SetBinContent( bin, misstagUp->GetBinContent( bin )/nom );
        misstagDown->SetBinContent( bin, misstagDown->GetBinContent( bin )/nom );
-       misstagUpS->SetBinContent( bin, misstagUpS->GetBinContent( bin )/nomS );
-       misstagDownS->SetBinContent( bin, misstagDownS->GetBinContent( bin )/nomS );
+       misstagUpS->SetBinContent( bin, (nomS > 0) ? misstagUpS->GetBinContent( bin )/nomS : 0 );
+       misstagDownS->SetBinContent( bin, (nomS > 0) ? misstagDownS->GetBinContent( bin )/nomS : 0 );
 
        if ( categoryMode == "highres") nominal->SetBinContent( bin, highres_sigmaMoverM_corr*nominal->GetBinContent( bin ) );
        if ( categoryMode == "lowres") nominal->SetBinContent( bin, lowres_sigmaMoverM_corr*nominal->GetBinContent( bin ) );
@@ -566,8 +566,8 @@ int main( int argc, char* argv[] )
 	 + pow( (fabs(renScaleUp->GetBinContent( bin )) + fabs(renScaleDown->GetBinContent( bin )))/2,2) 
 	 + pow( (fabs(facRenScaleUp->GetBinContent( bin )) + fabs(facRenScaleDown->GetBinContent( bin )))/2,2);
 
-       genMetS->SetBinContent( bin, genMetS->GetBinContent( bin )/nomS );
-       pileupS->SetBinContent( bin, pileupS->GetBinContent( bin )/nomS );
+       genMetS->SetBinContent( bin, (nomS > 0) ? genMetS->GetBinContent( bin )/nomS : 0 );
+       pileupS->SetBinContent( bin, (nomS > 0) ? pileupS->GetBinContent( bin )/nomS : 0 );
 
        for( int ipdf = 0; ipdf < 60; ipdf++ )
 	 {
@@ -600,8 +600,8 @@ int main( int argc, char* argv[] )
 	 {
 	   //pdf[ipdf]->SetBinContent( bin, pdf[ipdf]->GetBinContent( bin )/nom );
 	   //pdf[ipdf]->SetBinContent( bin, 0 ); //zero out pdf uncertainties for signal for now
-	   if ( ipdf < 59 ) outf << pdfS[ipdf]->GetBinContent( bin )/nomS << "\t";
-	   else outf << pdfS[ipdf]->GetBinContent( bin )/nomS << "\t";
+	   if ( ipdf < 59 ) outf << ((nomS > 0) ? pdfS[ipdf]->GetBinContent( bin )/nomS : 0) << "\t";
+	   else outf << ((nomS > 0) ? pdfS[ipdf]->GetBinContent( bin )/nomS : 0) << "\t";
 	 }
 
        //genMet systematics
@@ -617,6 +617,7 @@ int main( int argc, char* argv[] )
       
        std::cout << "Bin : " << bin << " " << tmp[0] << " " << tmp[1] << " " << tmp[2] << " " << tmp[3] << " : "
 	    << nom << " +/- " << 100*sqrt(totalFractionalUncertaintySqr) << "%\n";
+       std::cout << "signal: " << nomS << " " << pileupS->GetBinContent( bin ) << "\n";
  
      }
 
