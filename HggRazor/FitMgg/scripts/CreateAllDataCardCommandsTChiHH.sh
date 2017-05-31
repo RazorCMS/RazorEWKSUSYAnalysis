@@ -53,13 +53,15 @@ done
 #echo INPUT FILE  = $inputfiledir
 #echo OUTFILE PREFIX = $outfile
 
-extra_tag=Moriond_35p9ifb_March20_Summer16_ReMiniAOD_NewSigmaMoverM_Correction_PDFbugFixed_TChiHH_April19_
+extra_tag=EWK_Combination_13May
+indir=TChiHH
+
 
 for j in $(ls $inputfiledir);
 do
     name=`echo $j | awk -F "list_" '{print $2}' | awk -F ".txt" '{print $1}'`
     #echo $name
-    echo ./CreateDataCardCommands" --inputCF="$indir1$name".txt --outputFile=MakeDataCards_"$extra_tag$name".sh --dataFile="$datafile" --smhFile="$smhfile" --signalFile="$sfile"/SMS-TChiHH_"$name"_1pb_weighted.root --sModel="$name"_DataCards_"$extra_tag" --binningFile="$bfile --currentDir=$PWD
+    echo ./CreateDataCardCommands" --inputCF="$indir1$name".txt --outputFile=MakeDataCards_"$extra_tag$name".sh --dataFile="$datafile" --smhFile="$smhfile" --signalFile="$sfile"/SMS-TChiHH_"$name"_1pb_weighted.root --sModel="${indir}/${name}"_DataCards_"$extra_tag" --binningFile="$bfile --currentDir=$PWD
     echo bsub -q 8nh -e  $PWD/err/$name.err -o  $PWD/log/$name.out source MakeDataCards_$extra_tag$name.sh
 done
 
