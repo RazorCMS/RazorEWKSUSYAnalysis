@@ -412,7 +412,7 @@ void HggRazorSystematics::Loop()
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
 
-
+      //std::cout << "here"
       //require diphoton trigger
       if (!(_useISRPtCorrection && this->processName == "signal")) {
 	if (!(HLTDecision[82] || HLTDecision[83] || HLTDecision[93])) continue;//Ommit for FastSim

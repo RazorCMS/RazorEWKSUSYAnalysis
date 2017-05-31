@@ -101,15 +101,6 @@ int main( int argc, char* argv[] )
       return -1;
     }
 
-  //-----------------
-  //Signal Type
-  //-----------------
-  std::string signalType = ParseCommandLine( argc, argv, "-signalType=" );
-  if ( signalType == "" )
-    {
-      std::cerr << "[ERROR]: please provide the signalType. Use --signalType=<FullSim,FastSim>" << std::endl;
-      return -1;
-    } 
   
   //-----------------
   //pTGammaGamma cut
@@ -130,6 +121,21 @@ int main( int argc, char* argv[] )
       return -1;
     } 
   
+
+  //-----------------
+  //EWK SUSY Signals
+  //-----------------
+  bool isEWKSUSYSignal = false;
+  std::string isEWKSUSYSignalString = ParseCommandLine( argc, argv, "-EWKSUSYSignal=" );
+  if ( isEWKSUSYSignalString == "" )
+    {
+      std::cerr << "[ERROR]: please specify if signal is EWK SUSY Signal. Use --EWKSUSYSignal=<0,1>" << std::endl;
+      return -1;
+    } 
+  if (isEWKSUSYSignalString == "1" || isEWKSUSYSignalString == "true" ) isEWKSUSYSignal = true;
+
+
+
   //----------------------
   //SigmaMoverM correction
   //----------------------
@@ -183,10 +189,15 @@ int main( int argc, char* argv[] )
   else if (categoryMode == "highptlowres") categoryCutString = " && pTGammaGamma >= 110 && sigmaMoverM >= 0.0085";
 
   TString triggerCut = " && ( HLTDecision[82] || HLTDecision[83] || HLTDecision[93] ) ";
-  // TString metFilterCut = " && (Flag_HBHENoiseFilter == 1 && Flag_CSCTightHaloFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1)";
   TString metFilterCut = " && (Flag_HBHENoiseFilter == 1 && Flag_goodVertices == 1 && Flag_eeBadScFilter == 1 && Flag_HBHEIsoNoiseFilter == 1)";
-  //TString triggerCut = "";
-  //TString metFilterCut = "";
+  
+  //For fastsim signals, turn off trigger and met filters
+  if (isEWKSUSYSignal) 
+    {
+      triggerCut = "";
+      metFilterCut = "";
+    }
+  
 
 
   if ( analysisTag == "Razor2015_76X" ) 
@@ -195,13 +206,7 @@ int main( int argc, char* argv[] )
     } 
   else if ( analysisTag == "Razor2016_80X" ) 
     {
-      if ( signalType == "FullSim" ) cut = cut + categoryCutString + triggerCut + metFilterCut;//FullSim
-      else if ( signalType == "FastSim" ) cut = cut + categoryCutString;//FastSim
-      else
-	{
-	  std::cerr << "[ERROR]: please provide a valid signalType: FullSim, FastSim" << std::endl;
-	  return -1;
-	}
+      cut = cut + categoryCutString + triggerCut + metFilterCut;//FullSim
     } 
   else 
     {
@@ -277,7 +282,9 @@ int main( int argc, char* argv[] )
   TH2Poly* misstagUpS   = new TH2Poly("misstagUpS", "", 150, 10000, 0, 1 );//signal
   TH2Poly* misstagDownS = new TH2Poly("misstagDownS", "", 150, 10000, 0, 1 );//signal
   
-  
+  TH2Poly* genMetS = new TH2Poly("genMet_Signal", "", 150, 10000, 0, 1 );//signal
+  TH2Poly* pileupS = new TH2Poly("pileup_Signal", "", 150, 10000, 0, 1 );//signal
+
   TH2Poly* pdf[60];
   TH2Poly* pdfS[60];
   for ( int i = 0; i < 60; i++ )
@@ -342,6 +349,9 @@ int main( int argc, char* argv[] )
       misstagDownS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
       //pdf
       for( int i = 0; i < 60; i++ ) pdfS[i]->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+      //fastsim systematic
+      genMetS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
+      pileupS->AddBin( tmp[0], tmp[1], tmp[2], tmp[3] );
     }
     
   std::string process, rootFileName;
@@ -368,7 +378,12 @@ int main( int argc, char* argv[] )
       if ( process != "signal" ) assert( SumPdfWeights );     
       TH1F* ISRHist = (TH1F*)fin->Get("NISRJets");
       if ( process == "signal" ) assert( ISRHist );
-
+      TH1F* ISRPtHist = (TH1F*)fin->Get("PtISR");
+      if ( isEWKSUSYSignal && process == "signal" ) assert( ISRPtHist );
+      TH1F* NPVHist = (TH1F*)fin->Get("NPV");
+      if ( isEWKSUSYSignal && process == "signal" ) assert( NPVHist );
+      
+      
       TString tmpName = Form("tmp_%d.root", rand());
       TFile* tmp = new TFile( tmpName , "RECREATE");
       TTree* cutTree = tree->CopyTree( cut );
@@ -378,7 +393,7 @@ int main( int argc, char* argv[] )
       //---------------------------
       //Create HggSystematic object
       //---------------------------
-      HggRazorSystematics* hggSys = new HggRazorSystematics( cutTree, currentProcess, binCategory, analysisTag, _debug, _debug );
+      HggRazorSystematics* hggSys = new HggRazorSystematics( cutTree, currentProcess, binCategory, analysisTag, _debug, isEWKSUSYSignal, _debug );
       hggSys->SetLumi(lumi);
       //hggSys->PrintBinning();
       //hggSys->SetBinningMap( binningMap );
@@ -389,6 +404,10 @@ int main( int argc, char* argv[] )
       hggSys->SetFacScaleWeightsHisto( SumScaleWeights );
       hggSys->SetPdfWeightsHisto( SumPdfWeights );
       hggSys->SetISRHisto( ISRHist );
+      hggSys->SetNPVHisto( NPVHist );
+      hggSys->LoadNPVTarget("root://eoscms:///eos/cms/store/group/phys_susy/razor/Run2Analysis/ScaleFactors/PileupWeights/NPVTarget_2016.root");
+      if ( isEWKSUSYSignal ) hggSys->SetISRPtHisto( ISRPtHist );
+      
       hggSys->Loop();
       for ( auto tmp: myVectBinning )
 	{
@@ -437,6 +456,10 @@ int main( int argc, char* argv[] )
 		{
 		  pdfS[ipdf]->SetBinContent( bin, hggSys->GetPdfSystematic( ipdf, tmp[0], tmp[1] ) );
 		}
+	      
+	      //FastSim
+	      genMetS->SetBinContent( bin, hggSys->GetGenMetSystematic( tmp[0], tmp[1] ) );
+	      pileupS->SetBinContent( bin, hggSys->GetNominalError( tmp[0], tmp[1] ) );
 	    }
 	  else
 	    {
@@ -549,6 +572,20 @@ int main( int argc, char* argv[] )
 	   else outf << pdfS[ipdf]->GetBinContent( bin )/nomS << "\n";
 	 }
       
+       //Normalizing FastSIm
+       genMetS->SetBinContent( bin, genMetS->GetBinContent( bin )/nomS );
+       pileupS->SetBinContent( bin, pileupS->GetBinContent( bin )/nomS );
+       if ( isEWKSUSYSignal ) 
+	 {
+	   outf << genMetS->GetBinContent( bin ) << "\t";
+	   outf << pileupS->GetBinContent( bin ) << "\t";
+	 } 
+       else 
+	 {
+	   outf << "0.0" << "\t";
+	   outf << "0.0" << "\t";
+	 }
+       
        std::cout << "Bin : " << bin << " " << tmp[0] << " " << tmp[1] << " " << tmp[2] << " " << tmp[3] << " : "
 	    << nom << " +/- " << 100*sqrt(totalFractionalUncertaintySqr) << "%\n";
  

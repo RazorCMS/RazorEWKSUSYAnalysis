@@ -51,6 +51,7 @@ class smsPlotABS(object):
         # set x axis
         self.emptyHisto.GetXaxis().SetLabelFont(42)
         self.emptyHisto.GetXaxis().SetLabelSize(0.04)
+        self.emptyHisto.GetXaxis().SetLabelOffset(0.015)
         self.emptyHisto.GetXaxis().SetNdivisions(self.model.divX,self.model.optX)
         self.emptyHisto.GetXaxis().SetTitleFont(42)
         self.emptyHisto.GetXaxis().SetTitleSize(0.05)
@@ -61,6 +62,7 @@ class smsPlotABS(object):
         # set y axis
         self.emptyHisto.GetYaxis().SetLabelFont(42)
         self.emptyHisto.GetYaxis().SetLabelSize(0.04)
+        self.emptyHisto.GetYaxis().SetLabelOffset(0.015)
         self.emptyHisto.GetYaxis().SetNdivisions(self.model.divY,self.model.optY)
         self.emptyHisto.GetYaxis().SetTitleFont(42)
         self.emptyHisto.GetYaxis().SetTitleSize(0.05)
@@ -104,7 +106,7 @@ class smsPlotABS(object):
         textCMSp.SetTextAlign(13)
         textCMSp.SetTextFont(52)
         textCMSp.SetTextSize(0.045)
-        textCMSp.Draw()
+        #textCMSp.Draw()
         
         textCMS1 = rt.TLatex(0.55,0.97,"%.1f fb^{-1} (%s TeV)" %(float(self.lumi)/1000., self.energy))
         textCMS1.SetNDC()
@@ -347,9 +349,9 @@ class smsPlotABS(object):
 
         self.EXP['minus'].Draw("LSAME")
         self.EXP['nominal'].SetMarkerStyle(20);
-        self.EXP['nominal'].Draw("LSAME")
+        self.EXP['nominal'].Draw("lSAME")
         self.EXP['plus'].Draw("LSAME")
     
-        self.OBS['minus'].Draw("CSAME")
-        self.OBS['nominal'].Draw("CSAME")
-        self.OBS['plus'].Draw("CSAME")
+        self.OBS['minus'].Draw("LSAME")
+        self.OBS['nominal'].Draw("LSAME")
+        self.OBS['plus'].Draw("LSAME")

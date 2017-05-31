@@ -24,7 +24,7 @@ do
 	    anTag="$2"
 	    shift # past argument
 	    ;;
-	-s|--signalType)
+	-s|--EWKSUSYSignal)
 	    sigType="$2"
 	    shift # past argument
 	    ;;
@@ -52,8 +52,8 @@ for j in $(ls $inlist);
 do
     for i in "${categories[@]}";
     do
-	echo ./GetHggRazorSystematicsQuadratureFaster --inputList=$inlist/$j --category=$i --outputFile=$outfile"_"$i".txt" --lumi=$lumi --analysisTag=$anTag --binningFile=$bFile --signalType=$sigType
-	./GetHggRazorSystematicsQuadratureFaster --inputList=$inlist/$j --category=$i --outputFile=$outfile"_"$i".txt" --lumi=$lumi --analysisTag=$anTag --binningFile=$bFile --signalType=$sigType
+	echo ./GetHggRazorSystematicsQuadratureFaster --inputList=$inlist/$j --category=$i --outputFile=$outfile"_"$i".txt" --lumi=$lumi --analysisTag=$anTag --binningFile=$bFile --EWKSUSYSignal=$sigType
+	./GetHggRazorSystematicsQuadratureFaster --inputList=$inlist/$j --category=$i --outputFile=$outfile"_"$i".txt" --lumi=$lumi --analysisTag=$anTag --binningFile=$bFile --EWKSUSYSignal=$sigType
     done
     #echo $outfile"_"${categories[0]}".txt" $outfile"_"${categories[1]}".txt" $outfile"_"${categories[2]}".txt" $outfile"_"${categories[3]}".txt"
     #echo $outfile"_AllCategories_"$j
