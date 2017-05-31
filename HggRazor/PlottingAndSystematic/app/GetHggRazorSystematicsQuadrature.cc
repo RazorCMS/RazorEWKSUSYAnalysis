@@ -572,10 +572,15 @@ int main( int argc, char* argv[] )
 	 } else {
 	   genMetS->SetBinContent( bin, (nomS > 0) ? genMetS->GetBinContent( bin )/nomS : 0 );
 	 }
+	 if (pileupS->GetBinContent( bin )/nomS <= -1) {
+	   pileupS->SetBinContent( bin, -0.99);
+	 } else {
+	   pileupS->SetBinContent( bin, (nomS > 0) ? pileupS->GetBinContent( bin )/nomS : 0 );
+	 }   
        } else {
 	 genMetS->SetBinContent( bin, 0);
+	 pileupS->SetBinContent( bin, 0 ); 
        }
-       pileupS->SetBinContent( bin, (nomS > 0) ? pileupS->GetBinContent( bin )/nomS : 0 );
 
        for( int ipdf = 0; ipdf < 60; ipdf++ )
 	 {

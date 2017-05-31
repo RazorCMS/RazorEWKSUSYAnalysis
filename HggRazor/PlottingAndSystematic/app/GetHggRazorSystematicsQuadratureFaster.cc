@@ -574,16 +574,22 @@ int main( int argc, char* argv[] )
       
        //Normalizing FastSIm
        if ( (nomS > 0) ) {
-	 if (genMetS->GetBinContent( bin )/nomS < -1) {
+	 if (genMetS->GetBinContent( bin )/nomS <= -1) {
 	   genMetS->SetBinContent( bin, -0.99);
 	 } else {
 	   genMetS->SetBinContent( bin, (nomS > 0) ? genMetS->GetBinContent( bin )/nomS : 0 );
 	 }
+	 if (pileupS->GetBinContent( bin )/nomS <= -1) {
+	   pileupS->SetBinContent( bin, -0.99);
+	 } else {
+	   pileupS->SetBinContent( bin, (nomS > 0) ? pileupS->GetBinContent( bin )/nomS : 0 );
+	 }
        } else {
 	 genMetS->SetBinContent( bin, 0);
+	 pileupS->SetBinContent( bin, 0 );
        }
 
-       pileupS->SetBinContent( bin, (nomS > 0) ? pileupS->GetBinContent( bin )/nomS : 0 );
+       
        if ( isEWKSUSYSignal ) 
 	 {
 	   outf << genMetS->GetBinContent( bin ) << "\t";
