@@ -384,7 +384,7 @@ int main( int argc, char* argv[] )
       if ( isEWKSUSYSignal && process == "signal" ) assert( NPVHist );
       
       
-      TString tmpName = Form("tmp_%d.root", rand());
+      TString tmpName = Form("%s_tmp_%d.root", outputFile.c_str(), rand());
       TFile* tmp = new TFile( tmpName , "RECREATE");
       TTree* cutTree = tree->CopyTree( cut );
       assert( cutTree );

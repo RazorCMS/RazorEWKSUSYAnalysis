@@ -1309,8 +1309,8 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   //------------------------------------------------
   // C r e a t e   s i g n a l  s h a p e from TTree
   //------------------------------------------------
-  system ("mkdir -p HggRazorDataCards/" + sModel );
-  TString combinedRootFileName = "HggRazorDataCards/" + sModel + "/HggRazorWorkspace_bin" + binNumber + ".root";
+  system ("mkdir -p HggRazorDataCards/EWK_Combination/" + sModel );
+  TString combinedRootFileName = "HggRazorDataCards/EWK_Combination/" + sModel + "/HggRazorWorkspace_bin" + binNumber + ".root";
   TFile* ftmp = new TFile( combinedRootFileName, "recreate");
   
   RooWorkspace* ws = new RooWorkspace( "ws", "" );
@@ -1661,7 +1661,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   box->SetFillColor(kRed-9);
   box->SetFillStyle(3344);
   box->Draw("same");
-  c->SaveAs( "HggRazorDataCards/" + sModel + "/bkgFit_bin" + binNumber + ".pdf" );
+  c->SaveAs( "HggRazorDataCards/EWK_Combination/" + sModel + "/bkgFit_bin" + binNumber + ".pdf" );
   fmgg->SetName( "BkgOnlyFitPlot" );
   //ws->import( *model );
   ws->import( *bres );
@@ -1681,7 +1681,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   mytex->DrawLatex(0.8, 0.7, Form("N = %d", npoints_signal));
   mytex->Draw("same");
   c->Update();
-  c->SaveAs( "HggRazorDataCards/" + sModel + "/signalFit_bin" + binNumber + ".pdf" );
+  c->SaveAs( "HggRazorDataCards/EWK_Combination/" + sModel + "/signalFit_bin" + binNumber + ".pdf" );
   fmgg2->SetName( "SignalFitPlot" );
   ws->import( *fmgg2 );
 
@@ -1693,7 +1693,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   ws->pdf( tagSMH )->plotOn(fmgg3, RooFit::LineColor(kRed), RooFit::Range("Full"), RooFit::NormRange("Full"));
   //ws->pdf( tagSMH )->plotOn(fmgg3, RooFit::LineColor(kBlue), RooFit::LineStyle(kDashed), RooFit::Range("low,high"),RooFit::NormRange("low,high"));
   fmgg3->Draw();
-  c->SaveAs( "HggRazorDataCards/" + sModel + "/smhFit_bin" + binNumber + ".pdf" );
+  c->SaveAs( "HggRazorDataCards/EWK_Combination/" + sModel + "/smhFit_bin" + binNumber + ".pdf" );
   fmgg3->SetName( "SMHFitPlot" );
   ws->import( *fmgg3 );
 
@@ -1861,7 +1861,7 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
   std::cout << "[INFO]: Creating combine datacard" << std::endl;
   //std::string bNumber( binNumber );//TString to std::string
   combinedRootFileName = "HggRazorWorkspace_bin" + binNumber + ".root";
-  TString dataCardName = "HggRazorDataCards/" + sModel + "/HggRazorCard_bin" + binNumber + ".txt";
+  TString dataCardName = "HggRazorDataCards/EWK_Combination/" + sModel + "/HggRazorCard_bin" + binNumber + ".txt";
   std::ofstream ofs( dataCardName , std::ofstream::out );
 
   int combinedBinNumber = atoi(binNumber); // this is equal to binNumber, except for the LowRes bins, where it is equal to the number of the corresponding HighRes bin
@@ -1894,15 +1894,15 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
       ofs << "process\t\t\t\t\t\t0\t\t1\t\t2\n";
       ofs << "rate\t\t\t\t\t\t1\t\t1\t\t1\n";
       ofs << "----------------------------------------------------------------------------------------\n";
-      ofs << "CMS_Lumi\t\t\tlnN\t\t1.026\t\t1.026\t\t-\n";
-      ofs << "Photon_Trigger\t\t\tlnN\t\t1.05\t\t1.05\t\t-\n";
+      ofs << "CMS_Lumi_GG\t\t\tlnN\t\t1.026\t\t1.026\t\t-\n";
+      ofs << "Photon_Trigger_GG\t\t\tlnN\t\t1.05\t\t1.05\t\t-\n";
       //ofs << "ScaleNorm\t\t\tlnN\t\t-\t\t0.931/1.065\t\t-\n"; //instead allow scale variations to change xsection
-      ofs << "PdfNorm\t\t\t\tlnN\t\t-\t\t0.948/1.062\t\t-\n";
+      ofs << "PdfNorm_GG\t\t\t\tlnN\t\t-\t\t0.948/1.062\t\t-\n";
       
       if ( category == "highres" ) {
-	ofs << "SigmaMoverMEfficiency\t\t\t\tlnN\t\t" << (1.+2.*highres_sigmaMoverM_corr)/(1.+highres_sigmaMoverM_corr) << "/" << 1./(1.+highres_sigmaMoverM_corr) << "\t\t" << (1.+2.*highres_sigmaMoverM_corr)/(1.+highres_sigmaMoverM_corr) << "/" << 1./(1.+highres_sigmaMoverM_corr) << "\t\t-\n";
+	ofs << "SigmaMoverMEfficiency_GG\t\t\t\tlnN\t\t" << (1.+2.*highres_sigmaMoverM_corr)/(1.+highres_sigmaMoverM_corr) << "/" << 1./(1.+highres_sigmaMoverM_corr) << "\t\t" << (1.+2.*highres_sigmaMoverM_corr)/(1.+highres_sigmaMoverM_corr) << "/" << 1./(1.+highres_sigmaMoverM_corr) << "\t\t-\n";
       } else if (category == "lowres" ) {
-	ofs << "SigmaMoverMEfficiency\t\t\t\tlnN\t\t" << (1.+2.*lowres_sigmaMoverM_corr)/(1.+lowres_sigmaMoverM_corr) << "/" << 1./(1.+lowres_sigmaMoverM_corr) << "\t\t" << (1.+2.*lowres_sigmaMoverM_corr)/(1.+lowres_sigmaMoverM_corr) << "/" << 1./(1.+lowres_sigmaMoverM_corr) << "\t\t-\n";
+	ofs << "SigmaMoverMEfficiency_GG\t\t\t\tlnN\t\t" << (1.+2.*lowres_sigmaMoverM_corr)/(1.+lowres_sigmaMoverM_corr) << "/" << 1./(1.+lowres_sigmaMoverM_corr) << "\t\t" << (1.+2.*lowres_sigmaMoverM_corr)/(1.+lowres_sigmaMoverM_corr) << "/" << 1./(1.+lowres_sigmaMoverM_corr) << "\t\t-\n";
       }
 
       int totalSys = smh_sys.size();
@@ -1911,35 +1911,35 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
 	{
 	  if ( isys == 0 )
 	    {
-	      if ( fabs(smh_sys.at(isys+1) - 1.0) > 0.0001 ) ofs << "SMH_JES\t\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
+	      if ( fabs(smh_sys.at(isys+1) - 1.0) > 0.0001 ) ofs << "SMH_JES_GG\t\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
 	    }
 	  else if ( isys == 2 )
 	    {
 	      //ofs << "SMH_facScale_bin" << combinedBinNumber << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
-	      if ( fabs(smh_sys.at(isys+1) - 1.0) > 0.0001 ) ofs << "SMH_facScale" << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "\t\t-\n";
+	      if ( fabs(smh_sys.at(isys+1) - 1.0) > 0.0001 ) ofs << "SMH_facScale_GG" << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "\t\t-\n";
 	    }
 	  else if ( isys == 4 )
 	    {
 	      //ofs << "SMH_renScale_bin" << combinedBinNumber << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
-	       if ( fabs(smh_sys.at(isys+1) - 1.0) > 0.0001 ) ofs << "SMH_renScale" << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "\t\t-\n";
+	       if ( fabs(smh_sys.at(isys+1) - 1.0) > 0.0001 ) ofs << "SMH_renScale_GG" << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "\t\t-\n";
 	    } 
 	  else if ( isys == 6 )
 	    {
 	      //ofs << "SMH_facRenScale_bin" << combinedBinNumber << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "/" << smh_sys.at(isys) << "\t\t-\n";
-	      if ( fabs(smh_sys.at(isys+1) - 1.0) > 0.0001 ) ofs << "SMH_facRenScale" << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "\t\t-\n";
+	      if ( fabs(smh_sys.at(isys+1) - 1.0) > 0.0001 ) ofs << "SMH_facRenScale_GG" << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys+1) << "\t\t-\n";
 	    }
 	  else if ( isys > 7 )
 	    {
-	      if ( fabs(smh_sys.at(isys) - 1.0) > 0.0001 ) ofs << "SMH_pdf" << ctr << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys) << "\t\t-\n";
+	      if ( fabs(smh_sys.at(isys) - 1.0) > 0.0001 ) ofs << "SMH_pdf_GG" << ctr << "\t\t\tlnN\t\t-\t\t" << smh_sys.at(isys) << "\t\t-\n";
 	      ctr++;
 	    }
 	}
       ofs << "mu_Global\t\t\tparam\t\t 0 1.25\n";
-      if ( category != "highres" ) ofs << category << "_mu_Global\t\t\tparam\t\t 0 1.25\n";
+      if ( category != "highres" ) ofs << category << "_mu_Global_GG\t\t\tparam\t\t 0 1.25\n";
       if ( category == "hzbb" )
 	{
-	  ofs << "SMH_btag\t\t\tlnN\t\t-\t\t" << "0.961/1.04" "\t\t-\n";
-	  ofs << "SMH_misstag\t\t\tlnN\t\t-\t\t" << "0.992/1.008" << "\t\t-\n";
+	  ofs << "SMH_btag_GG\t\t\tlnN\t\t-\t\t" << "0.961/1.04" "\t\t-\n";
+	  ofs << "SMH_misstag_GG\t\t\tlnN\t\t-\t\t" << "0.992/1.008" << "\t\t-\n";
 	}
       
       //----------------------------------
@@ -1950,26 +1950,26 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
 	{
 	  if ( isys == 0 )
 	    {
-	      if ( fabs(signal_sys.at(isys) - 1.0) > 0.0001 && fabs(signal_sys.at(isys+1) - 1.0) > 0.0001 ) ofs << "Signal_JES\t\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	      if ( fabs(signal_sys.at(isys) - 1.0) > 0.0001 && fabs(signal_sys.at(isys+1) - 1.0) > 0.0001 ) ofs << "JESsig\t\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
 	    }
 	  else if ( isys == 2 )
 	    {
-	      if ( fabs(signal_sys.at(isys) - 1.0) > 0.0001 && fabs(signal_sys.at(isys+1) - 1.0) > 0.0001 ) ofs << "Signal_ISR\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	      if ( fabs(signal_sys.at(isys) - 1.0) > 0.0001 && fabs(signal_sys.at(isys+1) - 1.0) > 0.0001 ) ofs << "ISR\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
 	    }
 	  else if ( isys == 4 )
 	    {
 	      //ofs << "Signal_facScale_bin" << combinedBinNumber << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
-	      if ( fabs(signal_sys.at(isys) - 1.0) > 0.0001 && fabs(signal_sys.at(isys+1) - 1.0) > 0.0001 ) ofs << "Signal_facScale" << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	      if ( fabs(signal_sys.at(isys) - 1.0) > 0.0001 && fabs(signal_sys.at(isys+1) - 1.0) > 0.0001 ) ofs << "Signal_facScale_GG" << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
 	    }
 	  else if ( isys == 6 )
 	    {
 	      //ofs << "Signal_renScale_bin" << combinedBinNumber << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
-	      if ( fabs(signal_sys.at(isys) - 1.0) > 0.0001 && fabs(signal_sys.at(isys+1) - 1.0) > 0.0001 ) ofs << "Signal_renScale" << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	      if ( fabs(signal_sys.at(isys) - 1.0) > 0.0001 && fabs(signal_sys.at(isys+1) - 1.0) > 0.0001 ) ofs << "Signal_renScale_GG" << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
 	    }
 	  else if ( isys == 8 )
 	    {
 	      //ofs << "Signal_facRenScale_bin" << combinedBinNumber << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
-	      if ( fabs(signal_sys.at(isys) - 1.0) > 0.0001 && fabs(signal_sys.at(isys+1) - 1.0) > 0.0001 ) ofs << "Signal_facRenScale" << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+	      if ( fabs(signal_sys.at(isys) - 1.0) > 0.0001 && fabs(signal_sys.at(isys+1) - 1.0) > 0.0001 ) ofs << "Signal_facRenScale_GG" << "\t\t\tlnN\t\t" << signal_sys.at(isys+1) << "/" << signal_sys.at(isys) << "\t\t-\t\t-\n";
 	    }
 	  else if ( isys >= 10 && isys <= 69 )
 	    {
@@ -1982,13 +1982,13 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
 	  else if ( isys == 70 ) 
 	    {
 	      if (signal_sys.at(isys) != 1.0) {
-		ofs << "Signal_FastsimMet" << "\t\t\tlnN\t\t" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+		ofs << "MET" << "\t\t\tlnN\t\t" << signal_sys.at(isys) << "\t\t-\t\t-\n";
 	      }
 	    }
 	  else if ( isys == 71 ) 
 	    {
 	      if (signal_sys.at(isys) != 1.0) {
-		ofs << "Signal_FastsimPileup" << "\t\t\tlnN\t\t" << signal_sys.at(isys) << "\t\t-\t\t-\n";
+		ofs << "PUsig" << "\t\t\tlnN\t\t" << signal_sys.at(isys) << "\t\t-\t\t-\n";
 	      }
 	    } 
 	  else {
@@ -1998,8 +1998,8 @@ RooWorkspace* MakeDataCard( TTree* treeData, TTree* treeSignal, TTree* treeSMH, 
       
       if ( category == "hzbb" )
 	{
-	  ofs << "Signal_btag\t\t\tlnN\t\t" << "0.961/1.04\t\t-\t\t-\n";
-	  ofs << "Signal_misstag\t\t\tlnN\t\t" << "0.992/1.008\t\t-\t\t-\n";
+	  ofs << "Signal_btag_GG\t\t\tlnN\t\t" << "0.961/1.04\t\t-\t\t-\n";
+	  ofs << "Signal_misstag_GG\t\t\tlnN\t\t" << "0.992/1.008\t\t-\t\t-\n";
 	}
       //ofs << "SMH_renScale\t\t\tlnN\t\t-\t\t" << SMH_renScale << "\t\t-\n";
       //ofs << "SMH_facRenScale\t\t\tlnN\t\t-\t\t" << SMH_facRenScale << "\t\t-\n";
