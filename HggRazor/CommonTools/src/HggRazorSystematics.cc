@@ -807,8 +807,10 @@ float HggRazorSystematics::GetNominalYield( float mr, float rsq )
     y[0] = lowNVtx/lowNVtxFactor;
     y[1] = highNVtx/highNVtxFactor;
     double ey[2];
-    ey[0] = lowNVtxErr/lowNVtxFactor;
-    ey[1] = highNVtxErr/highNVtxFactor;
+     ey[0] = fmax(lowNVtxErr,1e-9)/lowNVtxFactor; //a trick to prevent zero error
+     ey[1] = fmax(highNVtxErr, 1e-9)/highNVtxFactor;//a trick to prevent zero error
+     // ey[0] = lowNVtxErr/lowNVtxFactor;
+     // ey[1] = highNVtxErr/highNVtxFactor;
    
     TGraphErrors *graph = new TGraphErrors(2,x,y,ex,ey);
     TFitResultPtr fitresult = graph->Fit("pol1","SMF");
@@ -827,6 +829,10 @@ float HggRazorSystematics::GetNominalYield( float mr, float rsq )
       //std::cout << "npv = " << npv << " : " << tmpweight << " : " << Yield << " +/- " << YieldErr << "\n";
       averageYield += tmpweight * Yield;
       averageYieldErr += tmpweight * YieldErr;
+    }
+    if (averageYield < 0) {
+      averageYield = 0;
+      averageYieldErr = 0;
     }
     nominal  = averageYield;
     //std::cout << "Average yield: " << averageYield << " +/- " << averageYieldErr << "\n";
@@ -863,8 +869,10 @@ float HggRazorSystematics::GetNominalError( float mr, float rsq )
     y[0] = lowNVtx/lowNVtxFactor;
     y[1] = highNVtx/highNVtxFactor;
     double ey[2];
-    ey[0] = lowNVtxErr/lowNVtxFactor;
-    ey[1] = highNVtxErr/highNVtxFactor;
+    // ey[0] = lowNVtxErr/lowNVtxFactor; //a trick to prevent zero error
+    // ey[1] = highNVtxErr/highNVtxFactor;//a trick to prevent zero error
+    ey[0] = fmax(lowNVtxErr,1e-9)/lowNVtxFactor; //a trick to prevent zero error
+    ey[1] = fmax(highNVtxErr, 1e-9)/highNVtxFactor;//a trick to prevent zero error
    
     TGraphErrors *graph = new TGraphErrors(2,x,y,ex,ey);
     TFitResultPtr fitresult = graph->Fit("pol1","SMF");
@@ -872,6 +880,8 @@ float HggRazorSystematics::GetNominalError( float mr, float rsq )
     double averageYield = 0;
     double averageYieldErr = 0;
     std::cout << "bins: " << NPVTarget->GetXaxis()->GetNbins() << "\n";
+    std::cout << "PU 14.68 : " << lowNVtx << " / " << lowNVtxFactor << " = " << lowNVtx/lowNVtxFactor << " " << lowNVtxErr/lowNVtxFactor << "\n";
+    std::cout << "PU 24.26: " << highNVtx << " / " << highNVtxFactor << " = " << highNVtx/highNVtxFactor << " " << highNVtxErr/highNVtxFactor << "\n";
     for (int i=1; i< NPVTarget->GetXaxis()->GetNbins(); i++) {
       double npv = NPVTarget->GetXaxis()->GetBinCenter(i);
       double tmpweight = NPVTarget->GetBinContent(i);
@@ -884,6 +894,12 @@ float HggRazorSystematics::GetNominalError( float mr, float rsq )
       averageYield += tmpweight * Yield;
       averageYieldErr += tmpweight * YieldErr;
     }
+    
+    if (averageYield < 0) {
+      averageYield = 0;
+      averageYieldErr = 0;
+    }
+
     nominal  = averageYieldErr;
     std::cout << "Average yield: " << averageYield << " +/- " << averageYieldErr << "\n";
 
