@@ -566,7 +566,15 @@ int main( int argc, char* argv[] )
 	 + pow( (fabs(renScaleUp->GetBinContent( bin )) + fabs(renScaleDown->GetBinContent( bin )))/2,2) 
 	 + pow( (fabs(facRenScaleUp->GetBinContent( bin )) + fabs(facRenScaleDown->GetBinContent( bin )))/2,2);
 
-       genMetS->SetBinContent( bin, (nomS > 0) ? genMetS->GetBinContent( bin )/nomS : 0 );
+       if ( (nomS > 0) ) {
+	 if (genMetS->GetBinContent( bin )/nomS < -1) {
+	   genMetS->SetBinContent( bin, -0.99);
+	 } else {
+	   genMetS->SetBinContent( bin, (nomS > 0) ? genMetS->GetBinContent( bin )/nomS : 0 );
+	 }
+       } else {
+	 genMetS->SetBinContent( bin, 0);
+       }
        pileupS->SetBinContent( bin, (nomS > 0) ? pileupS->GetBinContent( bin )/nomS : 0 );
 
        for( int ipdf = 0; ipdf < 60; ipdf++ )
@@ -617,7 +625,7 @@ int main( int argc, char* argv[] )
       
        std::cout << "Bin : " << bin << " " << tmp[0] << " " << tmp[1] << " " << tmp[2] << " " << tmp[3] << " : "
 	    << nom << " +/- " << 100*sqrt(totalFractionalUncertaintySqr) << "%\n";
-       std::cout << "signal: " << nomS << " " << pileupS->GetBinContent( bin ) << "\n";
+       std::cout << "signal: " << nomS << " " << pileupS->GetBinContent( bin ) << " " << genMetS->GetBinContent( bin ) << "\n";
  
      }
 

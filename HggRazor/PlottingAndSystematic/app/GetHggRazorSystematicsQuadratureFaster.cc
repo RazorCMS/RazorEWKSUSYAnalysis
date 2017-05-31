@@ -505,28 +505,28 @@ int main( int argc, char* argv[] )
        float totalFractionalUncertaintySqr = 0;
 
        //ISR systematic
-       ISRUpS->SetBinContent( bin, ISRUpS->GetBinContent(bin)/nomS );
-       ISRDownS->SetBinContent( bin, ISRDownS->GetBinContent(bin)/nomS );
+       ISRUpS->SetBinContent( bin, (nomS > 0) ? ISRUpS->GetBinContent(bin)/nomS: 0 );
+       ISRDownS->SetBinContent( bin, (nomS > 0) ? ISRDownS->GetBinContent(bin)/nomS: 0 );
 
        //Fac
-       facScaleUpS->SetBinContent( bin, facScaleUpS->GetBinContent(bin)/nomS );
-       facScaleDownS->SetBinContent( bin, facScaleDownS->GetBinContent(bin)/nomS );
+       facScaleUpS->SetBinContent( bin, (nomS > 0) ? facScaleUpS->GetBinContent(bin)/nomS : 0);
+       facScaleDownS->SetBinContent( bin, (nomS > 0) ? facScaleDownS->GetBinContent(bin)/nomS : 0 );
        //Ren
-       renScaleUpS->SetBinContent( bin, renScaleUpS->GetBinContent(bin)/nomS );
-       renScaleDownS->SetBinContent( bin, renScaleDownS->GetBinContent(bin)/nomS );
+       renScaleUpS->SetBinContent( bin, (nomS > 0) ? renScaleUpS->GetBinContent(bin)/nomS : 0 );
+       renScaleDownS->SetBinContent( bin, (nomS > 0) ? renScaleDownS->GetBinContent(bin)/nomS : 0 );
        //facRen
-       facRenScaleUpS->SetBinContent( bin, facRenScaleUpS->GetBinContent(bin)/nomS );
-       facRenScaleDownS->SetBinContent( bin, facRenScaleDownS->GetBinContent(bin)/nomS );
+       facRenScaleUpS->SetBinContent( bin, (nomS > 0) ? facRenScaleUpS->GetBinContent(bin)/nomS : 0 );
+       facRenScaleDownS->SetBinContent( bin, (nomS > 0) ? facRenScaleDownS->GetBinContent(bin)/nomS : 0 );
        //JES
-       JesUpS->SetBinContent( bin, JesUpS->GetBinContent( bin )/nomS );
-       JesDownS->SetBinContent( bin, JesDownS->GetBinContent( bin )/nomS );
+       JesUpS->SetBinContent( bin, (nomS > 0) ? JesUpS->GetBinContent( bin )/nomS : 0 );
+       JesDownS->SetBinContent( bin, (nomS > 0) ? JesDownS->GetBinContent( bin )/nomS : 0 );
 
        //btag
-       btagUpS->SetBinContent( bin, btagUpS->GetBinContent( bin )/nomS );
-       btagDownS->SetBinContent( bin, btagDownS->GetBinContent( bin )/nomS );
+       btagUpS->SetBinContent( bin, (nomS > 0) ? btagUpS->GetBinContent( bin )/nomS : 0 );
+       btagDownS->SetBinContent( bin, (nomS > 0) ? btagDownS->GetBinContent( bin )/nomS : 0 );
        //misstag
-       misstagUpS->SetBinContent( bin, misstagUpS->GetBinContent( bin )/nomS );
-       misstagDownS->SetBinContent( bin, misstagDownS->GetBinContent( bin )/nomS );
+       misstagUpS->SetBinContent( bin, (nomS > 0) ? misstagUpS->GetBinContent( bin )/nomS : 0 );
+       misstagDownS->SetBinContent( bin, (nomS > 0) ? misstagDownS->GetBinContent( bin )/nomS : 0 );
 
        outf << tmp[4] << "\t" << categoryMode << "\t" << tmp[0] << "\t" << tmp[2] << " \t" << tmp[1] << "\t" << tmp[3] << "\t"
 	    << nominal->GetBinContent( bin ) << "\t"
@@ -568,13 +568,22 @@ int main( int argc, char* argv[] )
        
        for( int ipdf = 0; ipdf < 60; ipdf++ )
 	 {
-	   if ( ipdf < 59 ) outf << pdfS[ipdf]->GetBinContent( bin )/nomS << "\t";
-	   else outf << pdfS[ipdf]->GetBinContent( bin )/nomS << "\n";
+	   if ( ipdf < 59 ) outf << ((nomS > 0) ? pdfS[ipdf]->GetBinContent( bin )/nomS : 0) << "\t";
+	   else outf << ((nomS > 0) ? pdfS[ipdf]->GetBinContent( bin )/nomS : 0) << "\t";
 	 }
       
        //Normalizing FastSIm
-       genMetS->SetBinContent( bin, genMetS->GetBinContent( bin )/nomS );
-       pileupS->SetBinContent( bin, pileupS->GetBinContent( bin )/nomS );
+       if ( (nomS > 0) ) {
+	 if (genMetS->GetBinContent( bin )/nomS < -1) {
+	   genMetS->SetBinContent( bin, -0.99);
+	 } else {
+	   genMetS->SetBinContent( bin, (nomS > 0) ? genMetS->GetBinContent( bin )/nomS : 0 );
+	 }
+       } else {
+	 genMetS->SetBinContent( bin, 0);
+       }
+
+       pileupS->SetBinContent( bin, (nomS > 0) ? pileupS->GetBinContent( bin )/nomS : 0 );
        if ( isEWKSUSYSignal ) 
 	 {
 	   outf << genMetS->GetBinContent( bin ) << "\t";
