@@ -53,7 +53,7 @@ done
 #echo INPUT FILE  = $inputfiledir
 #echo OUTFILE PREFIX = $outfile
 
-extra_tag=EWK_Combination_13May
+extra_tag=EWK_Combination_31May
 indir=TChiHH
 
 
