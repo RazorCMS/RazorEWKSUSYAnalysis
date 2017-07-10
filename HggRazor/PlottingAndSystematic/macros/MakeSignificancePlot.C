@@ -110,20 +110,37 @@ void MakeSignificancePlot( int option = 0) {
 
 
   TCanvas *cv = new TCanvas("cv","cv",800,600);
+  cv->SetBottomMargin(0.115);
   TH1F *hist = 0;
   if (option == 0) hist = new TH1F("hist",";Bin Number; Observed Significance;", 14, -0.5, 13.5);
   else if (option == 1) hist = new TH1F("hist",";Bin Number; Fitted Signal Yield / Uncertainty;", 19, -0.5, 18.5);
   // else if (option == 1) hist = new TH1F("hist",";Bin Number; Fitted N_{signal} / #sigma_{N_{signal}};", 19, -0.5, 18.5);
   
+  hist->GetXaxis()->SetBinLabel(1, "Bin 0");
+  hist->GetXaxis()->SetBinLabel(2, "Bin 1");
+  hist->GetXaxis()->SetBinLabel(3, "Bin 2");
+  hist->GetXaxis()->SetBinLabel(4, "Bin 3");
+  hist->GetXaxis()->SetBinLabel(5, "Bin 4");
+  hist->GetXaxis()->SetBinLabel(6, "Bin 5");
+  hist->GetXaxis()->SetBinLabel(7, "Bin 6");
+  hist->GetXaxis()->SetBinLabel(8, "Bin 7");
+  hist->GetXaxis()->SetBinLabel(9, "Bin 8");
+  hist->GetXaxis()->SetBinLabel(10, "Bin 9");
+  hist->GetXaxis()->SetBinLabel(11, "Bin 10");
+  hist->GetXaxis()->SetBinLabel(12, "Bin 11");
+  hist->GetXaxis()->SetBinLabel(13, "Bin 12");
+  hist->GetXaxis()->SetBinLabel(14, "Bin 13");
+  hist->GetXaxis()->LabelsOption("v");
   hist->SetStats(0);
   hist->SetMaximum(5);
-  hist->SetMinimum(-7);
+  hist->SetMinimum(-8.0);
   hist->GetYaxis()->SetTitleSize(0.05);
   hist->GetYaxis()->SetTitleOffset(0.85);
   hist->GetYaxis()->SetLabelSize(0.045);
+  hist->GetXaxis()->SetTitle("");
   hist->GetXaxis()->SetTitleSize(0.05);
   hist->GetXaxis()->SetTitleOffset(0.85);
-  hist->GetXaxis()->SetLabelSize(0.045);
+  hist->GetXaxis()->SetLabelSize(0.05);
   hist->Draw();
 
 
@@ -156,10 +173,10 @@ void MakeSignificancePlot( int option = 0) {
     l = new TLine(-0.48,0,18.5,0);
   }
 
-  TwoSigmaBand->SetFillColor(kGreen);
+  TwoSigmaBand->SetFillColor(kYellow);
   //box->SetFillStyle(3001);
   TwoSigmaBand->Draw("same");   
-  OneSigmaBand->SetFillColor(kYellow);
+  OneSigmaBand->SetFillColor(kGreen);
   //box->SetFillStyle(3001);
   OneSigmaBand->Draw("same");
   
@@ -168,6 +185,12 @@ void MakeSignificancePlot( int option = 0) {
   l->Draw();
 
   gr->Draw("P");
+  gPad->Update();
+  gPad->RedrawAxis();
+
+  TLine ll;
+  ll.DrawLine(gPad->GetUxmin(), gPad->GetUymax(), gPad->GetUxmax(), gPad->GetUymax());
+  ll.DrawLine(gPad->GetUxmax(), gPad->GetUymin(), gPad->GetUxmax(), gPad->GetUymax());
 
   TLatex *tex = new TLatex();
   tex->SetNDC();
@@ -189,20 +212,20 @@ void MakeSignificancePlot( int option = 0) {
   CMSLabel->Draw();
 
 
-  TLine *l1 = new TLine(7.5,-7,7.5,5);
+  TLine *l1 = new TLine(7.5,-8,7.5,5);
   l1->SetLineWidth(2);
   l1->SetLineStyle(2);
   l1->SetLineColor(kBlack);
   l1->Draw();
 
-  TLine *l2 = new TLine(8.5,-7,8.5,5);
+  TLine *l2 = new TLine(8.5,-8,8.5,5);
   l2->SetLineWidth(2);
   l2->SetLineStyle(2);
   l2->SetLineColor(kBlack);
   l2->Draw();
 
   if (option == 1) {
-    TLine *l3 = new TLine(13.5,-7,13.5,5);
+    TLine *l3 = new TLine(13.5,-8,13.5,5);
     l3->SetLineWidth(2);
     l3->SetLineStyle(2);
     l3->SetLineColor(kBlack);
@@ -215,7 +238,7 @@ void MakeSignificancePlot( int option = 0) {
   HighPtLabel->SetTextSize(0.035);
   HighPtLabel->SetTextFont(42);
   HighPtLabel->SetTextColor(kBlack);
-  HighPtLabel->DrawLatex(0.32,0.13,"#bf{HighPt Category}");
+  HighPtLabel->DrawLatex(0.34,0.13,"#bf{HighPt Category}");
   HighPtLabel->Draw();
 
   TLatex *HbbLabel = new TLatex();
@@ -224,8 +247,8 @@ void MakeSignificancePlot( int option = 0) {
   HbbLabel->SetTextSize(0.035);
   HbbLabel->SetTextFont(42);
   HbbLabel->SetTextColor(kBlack);
-  if (option == 0) HbbLabel->DrawLatex(0.59,0.13,"#bf{HZbb Category}");
-  else if (option ==1) HbbLabel->DrawLatex(0.465,0.13,"#bf{HZbb Category}");
+  if (option == 0) HbbLabel->DrawLatex(0.59,0.13,"#bf{H(#gamma#gamma)-Z(bb) Category}");
+  else if (option ==1) HbbLabel->DrawLatex(0.465,0.13,"#bf{H(#gamma#gamma)-Z(bb) Category}");
   HbbLabel->Draw();
 
   if (option == 0) {
@@ -235,8 +258,8 @@ void MakeSignificancePlot( int option = 0) {
     HighResLowResLabel->SetTextSize(0.035);
     HighResLowResLabel->SetTextFont(42);
     HighResLowResLabel->SetTextColor(kBlack);
-    HighResLowResLabel->DrawLatex(0.750,0.13,"#bf{HighRes/LowRes}");
-    HighResLowResLabel->DrawLatex(0.780,0.20,"#bf{Category}");
+    HighResLowResLabel->DrawLatex(0.730,0.13,"#bf{HighRes/LowRes}");
+    HighResLowResLabel->DrawLatex(0.760,0.20,"#bf{Category}");
     HighResLowResLabel->Draw();
   
   } else if (option == 1) {
