@@ -247,7 +247,7 @@ void MakeSignificancePlot( int option = 0) {
   HbbLabel->SetTextSize(0.035);
   HbbLabel->SetTextFont(42);
   HbbLabel->SetTextColor(kBlack);
-  if (option == 0) HbbLabel->DrawLatex(0.59,0.13,"#bf{H(#gamma#gamma)-Z(bb) Category}");
+  if (option == 0) HbbLabel->DrawLatex(0.59,0.13,"#bf{H(#gamma#gamma)-HZ(bb) Category}");
   else if (option ==1) HbbLabel->DrawLatex(0.465,0.13,"#bf{H(#gamma#gamma)-Z(bb) Category}");
   HbbLabel->Draw();
 
