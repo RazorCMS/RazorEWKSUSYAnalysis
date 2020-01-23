@@ -145,6 +145,7 @@ int main( int argc, char* argv[] )
     {
       ifs >> process >> process_file_name;
       if ( ifs.eof() ) break;
+      std::cout << "*****************************" << std::endl;
       std::cout << process << " " << process_file_name << std::endl;
       
       //------------------------------------------
@@ -157,8 +158,8 @@ int main( int argc, char* argv[] )
 	{
 	  ifs_process >> sub_process_file_name;
 	  if ( ifs_process.eof() ) break;
-	  std::cout << "*****************************" << std::endl;
 	  std::cout << sub_process_file_name << std::endl;
+	  std::cout << "*****************************" << std::endl;
 	  std::ifstream ifs_points( sub_process_file_name.c_str(), std::ifstream::in );
 	  assert(ifs_points);
 	  //variables
@@ -277,7 +278,7 @@ int main( int argc, char* argv[] )
   v_process.push_back("ST");
   v_process.push_back("VG");
   v_process.push_back("VV");
-  v_process.push_back("Wjets");
+  v_process.push_back("WJets");
   v_process.push_back("ZH");
   
   v_process.push_back("signal");
@@ -346,8 +347,9 @@ int main( int argc, char* argv[] )
 	}
       //std::cout << "map: " << key << " s: "  << signal << " bkg: " << bkg << std::endl;
       //double tmp_significance = signal[2]/sqrt(signal[2]+bkg[2]);
+      double tf_uncertainty = 0.80;
       double tmp_significance = signal[2]/(sqrt(bkg[2])+2.50);
-      if ( tmp_significance > significance  && bkg[2]> 0 && dy_tf_err[2]/dy_tf[2] < 0.95  && dy_tf[2] > 0.0 )
+      if ( tmp_significance > significance  && bkg[2]> 0 && dy_tf_err[2]/dy_tf[2] <= tf_uncertainty  && dy_tf[2] > 0.0 )
         {
           significance = tmp_significance;
 	  best_key = key;

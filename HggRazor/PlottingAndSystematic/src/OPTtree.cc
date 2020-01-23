@@ -30,12 +30,36 @@ void OPTtree::Loop()
 // METHOD2: replace line
 //    fChain->GetEntry(jentry);       //read all branches
 //by  b_branchname->GetEntry(ientry); //read only this branch
-   if (fChain == 0) return;
+   
 
+  
+  double MCSF = 1.0;
+  /*
+  if (year == "2016" && ( sample.Contains("TTJets") || sample.Contains("TTtoLL") ) ) MCSF *= 0.875996130969567; // apply TTJets SF 2016
+  if (year == "2017" && ( sample.Contains("TTJets") || sample.Contains("TTtoLL") ) ) MCSF *= 0.81560721955917; // apply TTJets SF 2017
+  if (year == "2018" && ( sample.Contains("TTJets") || sample.Contains("TTtoLL") ) ) MCSF *= 0.815111248; // apply TTJets SF 2018
+  //------------------------
+  //Z->ee/mumu SF
+  //------------------------
+  if (year == "2016" && (sample.Contains("DYJetsToLL") || sample.Contains("HToSSTobbbb")) ) MCSF *= 0.8789170;    // apply DY SF 2016
+  if (year == "2017" && (sample.Contains("DYJetsToLL") || sample.Contains("HToSSTobbbb")) ) MCSF *= 0.7388745;     // apply DY SF 2017
+  if (year == "2018" && (sample.Contains("DYJetsToLL") || sample.Contains("HToSSTobbbb")) ) MCSF *= 0.7341290;        // apply DY SF 2018
+  */
 
-   double ip_tagger   = 1.25;
+  //MCSF *= 0.875996130969567;
+  //MCSF *= 0.81560721955917;
+  //MCSF *= 0.815111248;
+
+  MCSF *= 0.8789170;
+  //MCSF *= 0.7388745;
+  //MCSF *= 0.7341290;
+  
+  if (fChain == 0) return;
+   
+  //80% sys TF
+  double ip_tagger   = 1.15;
    double ta_tagger   = -1.50;
-   double amax_tagger = 0.60;
+   double amax_tagger = 0.90;
    double zpt_cut     = 100.0;
    
    TH1F* ntags_high = new TH1F("ntags_high", "ntags_high", 3, -0.5, 2.5);
@@ -47,7 +71,8 @@ void OPTtree::Loop()
    TH1F* jet_pt_two_ntag_sublead  = new TH1F("jet_pt_one_ntag_sublead","jet_pt_one_ntag_sublead", 100, 0.0, 200.0);
    
    Long64_t nentries = fChain->GetEntriesFast();
-   
+
+   float NTAGS[] = {0.0,0.0,0.0};
    std::cout << nentries << std::endl;
    Long64_t nbytes = 0, nb = 0;
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
@@ -55,11 +80,12 @@ void OPTtree::Loop()
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
       int ntag = 0;
-      double weight = OPT_base_weight->at(0)*OPT_ele_weight->at(0)*OPT_PU_weight->at(0);
+      double weight = MCSF*OPT_base_weight->at(0)*OPT_ele_weight->at(0)*OPT_PU_weight->at(0);
       //std::cout << "OPT_ZPt: " << OPT_ZPt->size() << std::endl;
-      for( int i = 0; i < OPT_AODCaloJetMedianLog10IPSig->size(); i++ )
+      for( int i = 0; i < OPT_AODCaloJetMedianLog10TrackAngle->size(); i++ )
 	{
-	  if( OPT_AODCaloJetMedianLog10IPSig->at(i) > ip_tagger && OPT_AODCaloJetMedianLog10TrackAngle->at(i) > ta_tagger && OPT_AODCaloJetAlphaMax->at(i) < amax_tagger) 
+	  if( OPT_AODCaloJetMedianLog10IPSig->at(i) >= ip_tagger && OPT_AODCaloJetMedianLog10TrackAngle->at(i) >= ta_tagger && OPT_AODCaloJetAlphaMax->at(i) <= amax_tagger
+	      && OPT_AODCaloJetAlphaMax->at(i) >= 0.0 ) 
 	    {
 	      ntag++;
 	      jet_pt_one_ntag->Fill(OPT_AODCaloJetPt->at(i), weight);
@@ -69,8 +95,12 @@ void OPTtree::Loop()
       
       if( OPT_ZPt->at(0) >= zpt_cut ) ntags_high->Fill(ntag,weight);
       else ntags_low->Fill(ntag,weight);
+
+      if(ntag < 3 && OPT_ZPt->at(0) >= zpt_cut) NTAGS[ntag] += weight;
       // if (Cut(ientry) < 0) continue;
    }
+
+   std::cout << NTAGS[0] << " " << NTAGS[1] << " " << NTAGS[2] << std::endl;
    
    tf = (TH1F*)ntags_high->Clone("tf");
    tf->Divide(ntags_low);
